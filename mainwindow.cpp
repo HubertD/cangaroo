@@ -1,12 +1,12 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QStandardItemModel>
-#include <QStringList>
-#include <QStandardItem>
 #include <QTimer>
+#include <QThread>
 
 #include "views/CanMessageTraceViewModel.h"
-#include <iostream>
+#include "drivers/socketcan/SocketCanInterface.h"
+#include "drivers/socketcan/SocketCanInterfaceProvider.h"
+#include "drivers/CanListener.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    trace = new CanTrace(this, 500);
+    trace = new CanTrace(this, 100);
     appendMessages();
     appendMessages();
     appendMessages();
@@ -26,9 +26,28 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tree->setModel(model);
     ui->tree->setUniformRowHeights(true);
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(appendMessages()));
-    timer->start(5);
+    SocketCanInterfaceProvider prov;
+    prov.update();
+
+    qRegisterMetaType<CanMessage>("CanMessage");
+
+    CanInterfaceList interfaces = prov.getInterfaceList();
+    for (CanInterfaceList::iterator it=interfaces.begin(); it!=interfaces.end(); ++it) {
+        CanInterface *intf = *it;
+        intf->open();
+
+        QThread* thread = new QThread;
+        CanListener *listener = new CanListener(0, intf);
+        listener->moveToThread(thread);
+        connect(thread, SIGNAL(started()), listener, SLOT(run()));
+        connect(listener, SIGNAL(messageReceived(CanMessage)), trace, SLOT(enqueueMessage(CanMessage)));
+        thread->start();
+    }
+
+
+    //QTimer *timer = new QTimer(this);
+    //connect(timer, SIGNAL(timeout()), this, SLOT(appendMessages()));
+    //timer->start(5);
 
 }
 
@@ -44,6 +63,5 @@ void MainWindow::appendMessages()
     msg.setLength( 8 );
     msg.setData(0,1,2,3,4,5,6,7);
     trace->enqueueMessage(msg);
-    //model->addMessages(200);
     //ui->tree->scrollToBottom();
 }

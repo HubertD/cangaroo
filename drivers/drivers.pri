@@ -3,7 +3,8 @@ SOURCES += \
     $$PWD/CanInterfaceProvider.cpp \
     $$PWD/socketcan/libsocketcan/libsocketcan.c \
     $$PWD/socketcan/SocketCanInterface.cpp \
-    $$PWD/socketcan/SocketCanInterfaceProvider.cpp
+    $$PWD/socketcan/SocketCanInterfaceProvider.cpp \
+    $$PWD/CanListener.cpp
 
 HEADERS  += \
     $$PWD/CanInterface.h \
@@ -11,4 +12,5 @@ HEADERS  += \
     $$PWD/socketcan/libsocketcan/libsocketcan.h \
     $$PWD/socketcan/libsocketcan/can_netlink.h \
     $$PWD/socketcan/SocketCanInterface.h \
-    $$PWD/socketcan/SocketCanInterfaceProvider.h
+    $$PWD/socketcan/SocketCanInterfaceProvider.h \
+    $$PWD/CanListener.h
