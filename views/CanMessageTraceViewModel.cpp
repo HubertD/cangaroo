@@ -9,29 +9,6 @@ CanMessageTraceViewModel::CanMessageTraceViewModel(CanTrace *trace)
     connect(_trace, SIGNAL(afterAppend(int)), this, SLOT(afterAppend(int)));
 }
 
-/*
-void CanMessageTraceViewModel::addMessages(int num)
-{
-    beginInsertRows(QModelIndex(), _msgs.size(), _msgs.size()+num-1);
-    for (int i=0; i<num; i++) {
-        CanMessage *msg = new CanMessage();
-        msg->setId(i);
-        msg->setExtended(true);
-        msg->setLength( i % 9 );
-        msg->setByte(0, (i>>24)&0xFF);
-        msg->setByte(1, (i>>16)&0xFF);
-        msg->setByte(2, (i>> 8)&0xFF);
-        msg->setByte(3, (i>> 0)&0xFF);
-        msg->setByte(4, (i>>24)&0xFF);
-        msg->setByte(5, (i>>16)&0xFF);
-        msg->setByte(6, (i>> 8)&0xFF);
-        msg->setByte(7, (i>> 0)&0xFF);
-        _msgs.push_back(msg);
-    }
-    endInsertRows();
-}
-*/
-
 QModelIndex CanMessageTraceViewModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid() && parent.internalId()) {
@@ -58,7 +35,12 @@ int CanMessageTraceViewModel::rowCount(const QModelIndex &parent) const
         if (id & 0x80000000) { // node of a message
             return 0;
         } else { // a message
-            return _trace->getMessage(id-1)->getLength();
+            const CanMessage *msg = _trace->getMessage(id-1);
+            if (msg) {
+                return msg->getLength();
+            } else {
+                return 0;
+            }
         }
     } else {
         return _trace->size();
@@ -145,20 +127,21 @@ QVariant CanMessageTraceViewModel::data_DisplayRole(const QModelIndex &index, in
     if (id & 0x80000000) {
         switch (index.column()) {
             case 3: return QString().sprintf("row %d", index.row());
-            case 5: return QString().sprintf("id 0x%08X", index.parent().internalId());
-            case 6: return QString().sprintf("id 0x%08X", index.internalId());
+            case 5: return QString().sprintf("id 0x%08X", (uint32_t)index.parent().internalId());
+            case 6: return QString().sprintf("id 0x%08X", (uint32_t)index.internalId());
         }
 
-    } else {
+    } else if (id) {
         const CanMessage *msg = _trace->getMessage(id-1);
-        switch (index.column()) {
-            case 0: return QString().sprintf("%.04f", ((double)index.row()) / 100);
-            case 1: return "vcan0";
-            case 2: return (msg->getId() % 7)==0 ? "tx" : "rx";
-            case 3: return QString().sprintf("0x%08X", msg->getId());
-            case 5: return msg->getLength();
-            case 6: return can_data_as_hex(msg);
-            //case 6: return QString().sprintf("id 0x%08X", index.internalId());
+        if (msg) {
+            switch (index.column()) {
+                case 0: return QString().sprintf("%.04f", ((double)index.row()) / 100);
+                case 1: return "vcan0";
+                case 2: return (msg->getId() % 7)==0 ? "tx" : "rx";
+                case 3: return QString().sprintf("0x%08X", msg->getId());
+                case 5: return msg->getLength();
+                case 6: return can_data_as_hex(msg);
+            }
         }
     }
 

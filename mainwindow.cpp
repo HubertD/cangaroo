@@ -15,12 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     trace = new CanTrace(this, 100);
-    appendMessages();
-    appendMessages();
-    appendMessages();
-    appendMessages();
-    appendMessages();
-    trace->flushQueue();
 
     model = new CanMessageTraceViewModel(trace);
     ui->tree->setModel(model);
