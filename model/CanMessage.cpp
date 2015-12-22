@@ -23,7 +23,12 @@ CanMessage::CanMessage()
 CanMessage::CanMessage(uint32_t can_id)
   : _dlc(0), _u64(0)
 {
-	setId(can_id);
+    setId(can_id);
+}
+
+CanMessage::CanMessage(const CanMessage &msg)
+  : _raw_id(msg._raw_id), _dlc(msg._dlc), _u64(msg._u64)
+{
 }
 
 

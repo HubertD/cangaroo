@@ -2,11 +2,14 @@
 #include <iostream>
 #include <stddef.h>
 
-CanMessageTraceViewModel::CanMessageTraceViewModel()
+CanMessageTraceViewModel::CanMessageTraceViewModel(CanTrace *trace)
+  : _trace(trace)
 {
-    addMessages(100);
+    connect(_trace, SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
+    connect(_trace, SIGNAL(afterAppend(int)), this, SLOT(afterAppend(int)));
 }
 
+/*
 void CanMessageTraceViewModel::addMessages(int num)
 {
     beginInsertRows(QModelIndex(), _msgs.size(), _msgs.size()+num-1);
@@ -27,6 +30,7 @@ void CanMessageTraceViewModel::addMessages(int num)
     }
     endInsertRows();
 }
+*/
 
 QModelIndex CanMessageTraceViewModel::index(int row, int column, const QModelIndex &parent) const
 {
@@ -54,10 +58,10 @@ int CanMessageTraceViewModel::rowCount(const QModelIndex &parent) const
         if (id & 0x80000000) { // node of a message
             return 0;
         } else { // a message
-            return _msgs[id-1]->getLength();
+            return _trace->getMessage(id-1)->getLength();
         }
     } else {
-        return _msgs.size();
+        return _trace->size();
     }
 }
 
@@ -74,7 +78,7 @@ bool CanMessageTraceViewModel::hasChildren(const QModelIndex &parent) const
         if (id & 0x80000000) {
             return false;
         } else {
-            return _msgs[id-1]->getLength()>0;
+            return _trace->getMessage(id-1)->getLength()>0;
         }
     } else {
         return !parent.isValid();
@@ -109,6 +113,17 @@ QVariant CanMessageTraceViewModel::headerData(int section, Qt::Orientation orien
     return QVariant();
 }
 
+void CanMessageTraceViewModel::beforeAppend(int num_messages)
+{
+    beginInsertRows(QModelIndex(), _trace->size(), _trace->size()+num_messages-1);
+}
+
+void CanMessageTraceViewModel::afterAppend(int num_messages)
+{
+    (void) num_messages;
+    endInsertRows();
+}
+
 QVariant CanMessageTraceViewModel::data(const QModelIndex &index, int role) const
 {
     switch (role) {
@@ -135,7 +150,7 @@ QVariant CanMessageTraceViewModel::data_DisplayRole(const QModelIndex &index, in
         }
 
     } else {
-        CanMessage *msg = _msgs[id-1];
+        const CanMessage *msg = _trace->getMessage(id-1);
         switch (index.column()) {
             case 0: return QString().sprintf("%.04f", ((double)index.row()) / 100);
             case 1: return "vcan0";
@@ -165,7 +180,7 @@ QVariant CanMessageTraceViewModel::data_TextAlignmentRole(const QModelIndex &ind
     }
 }
 
-QString CanMessageTraceViewModel::can_data_as_hex(CanMessage *msg) const
+QString CanMessageTraceViewModel::can_data_as_hex(const CanMessage *msg) const
 {
     switch (msg->getLength()) {
         case 0: return "";

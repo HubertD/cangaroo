@@ -14,13 +14,21 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    model = new CanMessageTraceViewModel();
+    trace = new CanTrace(this, 500);
+    appendMessages();
+    appendMessages();
+    appendMessages();
+    appendMessages();
+    appendMessages();
+    trace->flushQueue();
+
+    model = new CanMessageTraceViewModel(trace);
     ui->tree->setModel(model);
     ui->tree->setUniformRowHeights(true);
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(appendMessages()));
-    timer->start(200);
+    timer->start(5);
 
 }
 
@@ -31,6 +39,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::appendMessages()
 {
-    model->addMessages(200);
+    CanMessage msg(0x123);
+    msg.setExtended(true);
+    msg.setLength( 8 );
+    msg.setData(0,1,2,3,4,5,6,7);
+    trace->enqueueMessage(msg);
+    //model->addMessages(200);
     //ui->tree->scrollToBottom();
 }

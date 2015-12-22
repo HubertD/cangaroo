@@ -2,30 +2,30 @@
 #define CANMESSAGEMODEL_H
 
 #include <QAbstractItemModel>
-#include "../model/CanMessage.h"
-
-typedef std::vector<CanMessage*> CanMessageVector;
-
+#include "../model/CanTrace.h"
 
 class CanMessageTraceViewModel : public QAbstractItemModel
 {
     Q_OBJECT
 
 public:
-    CanMessageTraceViewModel();
+    CanMessageTraceViewModel(CanTrace *trace);
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
     virtual QModelIndex parent(const QModelIndex &child) const;
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
-    bool hasChildren(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    virtual int rowCount(const QModelIndex &parent) const;
+    virtual int columnCount(const QModelIndex &parent) const;
+    virtual bool hasChildren(const QModelIndex &parent) const;
+    virtual QVariant data(const QModelIndex &index, int role) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
-    void addMessages(int num);
+public slots:
+    void beforeAppend(int num_messages);
+    void afterAppend(int num_messages);
+
 private:
-    CanMessageVector _msgs;
-    QString can_data_as_hex(CanMessage *msg) const;
+    CanTrace *_trace;
+    QString can_data_as_hex(const CanMessage *msg) const;
     QVariant data_DisplayRole(const QModelIndex &index, int role) const;
     QVariant data_TextAlignmentRole(const QModelIndex &index, int role) const;
 };

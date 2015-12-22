@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTreeView>
 #include <vector>
+#include <model/CanTrace.h>
 #include "views/CanMessageTraceViewModel.h"
 
 namespace Ui {
@@ -23,6 +24,7 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
+    CanTrace *trace;
     CanMessageTraceViewModel *model;
 };
 
