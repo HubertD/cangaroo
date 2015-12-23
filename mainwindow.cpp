@@ -4,6 +4,8 @@
 #include <QThread>
 
 #include "views/LinearTraceViewModel.h"
+#include "views/AggregatedTraceViewModel.h"
+
 #include "drivers/socketcan/SocketCanInterface.h"
 #include "drivers/socketcan/SocketCanInterfaceProvider.h"
 #include "drivers/CanListener.h"
@@ -16,8 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     trace = new CanTrace(this, 100);
 
-    model = new LinearTraceViewModel(trace);
-    ui->tree->setModel(model);
+    //model = new LinearTraceViewModel(trace);
+    ui->tree->setModel(new AggregatedTraceViewModel(trace));
     ui->tree->setUniformRowHeights(true);
 
     SocketCanInterfaceProvider prov;

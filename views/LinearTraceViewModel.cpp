@@ -50,7 +50,7 @@ int LinearTraceViewModel::rowCount(const QModelIndex &parent) const
 int LinearTraceViewModel::columnCount(const QModelIndex &parent) const
 {
     (void) parent;
-    return 7;
+    return column_count;
 }
 
 bool LinearTraceViewModel::hasChildren(const QModelIndex &parent) const
