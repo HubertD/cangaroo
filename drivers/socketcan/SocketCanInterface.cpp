@@ -64,7 +64,7 @@ void SocketCanInterface::open() {
 	}
 
 	struct ifreq ifr;
-	struct sockaddr_can addr;
+    struct sockaddr_can addr;
 	strcpy(ifr.ifr_name, _name.c_str());
 	ioctl(_fd, SIOCGIFINDEX, &ifr);
 

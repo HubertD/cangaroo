@@ -1,6 +1,6 @@
-SOURCES += \  
-    $$PWD/CanMessageTraceViewModel.cpp
+SOURCES += \    
+    $$PWD/LinearTraceViewModel.cpp
 
 HEADERS  += \
-    $$PWD/CanMessageTraceViewModel.h
+    $$PWD/LinearTraceViewModel.h
 

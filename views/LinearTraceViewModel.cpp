@@ -1,15 +1,15 @@
-#include "CanMessageTraceViewModel.h"
+#include "LinearTraceViewModel.h"
 #include <iostream>
 #include <stddef.h>
 
-CanMessageTraceViewModel::CanMessageTraceViewModel(CanTrace *trace)
+LinearTraceViewModel::LinearTraceViewModel(CanTrace *trace)
   : _trace(trace)
 {
     connect(_trace, SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
     connect(_trace, SIGNAL(afterAppend(int)), this, SLOT(afterAppend(int)));
 }
 
-QModelIndex CanMessageTraceViewModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex LinearTraceViewModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid() && parent.internalId()) {
         return createIndex(row, column, 0x80000000 | parent.internalId());
@@ -18,7 +18,7 @@ QModelIndex CanMessageTraceViewModel::index(int row, int column, const QModelInd
     }
 }
 
-QModelIndex CanMessageTraceViewModel::parent(const QModelIndex &child) const
+QModelIndex LinearTraceViewModel::parent(const QModelIndex &child) const
 {
     (void) child;
     quintptr id = child.internalId();
@@ -28,7 +28,7 @@ QModelIndex CanMessageTraceViewModel::parent(const QModelIndex &child) const
     return QModelIndex();
 }
 
-int CanMessageTraceViewModel::rowCount(const QModelIndex &parent) const
+int LinearTraceViewModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid()) {
         quintptr id = parent.internalId();
@@ -47,13 +47,13 @@ int CanMessageTraceViewModel::rowCount(const QModelIndex &parent) const
     }
 }
 
-int CanMessageTraceViewModel::columnCount(const QModelIndex &parent) const
+int LinearTraceViewModel::columnCount(const QModelIndex &parent) const
 {
     (void) parent;
     return 7;
 }
 
-bool CanMessageTraceViewModel::hasChildren(const QModelIndex &parent) const
+bool LinearTraceViewModel::hasChildren(const QModelIndex &parent) const
 {
     quintptr id = parent.internalId();
     if (id) {
@@ -68,7 +68,7 @@ bool CanMessageTraceViewModel::hasChildren(const QModelIndex &parent) const
 }
 
 
-QVariant CanMessageTraceViewModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant LinearTraceViewModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole) {
 
@@ -95,18 +95,18 @@ QVariant CanMessageTraceViewModel::headerData(int section, Qt::Orientation orien
     return QVariant();
 }
 
-void CanMessageTraceViewModel::beforeAppend(int num_messages)
+void LinearTraceViewModel::beforeAppend(int num_messages)
 {
     beginInsertRows(QModelIndex(), _trace->size(), _trace->size()+num_messages-1);
 }
 
-void CanMessageTraceViewModel::afterAppend(int num_messages)
+void LinearTraceViewModel::afterAppend(int num_messages)
 {
     (void) num_messages;
     endInsertRows();
 }
 
-QVariant CanMessageTraceViewModel::data(const QModelIndex &index, int role) const
+QVariant LinearTraceViewModel::data(const QModelIndex &index, int role) const
 {
     switch (role) {
         case Qt::DisplayRole:
@@ -118,7 +118,7 @@ QVariant CanMessageTraceViewModel::data(const QModelIndex &index, int role) cons
     }
 }
 
-QVariant CanMessageTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
+QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
     (void) role;
 
@@ -149,7 +149,7 @@ QVariant CanMessageTraceViewModel::data_DisplayRole(const QModelIndex &index, in
     return QVariant();
 }
 
-QVariant CanMessageTraceViewModel::data_TextAlignmentRole(const QModelIndex &index, int role) const
+QVariant LinearTraceViewModel::data_TextAlignmentRole(const QModelIndex &index, int role) const
 {
     (void) role;
     switch (index.column()) {
@@ -164,7 +164,7 @@ QVariant CanMessageTraceViewModel::data_TextAlignmentRole(const QModelIndex &ind
     }
 }
 
-QString CanMessageTraceViewModel::can_data_as_hex(const CanMessage *msg) const
+QString LinearTraceViewModel::can_data_as_hex(const CanMessage *msg) const
 {
     switch (msg->getLength()) {
         case 0: return "";

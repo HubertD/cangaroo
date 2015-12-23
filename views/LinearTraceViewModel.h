@@ -1,15 +1,15 @@
-#ifndef CANMESSAGEMODEL_H
-#define CANMESSAGEMODEL_H
+#ifndef LINEARTRACEVIEWMODEL_H
+#define LINEARTRACEVIEWMODEL_H
 
 #include <QAbstractItemModel>
 #include "../model/CanTrace.h"
 
-class CanMessageTraceViewModel : public QAbstractItemModel
+class LinearTraceViewModel : public QAbstractItemModel
 {
     Q_OBJECT
 
 public:
-    CanMessageTraceViewModel(CanTrace *trace);
+    LinearTraceViewModel(CanTrace *trace);
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
     virtual QModelIndex parent(const QModelIndex &child) const;
@@ -30,4 +30,4 @@ private:
     QVariant data_TextAlignmentRole(const QModelIndex &index, int role) const;
 };
 
-#endif // CANMESSAGEMODEL_H
+#endif // LINEARTRACEVIEWMODEL_H

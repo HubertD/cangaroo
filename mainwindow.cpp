@@ -3,7 +3,7 @@
 #include <QTimer>
 #include <QThread>
 
-#include "views/CanMessageTraceViewModel.h"
+#include "views/LinearTraceViewModel.h"
 #include "drivers/socketcan/SocketCanInterface.h"
 #include "drivers/socketcan/SocketCanInterfaceProvider.h"
 #include "drivers/CanListener.h"
@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     trace = new CanTrace(this, 100);
 
-    model = new CanMessageTraceViewModel(trace);
+    model = new LinearTraceViewModel(trace);
     ui->tree->setModel(model);
     ui->tree->setUniformRowHeights(true);
 
