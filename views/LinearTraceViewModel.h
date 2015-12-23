@@ -9,6 +9,17 @@ class LinearTraceViewModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
+    enum {
+        column_timestamp,
+        column_channel,
+        column_direction,
+        column_canid,
+        column_name,
+        column_dlc,
+        column_data
+    };
+
+public:
     LinearTraceViewModel(CanTrace *trace);
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;

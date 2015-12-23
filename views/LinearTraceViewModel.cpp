@@ -74,19 +74,19 @@ QVariant LinearTraceViewModel::headerData(int section, Qt::Orientation orientati
 
         if (orientation == Qt::Horizontal) {
             switch (section) {
-                case 0:
+                case column_timestamp:
                     return QString("Timestamp");
-                case 1:
+                case column_channel:
                     return QString("Channel");
-                case 2:
+                case column_direction:
                     return QString("Rx/Tx");
-                case 3:
+                case column_canid:
                     return QString("CAN ID");
-                case 4:
+                case column_name:
                     return QString("Name");
-                case 5:
+                case column_dlc:
                     return QString("DLC");
-                case 6:
+                case column_data:
                     return QString("Data");
             }
         }
@@ -126,9 +126,9 @@ QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int ro
 
     if (id & 0x80000000) {
         switch (index.column()) {
-            case 3: return QString().sprintf("row %d", index.row());
-            case 5: return QString().sprintf("id 0x%08X", (uint32_t)index.parent().internalId());
-            case 6: return QString().sprintf("id 0x%08X", (uint32_t)index.internalId());
+            case column_canid: return QString().sprintf("row %d", index.row());
+            case column_dlc: return QString().sprintf("id 0x%08X", (uint32_t)index.parent().internalId());
+            case column_data: return QString().sprintf("id 0x%08X", (uint32_t)index.internalId());
         }
 
     } else if (id) {
@@ -136,12 +136,12 @@ QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int ro
         if (msg) {
             struct timeval tv = msg->getTimestamp();
             switch (index.column()) {
-                case 0: return QString().sprintf("%.04f", ((double)tv.tv_sec + ((double)tv.tv_usec/1000000)));
-                case 1: return msg->getInterfaceId();
-                case 2: return (msg->getId() % 7)==0 ? "tx" : "rx";
-                case 3: return QString().sprintf("0x%08X", msg->getId());
-                case 5: return msg->getLength();
-                case 6: return can_data_as_hex(msg);
+                case column_timestamp: return QString().sprintf("%.04f", ((double)tv.tv_sec + ((double)tv.tv_usec/1000000)));
+                case column_channel: return msg->getInterfaceId();
+                case column_direction: return (msg->getId() % 7)==0 ? "tx" : "rx";
+                case column_canid: return QString().sprintf("0x%08X", msg->getId());
+                case column_dlc: return msg->getLength();
+                case column_data: return can_data_as_hex(msg);
             }
         }
     }
@@ -153,13 +153,13 @@ QVariant LinearTraceViewModel::data_TextAlignmentRole(const QModelIndex &index, 
 {
     (void) role;
     switch (index.column()) {
-        case 0: return Qt::AlignRight + Qt::AlignVCenter;
-        case 1: return Qt::AlignCenter + Qt::AlignVCenter;
-        case 2: return Qt::AlignCenter + Qt::AlignVCenter;
-        case 3: return Qt::AlignRight + Qt::AlignVCenter;
-        case 4: return Qt::AlignLeft + Qt::AlignVCenter;
-        case 5: return Qt::AlignCenter + Qt::AlignVCenter;
-        case 6: return Qt::AlignLeft + Qt::AlignVCenter;
+        case column_timestamp: return Qt::AlignRight + Qt::AlignVCenter;
+        case column_channel: return Qt::AlignCenter + Qt::AlignVCenter;
+        case column_direction: return Qt::AlignCenter + Qt::AlignVCenter;
+        case column_canid: return Qt::AlignRight + Qt::AlignVCenter;
+        case column_name: return Qt::AlignLeft + Qt::AlignVCenter;
+        case column_dlc: return Qt::AlignCenter + Qt::AlignVCenter;
+        case column_data: return Qt::AlignLeft + Qt::AlignVCenter;
        default: return QVariant();
     }
 }
