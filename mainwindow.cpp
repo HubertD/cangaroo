@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
         CanListener *listener = new CanListener(0, intf);
         listener->moveToThread(thread);
         connect(thread, SIGNAL(started()), listener, SLOT(run()));
-        connect(listener, SIGNAL(messageReceived(int, CanMessage)), trace, SLOT(enqueueMessage(int, CanMessage)));
+        connect(listener, SIGNAL(messageReceived(CanMessage)), trace, SLOT(enqueueMessage(CanMessage)));
         thread->start();
     }
 }

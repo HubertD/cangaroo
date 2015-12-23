@@ -17,6 +17,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
@@ -110,7 +111,12 @@ void SocketCanInterface::sendMessage(const CanMessage msg) {
 CanMessage SocketCanInterface::readMessage() {
 	struct can_frame frame;
 	::read(_fd, &frame, sizeof(struct can_frame));
+
+    struct timeval tv;
+    ioctl(_fd, SIOCGSTAMP, &tv);
+
 	CanMessage result(frame.can_id);
+    result.setTimestamp(tv);
 
 	if (frame.can_id & CAN_EFF_FLAG) {
 		result.setExtended(true);

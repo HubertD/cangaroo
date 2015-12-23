@@ -37,7 +37,7 @@ const CanMessage *CanTrace::getMessage(unsigned long idx)
     }
 }
 
-void CanTrace::enqueueMessage(int interface_id, const CanMessage &msg, bool more_to_follow)
+void CanTrace::enqueueMessage(const CanMessage &msg, bool more_to_follow)
 {
     _queueMutex.lock();
     _queue.push_back(new CanMessage(msg));

@@ -134,8 +134,9 @@ QVariant CanMessageTraceViewModel::data_DisplayRole(const QModelIndex &index, in
     } else if (id) {
         const CanMessage *msg = _trace->getMessage(id-1);
         if (msg) {
+            struct timeval tv = msg->getTimestamp();
             switch (index.column()) {
-                case 0: return QString().sprintf("%.04f", ((double)index.row()) / 100);
+                case 0: return QString().sprintf("%.04f", ((double)tv.tv_sec + ((double)tv.tv_usec/1000000)));
                 case 1: return msg->getInterfaceId();
                 case 2: return (msg->getId() % 7)==0 ? "tx" : "rx";
                 case 3: return QString().sprintf("0x%08X", msg->getId());

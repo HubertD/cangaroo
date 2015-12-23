@@ -27,7 +27,7 @@ CanMessage::CanMessage(uint32_t can_id)
 }
 
 CanMessage::CanMessage(const CanMessage &msg)
-  : _raw_id(msg._raw_id), _interface_id(msg._interface_id), _dlc(msg._dlc), _u64(msg._u64)
+  : _raw_id(msg._raw_id), _interface_id(msg._interface_id), _dlc(msg._dlc), _u64(msg._u64), _timestamp(msg._timestamp)
 {
 }
 
@@ -201,5 +201,15 @@ void CanMessage::setData(const uint8_t d0, const uint8_t d1, const uint8_t d2,
 	_u8[4] = d4;
 	_u8[5] = d5;
 	_u8[6] = d6;
-	_u8[7] = d7;
+    _u8[7] = d7;
+}
+
+timeval CanMessage::getTimestamp() const
+{
+    return _timestamp;
+}
+
+void CanMessage::setTimestamp(const timeval timestamp)
+{
+    _timestamp = timestamp;
 }

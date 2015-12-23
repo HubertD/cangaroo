@@ -14,7 +14,7 @@ void CanListener::run()
 {
     while (true) {
         CanMessage msg = _intf->readMessage();
-        emit messageReceived(_intf->getId(), msg);
+        emit messageReceived(msg);
     }
 
 }

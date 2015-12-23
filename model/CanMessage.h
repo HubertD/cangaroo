@@ -8,6 +8,7 @@
 #ifndef BASE_CANMESSAGE_H_
 #define BASE_CANMESSAGE_H_
 #include <stdint.h>
+#include <sys/time.h>
 
 class CanMessage {
 public:
@@ -48,6 +49,9 @@ public:
 	void setData(const uint8_t d0, const uint8_t d1, const uint8_t d2, const uint8_t d3, const uint8_t d4, const uint8_t d5, const uint8_t d6);
 	void setData(const uint8_t d0, const uint8_t d1, const uint8_t d2, const uint8_t d3, const uint8_t d4, const uint8_t d5, const uint8_t d6, const uint8_t d7);
 
+    struct timeval getTimestamp() const;
+    void setTimestamp(const struct timeval timestamp);
+
 private:
 	uint32_t _raw_id;
     uint16_t _interface_id;
@@ -58,6 +62,7 @@ private:
 		uint32_t _u32[2];
 		uint64_t _u64;
 	};
+    struct timeval _timestamp;
 
 };
 

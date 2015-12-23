@@ -29,7 +29,7 @@ signals:
     void afterClear();
 
 public slots:
-    void enqueueMessage(int interface_id, const CanMessage &msg, bool more_to_follow=false);
+    void enqueueMessage(const CanMessage &msg, bool more_to_follow=false);
     void flushQueue();
 
 private:
