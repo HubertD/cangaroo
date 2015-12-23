@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <sys/time.h>
 
+#include <QString>
+
 class CanMessage {
 public:
 	CanMessage();
@@ -51,6 +53,8 @@ public:
 
     struct timeval getTimestamp() const;
     void setTimestamp(const struct timeval timestamp);
+
+    QString getDataHexString() const;
 
 private:
 	uint32_t _raw_id;

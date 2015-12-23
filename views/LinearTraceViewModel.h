@@ -36,7 +36,6 @@ public slots:
 
 private:
     CanTrace *_trace;
-    QString can_data_as_hex(const CanMessage *msg) const;
     QVariant data_DisplayRole(const QModelIndex &index, int role) const;
     QVariant data_TextAlignmentRole(const QModelIndex &index, int role) const;
 };

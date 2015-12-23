@@ -213,3 +213,20 @@ void CanMessage::setTimestamp(const timeval timestamp)
 {
     _timestamp = timestamp;
 }
+
+QString CanMessage::getDataHexString() const
+{
+    switch (getLength()) {
+        case 0: return "";
+        case 1: return QString().sprintf("%02X", getByte(0));
+        case 2: return QString().sprintf("%02X %02X", getByte(0), getByte(1));
+        case 3: return QString().sprintf("%02X %02X %02X", getByte(0), getByte(1), getByte(2));
+        case 4: return QString().sprintf("%02X %02X %02X %02X", getByte(0), getByte(1), getByte(2), getByte(3));
+        case 5: return QString().sprintf("%02X %02X %02X %02X %02X", getByte(0), getByte(1), getByte(2), getByte(3), getByte(4));
+        case 6: return QString().sprintf("%02X %02X %02X %02X %02X %02X", getByte(0), getByte(1), getByte(2), getByte(3), getByte(4), getByte(5));
+        case 7: return QString().sprintf("%02X %02X %02X %02X %02X %02X %02X", getByte(0), getByte(1), getByte(2), getByte(3), getByte(4), getByte(5), getByte(6));
+        case 8: return QString().sprintf("%02X %02X %02X %02X %02X %02X %02X %02X", getByte(0), getByte(1), getByte(2), getByte(3), getByte(4), getByte(5), getByte(6), getByte(7));
+        default: return QString();
+    }
+
+}

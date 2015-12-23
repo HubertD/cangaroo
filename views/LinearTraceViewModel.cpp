@@ -141,7 +141,7 @@ QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int ro
                 case column_direction: return (msg->getId() % 7)==0 ? "tx" : "rx";
                 case column_canid: return QString().sprintf("0x%08X", msg->getId());
                 case column_dlc: return msg->getLength();
-                case column_data: return can_data_as_hex(msg);
+                case column_data: return msg->getDataHexString();
             }
         }
     }
@@ -163,20 +163,3 @@ QVariant LinearTraceViewModel::data_TextAlignmentRole(const QModelIndex &index, 
        default: return QVariant();
     }
 }
-
-QString LinearTraceViewModel::can_data_as_hex(const CanMessage *msg) const
-{
-    switch (msg->getLength()) {
-        case 0: return "";
-        case 1: return QString().sprintf("%02X", msg->getByte(0));
-        case 2: return QString().sprintf("%02X %02X", msg->getByte(0), msg->getByte(1));
-        case 3: return QString().sprintf("%02X %02X %02X", msg->getByte(0), msg->getByte(1), msg->getByte(2));
-        case 4: return QString().sprintf("%02X %02X %02X %02X", msg->getByte(0), msg->getByte(1), msg->getByte(2), msg->getByte(3));
-        case 5: return QString().sprintf("%02X %02X %02X %02X %02X", msg->getByte(0), msg->getByte(1), msg->getByte(2), msg->getByte(3), msg->getByte(4));
-        case 6: return QString().sprintf("%02X %02X %02X %02X %02X %02X", msg->getByte(0), msg->getByte(1), msg->getByte(2), msg->getByte(3), msg->getByte(4), msg->getByte(5));
-        case 7: return QString().sprintf("%02X %02X %02X %02X %02X %02X %02X", msg->getByte(0), msg->getByte(1), msg->getByte(2), msg->getByte(3), msg->getByte(4), msg->getByte(5), msg->getByte(6));
-        case 8: return QString().sprintf("%02X %02X %02X %02X %02X %02X %02X %02X", msg->getByte(0), msg->getByte(1), msg->getByte(2), msg->getByte(3), msg->getByte(4), msg->getByte(5), msg->getByte(6), msg->getByte(7));
-        default: return QString();
-    }
-}
-
