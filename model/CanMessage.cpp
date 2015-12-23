@@ -27,7 +27,7 @@ CanMessage::CanMessage(uint32_t can_id)
 }
 
 CanMessage::CanMessage(const CanMessage &msg)
-  : _raw_id(msg._raw_id), _dlc(msg._dlc), _u64(msg._u64)
+  : _raw_id(msg._raw_id), _interface_id(msg._interface_id), _dlc(msg._dlc), _u64(msg._u64)
 {
 }
 
@@ -89,7 +89,17 @@ void CanMessage::setErrorFrame(const bool isErrorFrame) {
 		_raw_id |= id_flag_error;
 	} else {
 		_raw_id &= ~id_flag_error;
-	}
+    }
+}
+
+uint16_t CanMessage::getInterfaceId() const
+{
+    return _interface_id;
+}
+
+void CanMessage::setInterfaceId(const uint16_t interface_id)
+{
+    _interface_id = interface_id;
 }
 
 

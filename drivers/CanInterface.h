@@ -9,6 +9,7 @@
 #define BASE_CANINTERFACE_H_
 
 #include <string>
+#include <stdint.h>
 
 using namespace std;
 
@@ -31,7 +32,11 @@ public:
 	virtual void sendMessage(const CanMessage msg) = 0;
 	virtual CanMessage readMessage() = 0;
 
+    uint16_t getId();
+    void setId(uint16_t id);
+
 private:
+    uint16_t _id;
 	CanInterfaceProvider *_provider;
 };
 

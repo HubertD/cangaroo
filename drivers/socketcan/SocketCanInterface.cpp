@@ -124,6 +124,8 @@ CanMessage SocketCanInterface::readMessage() {
 		result.setErrorFrame(true);
 	}
 
+    result.setInterfaceId(getId());
+
 	uint8_t len = frame.can_dlc;
 	if (len>8) { len = 8; }
 

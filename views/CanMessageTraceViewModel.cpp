@@ -136,7 +136,7 @@ QVariant CanMessageTraceViewModel::data_DisplayRole(const QModelIndex &index, in
         if (msg) {
             switch (index.column()) {
                 case 0: return QString().sprintf("%.04f", ((double)index.row()) / 100);
-                case 1: return "vcan0";
+                case 1: return msg->getInterfaceId();
                 case 2: return (msg->getId() % 7)==0 ? "tx" : "rx";
                 case 3: return QString().sprintf("0x%08X", msg->getId());
                 case 5: return msg->getLength();

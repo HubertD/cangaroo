@@ -8,6 +8,8 @@
 #include "CanMessage.h"
 #include <vector>
 
+class CanInterface;
+
 class CanTrace : public QObject
 {
     Q_OBJECT
@@ -27,7 +29,7 @@ signals:
     void afterClear();
 
 public slots:
-    void enqueueMessage(const CanMessage &msg, bool more_to_follow=false);
+    void enqueueMessage(int interface_id, const CanMessage &msg, bool more_to_follow=false);
     void flushQueue();
 
 private:

@@ -20,7 +20,6 @@ public:
     ~MainWindow();
 
 public slots:
-    void appendMessages();
 
 private:
     Ui::MainWindow *ui;

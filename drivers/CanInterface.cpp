@@ -8,7 +8,7 @@
 #include "CanInterface.h"
 
 CanInterface::CanInterface(CanInterfaceProvider *provider)
-  : _provider(provider)
+  : _id(-1), _provider(provider)
 {
 }
 
@@ -23,4 +23,14 @@ void CanInterface::open() {
 }
 
 void CanInterface::close() {
+}
+
+uint16_t CanInterface::getId()
+{
+    return _id;
+}
+
+void CanInterface::setId(uint16_t id)
+{
+    _id = id;
 }

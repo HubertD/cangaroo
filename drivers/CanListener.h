@@ -13,7 +13,7 @@ public:
     explicit CanListener(QObject *parent, CanInterface *intf);
 
 signals:
-    void messageReceived(const CanMessage &msg);
+    void messageReceived(int interface_id, const CanMessage &msg);
 
 public slots:
     void run();

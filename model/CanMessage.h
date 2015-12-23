@@ -30,6 +30,9 @@ public:
 	bool isErrorFrame() const;
 	void setErrorFrame(const bool isErrorFrame);
 
+    uint16_t getInterfaceId() const;
+    void setInterfaceId(const uint16_t interface_id);
+
 	uint8_t getLength() const;
 	void setLength(const uint8_t dlc);
 
@@ -47,7 +50,8 @@ public:
 
 private:
 	uint32_t _raw_id;
-	uint8_t _dlc;
+    uint16_t _interface_id;
+    uint8_t _dlc;
 	union {
 		uint8_t _u8[8];
 		uint16_t _u16[4];
