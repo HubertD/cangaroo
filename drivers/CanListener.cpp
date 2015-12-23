@@ -12,9 +12,11 @@ CanListener::CanListener(QObject *parent, CanInterface *intf)
 
 void CanListener::run()
 {
+    CanMessage msg;
     while (true) {
-        CanMessage msg = _intf->readMessage();
-        emit messageReceived(msg);
+        if (_intf->readMessage(msg)) {
+            emit messageReceived(msg);
+        }
     }
 
 }

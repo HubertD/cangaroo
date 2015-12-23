@@ -29,8 +29,8 @@ public:
 	virtual void open();
 	virtual void close();
 
-	virtual void sendMessage(const CanMessage msg) = 0;
-	virtual CanMessage readMessage() = 0;
+    virtual void sendMessage(const CanMessage &msg) = 0;
+    virtual bool readMessage(CanMessage &msg) = 0;
 
     uint16_t getId();
     void setId(uint16_t id);

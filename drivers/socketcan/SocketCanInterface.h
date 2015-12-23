@@ -26,8 +26,8 @@ public:
 	virtual void open();
 	virtual void close();
 
-	virtual void sendMessage(const CanMessage msg);
-	virtual CanMessage readMessage();
+    virtual void sendMessage(const CanMessage &msg);
+    virtual bool readMessage(CanMessage &msg);
 
 	int getIfIndex();
 

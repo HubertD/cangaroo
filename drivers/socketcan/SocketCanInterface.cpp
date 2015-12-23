@@ -80,7 +80,7 @@ void SocketCanInterface::close() {
 	::close(_fd);
 }
 
-void SocketCanInterface::sendMessage(const CanMessage msg) {
+void SocketCanInterface::sendMessage(const CanMessage &msg) {
 	struct can_frame frame;
 
 	frame.can_id = msg.getId();
@@ -108,37 +108,38 @@ void SocketCanInterface::sendMessage(const CanMessage msg) {
 	::write(_fd, &frame, sizeof(struct can_frame));
 }
 
-CanMessage SocketCanInterface::readMessage() {
-	struct can_frame frame;
+bool SocketCanInterface::readMessage(CanMessage &msg) {
+
+    struct can_frame frame;
 	::read(_fd, &frame, sizeof(struct can_frame));
 
     struct timeval tv;
     ioctl(_fd, SIOCGSTAMP, &tv);
 
-	CanMessage result(frame.can_id);
-    result.setTimestamp(tv);
+    msg.setId(frame.can_id);
+    msg.setTimestamp(tv);
 
 	if (frame.can_id & CAN_EFF_FLAG) {
-		result.setExtended(true);
+        msg.setExtended(true);
 	}
 
 	if (frame.can_id & CAN_RTR_FLAG) {
-		result.setRTR(true);
+        msg.setRTR(true);
 	}
 
 	if (frame.can_id & CAN_ERR_FLAG) {
-		result.setErrorFrame(true);
+        msg.setErrorFrame(true);
 	}
 
-    result.setInterfaceId(getId());
+    msg.setInterfaceId(getId());
 
 	uint8_t len = frame.can_dlc;
 	if (len>8) { len = 8; }
 
-	result.setLength(len);
+    msg.setLength(len);
 	for (int i=0; i<len; i++) {
-		result.setByte(i, frame.data[i]);
+        msg.setByte(i, frame.data[i]);
 	}
 
-	return result;
+    return true;
 }
