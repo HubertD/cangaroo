@@ -12,7 +12,6 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
     struct timeval tv_last, tv_now;
 
     uint32_t raw_id = msg.getRawId();
-    beginResetModel();
 
     if (_map.find(raw_id) == _map.end()) {
         // create new row
@@ -21,15 +20,20 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
         item->_interval.tv_sec = 0;
         item->_interval.tv_usec = 0;
 
+        beginResetModel();
         _list.push_back(item);
         _map[raw_id] = item;
+        endResetModel();
 
     } else {
 
         // update row
+
         item = _map[raw_id];
         tv_last = item->_lastmsg.getTimestamp();
         tv_now = msg.getTimestamp();
+
+        int row = std::find(_list.begin(), _list.end(), item) - _list.begin();
         item->_lastmsg = msg;
 
         int diff_us = tv_now.tv_usec - tv_last.tv_usec;
@@ -40,9 +44,10 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
         }
         item->_interval.tv_usec = diff_us;
 
+        dataChanged(createIndex(row, 0, item), createIndex(row, column_count-1, item));
+
     }
 
-    endResetModel();
 }
 
 
