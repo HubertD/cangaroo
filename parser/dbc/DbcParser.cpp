@@ -78,16 +78,22 @@ void DbcParser::skipSectionEnding()
 
 }
 
-void DbcParser::skipColon()
+bool DbcParser::skipChar(QChar ch)
 {
     skipWhiteSpace();
     if (_pos<_str.length()) {
-        if (_str[_pos] == ':') {
+        if (_str[_pos] == ch) {
             _pos++;
+            return true;
         } else {
-            // TODO throw colon expected
+            return false;
         }
     }
+}
+
+bool DbcParser::skipColon()
+{
+    return skipChar(':');
 }
 
 QString DbcParser::readRegExp(const QRegExp &re)
@@ -119,6 +125,8 @@ QString DbcParser::readSectionName()
 {
     static const QRegExp rx("([A-Z_]+)");
     skipWhiteSpace();
+
+    QStringRef ref = _str.midRef(_pos, 200);
     return readRegExp(rx);
 }
 
@@ -145,6 +153,24 @@ qlonglong DbcParser::readInteger()
     }
 }
 
+double DbcParser::readDouble()
+{
+    static const QRegExp rx("([-\\+]?\\d+(\\.\\d+)?(E[-+]?\\d+)?)");
+    skipWhiteSpace();
+    QString s = readRegExp(rx);
+
+    QStringRef ref = _str.midRef(_pos, 200);
+
+    bool ok;
+    qlonglong result = s.toDouble(&ok);
+    if (ok) {
+        return result;
+    } else {
+        // TODO throw could not read float exception
+        return 0;
+    }
+}
+
 
 void DbcParser::parseSection() {
 
@@ -163,6 +189,7 @@ void DbcParser::parseSection() {
     } else {
         // skip till next section...
         while (!isAtSectionEnding()) { _pos++; }
+        skipSectionEnding();
     }
 
     /*
@@ -217,7 +244,64 @@ void DbcParser::parseSectionBo()
     QString sender = readIdentifier();
 
     while (!isAtSectionEnding()) {
-        _pos++;
+        parseSectionBoSg();
+    }
+}
+
+void DbcParser::parseSectionBoSg()
+{
+    if (readIdentifier()=="SG_") {
+        QString signal_name = readIdentifier();
+
+        bool is_muxer = false;
+        bool is_muxed = false;
+        qlonglong mux_value = 0;
+
+        if (skipChar('M')) {
+            is_muxer = true;
+        } else if (skipChar('m')) {
+            mux_value = readInteger();
+            is_muxed = true;
+        }
+
+        skipChar(':');
+        qlonglong start_bit = readInteger();
+        skipChar('|');
+        qlonglong signal_len = readInteger();
+        skipChar('@');
+        qlonglong byte_order = readInteger();
+        bool is_unsigned = false;
+        if (_str[_pos]=='+') {
+            is_unsigned = true;
+            _pos++;
+        }
+
+        skipChar('(');
+        double factor = readDouble();
+        skipChar(',');
+        double offset = readDouble();
+        skipChar(')');
+
+        skipChar('[');
+        double minimum = readDouble();
+        skipChar('|');
+        double maximum = readDouble();
+        skipChar(']');
+
+        QString unit = readString();
+
+        while (true) {
+            QString receiver = readIdentifier();
+            if (isAtSectionEnding()) {
+                break;
+            }
+            if (!skipChar(',')) {
+                break;
+            }
+        }
+
+
+
     }
 }
 

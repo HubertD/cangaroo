@@ -12,52 +12,21 @@ public:
     void parseFile(QFile *file);
 
 private:
-    typedef enum {
-        tokInvalid,
-
-        tokSectionVersion,
-        tokSectionNs,
-        tokSectionBs,
-        tokSectionBu,
-        tokSectionBo,
-        tokSectionSg,
-        tokSectionBoTxBu,
-        tokSectionCm,
-        tokSectionBaDef,
-        tokSectionBaDefDef,
-        tokSectionBaDefDefRel,
-        tokSectionBa,
-        tokSectionBaRel,
-        tokSectionVal,
-
-        tokIdentifier,
-        tokInteger,
-        tokFloat,
-        tokString,
-        tokColon,
-        tokPipe,
-        tokAt,
-        tokPlus,
-        tokComma,
-        tokParentOpen,
-        tokParentClose,
-        tokBracketOpen,
-        tokBracketClose,
-    } token_t;
-
     QString _str;
     int _pos;
 
     bool isAtSectionEnding();
     void skipWhiteSpace();
     void skipSectionEnding();
-    void skipColon();
+    bool skipChar(QChar ch);
+    bool skipColon();
 
     QString readRegExp(const QRegExp &re);
     QString readSectionName();
     QString readIdentifier();
     QString readString();
     qlonglong readInteger();
+    double readDouble();
 
     void parse();
     void parseSection();
@@ -66,6 +35,7 @@ private:
     void parseSectionBs();
     void parseSectionBu();
     void parseSectionBo();
+    void parseSectionBoSg();
 
 };
 
