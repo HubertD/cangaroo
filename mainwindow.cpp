@@ -10,11 +10,17 @@
 #include "drivers/socketcan/SocketCanInterfaceProvider.h"
 #include "drivers/CanListener.h"
 
+#include "parser/dbc/DbcParser.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    DbcParser parser;
+    QFile *dbc = new QFile("test.dbc");
+    parser.parseFile(dbc);
 
     trace = new CanTrace(this, 100);
 
