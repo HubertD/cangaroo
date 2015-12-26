@@ -1,0 +1,116 @@
+#include "DbcTokens.h"
+
+DbcToken::DbcToken(int line, int column, dbc_token_type_t type)
+  : _line(line), _col(column), _type(type), _numLineBreaks(0)
+{
+
+}
+
+bool DbcToken::appendChar(QChar ch)
+{
+    if (acceptsChar(ch)) {
+        if (ch=='\n') {
+            _numLineBreaks++;
+        }
+        _data.append(ch);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+dbc_token_type_t DbcToken::getType()
+{
+    return _type;
+}
+
+QString DbcToken::getData()
+{
+    return _data;
+}
+
+int DbcToken::countLineBreaks()
+{
+    return _numLineBreaks;
+}
+
+int DbcToken::getLine()
+{
+    return _line;
+}
+
+int DbcToken::getColumn()
+{
+    return _col;
+}
+
+
+DbcIdentifierToken::DbcIdentifierToken(int line, int column)
+  : DbcToken(line, column, dbc_tok_identifier)
+{
+}
+
+bool DbcIdentifierToken::acceptsChar(QChar ch)
+{
+    static const QString acceptableStartChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
+    static const QString acceptableChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_");
+    if (_data.isEmpty()) {
+        return acceptableStartChars.contains(ch);
+    } else {
+        return acceptableChars.contains(ch);
+    }
+}
+
+
+DbcStringToken::DbcStringToken(int line, int column)
+  : DbcToken(line, column, dbc_tok_string)
+{
+}
+
+bool DbcStringToken::acceptsChar(QChar ch)
+{
+   if (_data.isEmpty()) {
+       return (ch=='"');
+   } else if (_data.length()<2) {
+       return true;
+   } else {
+       return !_data.endsWith('"');
+   }
+}
+
+
+
+
+DbcWhitespaceToken::DbcWhitespaceToken(int line, int column)
+  : DbcToken(line, column, dbc_tok_whitespace)
+{
+}
+
+bool DbcWhitespaceToken::acceptsChar(QChar ch)
+{
+    return ch.isSpace();
+}
+
+DbcRegExpToken::DbcRegExpToken(int line, int column, dbc_token_type_t type, QRegExp re)
+  : DbcToken(line, column, type),
+    _re(re)
+{
+}
+
+bool DbcRegExpToken::acceptsChar(QChar ch)
+{
+    QString s = _data + ch;
+    return (_re.indexIn(s)==0);
+}
+
+DbcSingleCharToken::DbcSingleCharToken(int line, int column, dbc_token_type_t type, QChar ch)
+  : DbcToken(line, column, type),
+    _ch(ch)
+{
+}
+
+bool DbcSingleCharToken::acceptsChar(QChar ch)
+{
+    return (ch==_ch) && _data.isEmpty();
+}
+
