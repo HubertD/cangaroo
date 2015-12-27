@@ -56,11 +56,14 @@ QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
 
 QVariant BaseTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
+    (void) index;
+    (void) role;
     return QVariant();
 }
 
-QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, int role, CanMessage *msg, timeval tv) const
+QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, int role, const CanMessage *msg, timeval tv) const
 {
+    (void) role;
     double intervalD;
     CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
 
@@ -97,8 +100,9 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
     }
 }
 
-QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, int role, CanMessage *msg) const
+QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, int role, const CanMessage *msg) const
 {
+    (void) role;
     uint32_t raw_data;
     QString value_name;
 

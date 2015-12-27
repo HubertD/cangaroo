@@ -4,23 +4,11 @@
 #include <QAbstractItemModel>
 #include <model/CanDb.h>
 #include <model/CanTrace.h>
+#include "BaseTraceViewModel.h"
 
-class LinearTraceViewModel : public QAbstractItemModel
+class LinearTraceViewModel : public BaseTraceViewModel
 {
     Q_OBJECT
-
-public:
-    enum {
-        column_timestamp,
-        column_channel,
-        column_direction,
-        column_canid,
-        column_name,
-        column_dlc,
-        column_data,
-
-        column_count
-    };
 
 public:
     LinearTraceViewModel(CanDb *candb, CanTrace *trace);
@@ -30,17 +18,13 @@ public:
     virtual int rowCount(const QModelIndex &parent) const;
     virtual int columnCount(const QModelIndex &parent) const;
     virtual bool hasChildren(const QModelIndex &parent) const;
-    virtual QVariant data(const QModelIndex &index, int role) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
 public slots:
     void beforeAppend(int num_messages);
     void afterAppend(int num_messages);
 
 private:
-    CanTrace *_trace;
-    QVariant data_DisplayRole(const QModelIndex &index, int role) const;
-    QVariant data_TextAlignmentRole(const QModelIndex &index, int role) const;
+    virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;
 };
 
 #endif // LINEARTRACEVIEWMODEL_H
