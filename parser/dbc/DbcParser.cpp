@@ -166,7 +166,7 @@ bool DbcParser::expectSectionEnding(DbcTokenList &tokens)
         return true;
     }
 
-    DbcToken *token = readToken(tokens, dbc_tok_whitespace);
+    DbcToken *token = readToken(tokens, dbc_tok_whitespace|dbc_tok_semicolon);
     if (!token) {
         return false;
     }
@@ -266,8 +266,13 @@ bool DbcParser::expectDouble(DbcTokenList &tokens, double *df, bool skipWhitespa
 void DbcParser::skipUntilSectionEnding(DbcTokenList &tokens)
 {
     while (!tokens.isEmpty()) {
-        if (expectSectionEnding(tokens)) {
-            break;
+        DbcToken *token = readToken(tokens, dbc_tok_ALL, false, false);
+        if (!token) { return; }
+        if (isSectionEnding(token)) {
+            free(token);
+            return;
+        } else {
+            free(token);
         }
     }
 }
@@ -375,12 +380,24 @@ bool DbcParser::parseSectionBo(DbcTokenList &tokens)
     if (!expectIdentifier(tokens, &sender)) { return false; }
 
     QString subsect;
-    while (expectIdentifier(tokens, &subsect)) {
-        if (subsect!="SG_") { return false; }
-        if (!parseSectionBoSg(tokens)) { return false; }
-    }
+    while (true) {
+        if (expectSectionEnding(tokens)) {
+            return true;
+         } else {
+            if (!expectIdentifier(tokens, &subsect)) {
+                return false;
+            }
 
-    return expectSectionEnding(tokens);
+            if (subsect!="SG_") {
+                return false;
+            }
+
+            if (!parseSectionBoSg(tokens)) {
+                return false;
+            }
+        }
+
+    }
 }
 
 bool DbcParser::parseSectionBoSg(DbcTokenList &tokens)
@@ -446,8 +463,7 @@ bool DbcParser::parseSectionBoSg(DbcTokenList &tokens)
     if (!expectIdentifier(tokens, &receiver)) { return false; }
     receivers.append(receiver);
 
-    while (!expectLineBreak(tokens)) {
-        if (!expectAndSkipToken(tokens, dbc_tok_comma)) { return false; }
+    while (expectAndSkipToken(tokens, dbc_tok_comma, false, false)) {
         if (!expectIdentifier(tokens, &receiver)) { return false; }
         receivers.append(receiver);
     }

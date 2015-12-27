@@ -19,7 +19,9 @@ typedef enum {
     dbc_tok_bracket_open = 1024,
     dbc_tok_bracket_close = 2048,
     dbc_tok_comma = 4096,
-    dbc_tok_semicolon = 8192
+    dbc_tok_semicolon = 8192,
+
+    dbc_tok_ALL = 0xFFFFFFFF
 } dbc_token_type_t;
 
 class DbcToken {
