@@ -73,14 +73,19 @@ DbcParser::error_t DbcParser::tokenize(QFile *file, DbcParser::DbcTokenList &tok
         return err_cannot_open_file;
     }
 
-    char ch;
     DbcToken *currentToken = 0;
     int line = 1;
     int column = 0;
 
     error_t retval = err_ok;
 
-    while (file->getChar(&ch)) {
+    QTextStream in(file);
+    in.setCodec("ISO 8859-1");
+
+    while (true) {
+        QString s = in.read(1);
+        if (s.isEmpty()) { break; }
+        QChar ch = s[0];
 
         if (ch=='\n') {
             line++;
