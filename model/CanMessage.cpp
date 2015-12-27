@@ -214,6 +214,15 @@ void CanMessage::setTimestamp(const timeval timestamp)
     _timestamp = timestamp;
 }
 
+QString CanMessage::getIdString() const
+{
+    if (isExtended()) {
+        return QString().sprintf("0x%08X", getId());
+    } else {
+        return QString().sprintf("0x%03X", getId());
+    }
+}
+
 QString CanMessage::getDataHexString() const
 {
     switch (getLength()) {

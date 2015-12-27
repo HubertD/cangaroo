@@ -6,6 +6,7 @@
 #include <vector>
 #include <model/CanTrace.h>
 #include "views/LinearTraceViewModel.h"
+#include "model/CanDb.h"
 
 namespace Ui {
 class MainWindow;
@@ -22,6 +23,7 @@ public:
 public slots:
 
 private:
+    CanDb _candb;
     Ui::MainWindow *ui;
     CanTrace *trace;
     LinearTraceViewModel *model;

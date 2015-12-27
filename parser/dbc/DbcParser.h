@@ -6,6 +6,8 @@
 #include <QList>
 #include "DbcTokens.h"
 
+class CanDb;
+
 class DbcParser
 {
 
@@ -20,7 +22,7 @@ public:
 
 public:
     DbcParser();
-    void parseFile(QFile *file);
+    bool parseFile(QFile *file, CanDb *candb);
 
 private:
     int _errorLine;
@@ -48,13 +50,13 @@ private:
 
     DbcToken *readToken(DbcTokenList &tokens, int typeMask, bool skipWhitespace=true, bool skipSectionEnding=false);
 
-    void parse(DbcTokenList &tokens);
+    bool parse(CanDb *candb, DbcTokenList &tokens);
     bool parseIdentifierList(DbcTokenList &tokens, QStringList *list);
 
-    bool parseSection(DbcTokenList &tokens);
-    bool parseSectionVersion(DbcTokenList &tokens);
+    bool parseSection(CanDb *candb, DbcTokenList &tokens);
+    bool parseSectionVersion(CanDb *candb, DbcTokenList &tokens);
     bool parseSectionBs(DbcTokenList &tokens);
-    bool parseSectionBo(DbcTokenList &tokens);
+    bool parseSectionBo(CanDb *candb, DbcTokenList &tokens);
     bool parseSectionBoSg(DbcTokenList &tokens);
 
 };

@@ -54,6 +54,7 @@ public:
     struct timeval getTimestamp() const;
     void setTimestamp(const struct timeval timestamp);
 
+    QString getIdString() const;
     QString getDataHexString() const;
 
 private:

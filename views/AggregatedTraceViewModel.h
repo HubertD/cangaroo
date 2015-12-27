@@ -8,7 +8,7 @@
 #include <sys/time.h>
 #include "model/CanMessage.h"
 #include "model/CanTrace.h"
-
+#include "model/CanDb.h"
 
 class AggregatedTraceViewItem
 {
@@ -38,7 +38,7 @@ public:
 
 
 public:
-    AggregatedTraceViewModel(CanTrace *trace);
+    AggregatedTraceViewModel(CanDb *candb, CanTrace *trace);
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
     virtual QModelIndex parent(const QModelIndex &child) const;
@@ -52,6 +52,7 @@ public slots:
     void messageReceived(const CanMessage &msg);
 
 private:
+    CanDb *_candb;
     CanTrace *_trace;
     CanIdMap _map;
     ItemList _list;

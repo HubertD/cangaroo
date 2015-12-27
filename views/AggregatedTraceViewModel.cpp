@@ -1,7 +1,7 @@
 #include "AggregatedTraceViewModel.h"
 
-AggregatedTraceViewModel::AggregatedTraceViewModel(CanTrace *trace)
-  : _trace(trace)
+AggregatedTraceViewModel::AggregatedTraceViewModel(CanDb *candb, CanTrace *trace)
+  : _candb(candb), _trace(trace)
 {
     connect(trace, SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
 }
@@ -139,14 +139,20 @@ QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, in
 
     const CanMessage *msg = &item->_lastmsg;
 
+    CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
+
     struct timeval tv = item->_interval;
+    double intervalD;
     switch (index.column()) {
-        case column_timestamp: return QString().sprintf("%.04f", ((double)tv.tv_sec + ((double)tv.tv_usec/1000000)));
+        case column_timestamp:
+            intervalD = (double)tv.tv_sec + ((double)tv.tv_usec/1000000);
+            return (intervalD==0) ? "" : QString().sprintf("%.04f", intervalD);
         case column_channel: return msg->getInterfaceId();
         case column_direction: return (msg->getId() % 7)==0 ? "tx" : "rx";
-        case column_canid: return QString().sprintf("0x%08X", msg->getId());
+        case column_canid: return msg->getIdString();
         case column_dlc: return msg->getLength();
         case column_data: return msg->getDataHexString();
+        case column_name: return dbmsg ? dbmsg->getName() : "unknown";
     }
 
 

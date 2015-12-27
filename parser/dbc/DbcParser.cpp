@@ -1,5 +1,6 @@
 #include "DbcParser.h"
 #include <QTextStream>
+#include "model/CanDb.h"
 #include <stdint.h>
 #include <iostream>
 
@@ -10,7 +11,7 @@ DbcParser::DbcParser()
 {
 }
 
-void DbcParser::parseFile(QFile *file)
+bool DbcParser::parseFile(QFile *file, CanDb *candb)
 {
     DbcTokenList tokens;
     if (tokenize(file, tokens) != err_ok) {
@@ -19,9 +20,11 @@ void DbcParser::parseFile(QFile *file)
             //std::cout << " at line " << _errorLine << ", column " << _errorColumn;
         }
         //std::cout << "." << std::endl;
-        return;
+        return false;
     }
-    parse(tokens);
+
+    candb->setFilename(file->fileName());
+    return parse(candb, tokens);
 }
 
 DbcToken *DbcParser::createNewToken(QChar ch, int line, int column)
@@ -293,23 +296,26 @@ bool DbcParser::parseIdentifierList(DbcTokenList &tokens, QStringList *list)
     return expectSectionEnding(tokens);
 }
 
-void DbcParser::parse(DbcTokenList &tokens)
+bool DbcParser::parse(CanDb *candb, DbcTokenList &tokens)
 {
     _dbcVersion.clear();
     _nsEntries.clear();
     _buEntries.clear();
 
     while (!tokens.isEmpty()) {
-        if (!parseSection(tokens)) {
-            return; // todo throw error?
+        if (!parseSection(candb, tokens)) {
+            return false;
         }
     }
+
+    return true;
 }
 
-bool DbcParser::parseSection(DbcTokenList &tokens) {
+bool DbcParser::parseSection(CanDb *candb, DbcTokenList &tokens) {
     bool retval = true;
 
     QString sectionName;
+    QStringList strings;
 
     while (retval) {
 
@@ -319,15 +325,26 @@ bool DbcParser::parseSection(DbcTokenList &tokens) {
 
         if (expectIdentifier(tokens, &sectionName, true, true)) {
             if (sectionName == "VERSION") {
-                retval &= parseSectionVersion(tokens);
+                retval &= parseSectionVersion(candb, tokens);
             } else if (sectionName == "NS_") {
-                retval &= parseIdentifierList(tokens, &_nsEntries);
+                strings.clear();
+                retval &= parseIdentifierList(tokens, &strings);
             } else if (sectionName == "BS_") {
                 retval &= parseSectionBs(tokens);
             } else if (sectionName == "BU_") {
-                retval &= parseIdentifierList(tokens, &_buEntries);
+
+                strings.clear();
+                if (parseIdentifierList(tokens, &strings)) {
+                    QString s;
+                    foreach(s, strings) {
+                        candb->getOrCreateNode(s);
+                    }
+                } else {
+                    retval = false;
+                }
+
             } else if (sectionName == "BO_") {
-                retval &= parseSectionBo(tokens);
+                retval &= parseSectionBo(candb, tokens);
             } else {
                 skipUntilSectionEnding(tokens);
             }
@@ -350,9 +367,11 @@ bool DbcParser::parseSection(DbcTokenList &tokens) {
 */
 }
 
-bool DbcParser::parseSectionVersion(DbcTokenList &tokens)
+bool DbcParser::parseSectionVersion(CanDb *candb, DbcTokenList &tokens)
 {
-    if (!expectString(tokens, &_dbcVersion)) { return false; }
+    QString version;
+    if (!expectString(tokens, &version)) { return false; }
+    candb->setVersion(version);
     return expectSectionEnding(tokens);
 }
 
@@ -366,7 +385,7 @@ bool DbcParser::parseSectionBs(DbcParser::DbcTokenList &tokens)
 }
 
 
-bool DbcParser::parseSectionBo(DbcTokenList &tokens)
+bool DbcParser::parseSectionBo(CanDb *candb, DbcTokenList &tokens)
 {
     long long can_id;
     int dlc;
@@ -378,6 +397,13 @@ bool DbcParser::parseSectionBo(DbcTokenList &tokens)
     if (!expectAndSkipToken(tokens, dbc_tok_colon)) { return false; }
     if (!expectInt(tokens, &dlc)) { return false; }
     if (!expectIdentifier(tokens, &sender)) { return false; }
+
+    CanDbMessage *msg = new CanDbMessage(candb);
+    msg->setRaw_id(can_id);
+    msg->setName(msg_name);
+    msg->setDlc(dlc);
+    msg->setSender(candb->getOrCreateNode(sender));
+    candb->addMessage(msg);
 
     QString subsect;
     while (true) {
@@ -396,8 +422,9 @@ bool DbcParser::parseSectionBo(DbcTokenList &tokens)
                 return false;
             }
         }
-
     }
+
+
 }
 
 bool DbcParser::parseSectionBoSg(DbcTokenList &tokens)

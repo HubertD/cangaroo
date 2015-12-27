@@ -11,6 +11,7 @@
 #include "drivers/CanListener.h"
 
 #include "parser/dbc/DbcParser.h"
+#include "model/CanDb.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -20,12 +21,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     DbcParser parser;
     QFile *dbc = new QFile("test.dbc");
-    parser.parseFile(dbc);
+    parser.parseFile(dbc, &_candb);
 
     trace = new CanTrace(this, 100);
 
     //model = new LinearTraceViewModel(trace);
-    ui->tree->setModel(new AggregatedTraceViewModel(trace));
+    ui->tree->setModel(new AggregatedTraceViewModel(&_candb, trace));
     ui->tree->setUniformRowHeights(true);
 
     SocketCanInterfaceProvider prov;
