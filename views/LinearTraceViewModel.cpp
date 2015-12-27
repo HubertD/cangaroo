@@ -2,7 +2,7 @@
 #include <iostream>
 #include <stddef.h>
 
-LinearTraceViewModel::LinearTraceViewModel(CanTrace *trace)
+LinearTraceViewModel::LinearTraceViewModel(CanDb *candb, CanTrace *trace)
   : _trace(trace)
 {
     connect(_trace, SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));

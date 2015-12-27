@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _trace = new CanTrace(this, 100);
 
-    _linearTraceViewModel = new LinearTraceViewModel(_trace);
+    _linearTraceViewModel = new LinearTraceViewModel(&_candb, _trace);
     _aggregatedTraceViewModel = new AggregatedTraceViewModel(&_candb, _trace);
 
     ui->tree->setModel(_linearTraceViewModel);

@@ -2,7 +2,8 @@
 #define LINEARTRACEVIEWMODEL_H
 
 #include <QAbstractItemModel>
-#include "../model/CanTrace.h"
+#include <model/CanDb.h>
+#include <model/CanTrace.h>
 
 class LinearTraceViewModel : public QAbstractItemModel
 {
@@ -22,7 +23,7 @@ public:
     };
 
 public:
-    LinearTraceViewModel(CanTrace *trace);
+    LinearTraceViewModel(CanDb *candb, CanTrace *trace);
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
     virtual QModelIndex parent(const QModelIndex &child) const;

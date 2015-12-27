@@ -1,36 +1,29 @@
 #include "AggregatedTraceViewModel.h"
 
 AggregatedTraceViewModel::AggregatedTraceViewModel(CanDb *candb, CanTrace *trace)
-  : _candb(candb), _trace(trace)
+  : BaseTraceViewModel(candb, trace)
 {
     _rootItem = new AggregatedTraceViewItem(0);
-
     connect(trace, SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
 }
 
 void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
 {
-    AggregatedTraceViewItem *item, *subitem;
+    AggregatedTraceViewItem *item;
     struct timeval tv_last, tv_now;
 
     uint32_t raw_id = msg.getRawId();
 
-    if (_map.find(raw_id) == _map.end()) {
+    if (!_map.contains(raw_id)) {
+
         // create new row
         item = new AggregatedTraceViewItem(_rootItem);
-        item->_name = "unknown";
         item->_lastmsg = msg;
-        item->_interval.tv_sec = 0;
-        item->_interval.tv_usec = 0;
 
         CanDbMessage *dbmsg = _candb->getMessageById(raw_id);
         if (dbmsg) {
-            item->_name = dbmsg->getName();
-            CanDbSignal *dbsignal;
-            foreach (dbsignal, dbmsg->getSignals()) {
-                subitem = new AggregatedTraceViewItem(item);
-                subitem->_name = dbsignal->name();
-                item->appendChild(subitem);
+            for (int i=0; i<dbmsg->getSignals().length(); i++) {
+                item->appendChild(new AggregatedTraceViewItem(item));
             }
         }
 
@@ -113,178 +106,16 @@ int AggregatedTraceViewModel::rowCount(const QModelIndex &parent) const
     return parentItem->childCount();
 }
 
-int AggregatedTraceViewModel::columnCount(const QModelIndex &parent) const
-{
-    (void) parent;
-    return column_count;
-}
-
-QVariant AggregatedTraceViewModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    if (role == Qt::DisplayRole) {
-
-        if (orientation == Qt::Horizontal) {
-            switch (section) {
-                case column_timestamp:
-                    return QString("Timestamp");
-                case column_channel:
-                    return QString("Channel");
-                case column_direction:
-                    return QString("Rx/Tx");
-                case column_canid:
-                    return QString("CAN ID");
-                case column_name:
-                    return QString("Name");
-                case column_dlc:
-                    return QString("DLC");
-                case column_data:
-                    return QString("Data");
-                case column_comment:
-                    return QString("Comment");
-            }
-        }
-
-    }
-    return QVariant();
-}
-
-QVariant AggregatedTraceViewModel::data(const QModelIndex &index, int role) const
-{
-    switch (role) {
-        case Qt::DisplayRole:
-            return data_DisplayRole(index, role);
-        case Qt::TextAlignmentRole:
-            return data_TextAlignmentRole(index, role);
-        default:
-            return QVariant();
-    }
-}
-
 QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
-    (void) role;
-
     AggregatedTraceViewItem *item = (AggregatedTraceViewItem *)index.internalPointer();
+    if (!item) { return QVariant(); }
 
-    if (item->parent() != _rootItem) {
-
-        const CanMessage *msg = &item->parent()->_lastmsg;
-
-        CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
-        if (!dbmsg) { return QVariant(); }
-
-        CanDbSignal *dbsignal = dbmsg->getSignal(item->row());
-        if (!dbsignal) { return QVariant(); }
-
-        uint32_t raw_data;
-        QString value_name;
-        switch (index.column()) {
-
-            case column_name:
-                return dbsignal->name();
-
-            case column_data:
-                raw_data = msg->extractSignal(dbsignal->startBit(), dbsignal->length(), false);
-                value_name = dbsignal->getValueName(raw_data);
-
-                if (value_name.isEmpty()) {
-                    return raw_data;
-                } else {
-                    return QString().number(raw_data) + " - " + value_name;
-                }
-
-            case column_comment:
-                return dbsignal->comment();
-
-            default:
-                return QVariant();
-
-        }
-    }
-
-    const CanMessage *msg = &item->_lastmsg;
-    CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
-
-    struct timeval tv = item->_interval;
-    double intervalD;
-    switch (index.column()) {
-        case column_timestamp:
-            intervalD = (double)tv.tv_sec + ((double)tv.tv_usec/1000000);
-            return (intervalD==0) ? "" : QString().sprintf("%.04f", intervalD);
-        case column_channel:
-            return msg->getInterfaceId();
-        case column_direction:
-            return (msg->getId() % 7)==0 ? "tx" : "rx";
-        case column_canid:
-            return msg->getIdString();
-        case column_name:
-            return (dbmsg) ? dbmsg->getName() : "";
-        case column_dlc:
-            return msg->getLength();
-        case column_data:
-            return msg->getDataHexString();
-        case column_comment:
-            return (dbmsg) ? dbmsg->getComment() : "";
-
-    }
-
-
-    return QVariant();
-}
-
-QVariant AggregatedTraceViewModel::data_TextAlignmentRole(const QModelIndex &index, int role) const
-{
-    (void) role;
-    switch (index.column()) {
-        case column_timestamp: return Qt::AlignRight + Qt::AlignVCenter;
-        case column_channel: return Qt::AlignCenter + Qt::AlignVCenter;
-        case column_direction: return Qt::AlignCenter + Qt::AlignVCenter;
-        case column_canid: return Qt::AlignRight + Qt::AlignVCenter;
-        case column_name: return Qt::AlignLeft + Qt::AlignVCenter;
-        case column_dlc: return Qt::AlignCenter + Qt::AlignVCenter;
-        case column_data: return Qt::AlignLeft + Qt::AlignVCenter;
-        case column_comment: return Qt::AlignLeft + Qt::AlignVCenter;
-       default: return QVariant();
+    if (item->parent() == _rootItem) { // CanMessage row
+        return data_DisplayRole_Message(index, role, &item->_lastmsg, item->_interval);
+    } else { // CanSignal Row
+        return data_DisplayRole_Signal(index, role, &item->parent()->_lastmsg);
     }
 }
 
 
-AggregatedTraceViewItem::AggregatedTraceViewItem(AggregatedTraceViewItem *parent)
-  : _parent(parent)
-{
-
-}
-
-AggregatedTraceViewItem::~AggregatedTraceViewItem()
-{
-    qDeleteAll(_children);
-}
-
-void AggregatedTraceViewItem::appendChild(AggregatedTraceViewItem *child)
-{
-    _children.append(child);
-}
-
-AggregatedTraceViewItem *AggregatedTraceViewItem::child(int row) const
-{
-    return _children.value(row);
-}
-
-int AggregatedTraceViewItem::childCount() const
-{
-    return _children.count();
-}
-
-int AggregatedTraceViewItem::row() const
-{
-    if (_parent) {
-        return _parent->_children.indexOf(const_cast<AggregatedTraceViewItem*>(this));
-    } else {
-        return 0;
-    }
-}
-
-AggregatedTraceViewItem *AggregatedTraceViewItem::parent()
-{
-    return _parent;
-}
