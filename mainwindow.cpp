@@ -23,10 +23,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QFile *dbc = new QFile("test.dbc");
     parser.parseFile(dbc, &_candb);
 
-    trace = new CanTrace(this, 100);
+    _trace = new CanTrace(this, 100);
 
-    //model = new LinearTraceViewModel(trace);
-    ui->tree->setModel(new AggregatedTraceViewModel(&_candb, trace));
+    _linearTraceViewModel = new LinearTraceViewModel(_trace);
+    _aggregatedTraceViewModel = new AggregatedTraceViewModel(&_candb, _trace);
+
+    ui->tree->setModel(_linearTraceViewModel);
     ui->tree->setUniformRowHeights(true);
     ui->tree->setColumnWidth(0, 80);
     ui->tree->setColumnWidth(1, 70);
@@ -35,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tree->setColumnWidth(4, 200);
     ui->tree->setColumnWidth(5, 50);
     ui->tree->setColumnWidth(6, 200);
+
+    connect(ui->cbAggregate, SIGNAL(stateChanged(int)), this, SLOT(onCbTraceTypeChanged(int)));
 
     SocketCanInterfaceProvider prov;
     prov.update();
@@ -52,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
         CanListener *listener = new CanListener(0, intf);
         listener->moveToThread(thread);
         connect(thread, SIGNAL(started()), listener, SLOT(run()));
-        connect(listener, SIGNAL(messageReceived(CanMessage)), trace, SLOT(enqueueMessage(CanMessage)));
+        connect(listener, SIGNAL(messageReceived(CanMessage)), _trace, SLOT(enqueueMessage(CanMessage)));
         thread->start();
     }
 }
@@ -60,4 +64,14 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::onCbTraceTypeChanged(int i)
+{
+    if (i==Qt::Checked) {
+        ui->tree->setModel(_aggregatedTraceViewModel);
+    } else {
+        ui->tree->setModel(_linearTraceViewModel);
+    }
+
 }

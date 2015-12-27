@@ -2,11 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QTreeView>
-#include <vector>
+#include <model/CanDb.h>
 #include <model/CanTrace.h>
-#include "views/LinearTraceViewModel.h"
-#include "model/CanDb.h"
+#include <views/LinearTraceViewModel.h>
+#include <views/AggregatedTraceViewModel.h>
 
 namespace Ui {
 class MainWindow;
@@ -21,12 +20,15 @@ public:
     ~MainWindow();
 
 public slots:
+    void onCbTraceTypeChanged(int i);
 
 private:
-    CanDb _candb;
     Ui::MainWindow *ui;
-    CanTrace *trace;
-    LinearTraceViewModel *model;
+    CanDb _candb;
+    CanTrace *_trace;
+    LinearTraceViewModel *_linearTraceViewModel;
+    AggregatedTraceViewModel *_aggregatedTraceViewModel;
+
 };
 
 #endif // MAINWINDOW_H

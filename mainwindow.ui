@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>782</width>
-    <height>494</height>
+    <width>927</width>
+    <height>642</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,16 +46,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="toolButton_4">
+       <widget class="QCheckBox" name="cbAggregate">
         <property name="text">
-         <string>trace</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="toolButton_5">
-        <property name="text">
-         <string>group</string>
+         <string>Aggregate Messages</string>
         </property>
        </widget>
       </item>
@@ -78,7 +71,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>782</width>
+     <width>927</width>
      <height>21</height>
     </rect>
    </property>
