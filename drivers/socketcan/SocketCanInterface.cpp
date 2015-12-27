@@ -118,19 +118,9 @@ bool SocketCanInterface::readMessage(CanMessage &msg) {
 
     msg.setId(frame.can_id);
     msg.setTimestamp(tv);
-
-	if (frame.can_id & CAN_EFF_FLAG) {
-        msg.setExtended(true);
-	}
-
-	if (frame.can_id & CAN_RTR_FLAG) {
-        msg.setRTR(true);
-	}
-
-	if (frame.can_id & CAN_ERR_FLAG) {
-        msg.setErrorFrame(true);
-	}
-
+    msg.setExtended((frame.can_id & CAN_EFF_FLAG)!=0);
+    msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
+    msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);
     msg.setInterfaceId(getId());
 
 	uint8_t len = frame.can_dlc;

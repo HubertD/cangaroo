@@ -85,6 +85,7 @@ DbcParser::error_t DbcParser::tokenize(QFile *file, DbcParser::DbcTokenList &tok
     while (true) {
         QString s = in.read(1);
         if (s.isEmpty()) { break; }
+
         QChar ch = s[0];
 
         if (ch=='\n') {
