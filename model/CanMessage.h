@@ -42,6 +42,9 @@ public:
 	uint8_t getByte(const uint8_t index) const;
 	void setByte(const uint8_t index, const uint8_t value);
 
+    uint64_t getU64() const;
+    uint64_t extractSignal(const uint8_t start_bit, const uint8_t length, const bool isBigEndian) const;
+
 	void setData(const uint8_t d0);
 	void setData(const uint8_t d0, const uint8_t d1);
 	void setData(const uint8_t d0, const uint8_t d1, const uint8_t d2);

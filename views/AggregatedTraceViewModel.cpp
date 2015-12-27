@@ -3,25 +3,39 @@
 AggregatedTraceViewModel::AggregatedTraceViewModel(CanDb *candb, CanTrace *trace)
   : _candb(candb), _trace(trace)
 {
+    _rootItem = new AggregatedTraceViewItem(0);
+
     connect(trace, SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
 }
 
 void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
 {
-    AggregatedTraceViewItem *item;
+    AggregatedTraceViewItem *item, *subitem;
     struct timeval tv_last, tv_now;
 
     uint32_t raw_id = msg.getRawId();
 
     if (_map.find(raw_id) == _map.end()) {
         // create new row
-        item = new AggregatedTraceViewItem();
+        item = new AggregatedTraceViewItem(_rootItem);
+        item->_name = "unknown";
         item->_lastmsg = msg;
         item->_interval.tv_sec = 0;
         item->_interval.tv_usec = 0;
 
+        CanDbMessage *dbmsg = _candb->getMessageById(raw_id);
+        if (dbmsg) {
+            item->_name = dbmsg->getName();
+            CanDbSignal *dbsignal;
+            foreach (dbsignal, dbmsg->getSignals()) {
+                subitem = new AggregatedTraceViewItem(item);
+                subitem->_name = dbsignal->name();
+                item->appendChild(subitem);
+            }
+        }
+
         beginResetModel();
-        _list.push_back(item);
+        _rootItem->appendChild(item);
         _map[raw_id] = item;
         endResetModel();
 
@@ -33,7 +47,6 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
         tv_last = item->_lastmsg.getTimestamp();
         tv_now = msg.getTimestamp();
 
-        int row = std::find(_list.begin(), _list.end(), item) - _list.begin();
         item->_lastmsg = msg;
 
         int diff_us = tv_now.tv_usec - tv_last.tv_usec;
@@ -44,6 +57,7 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
         }
         item->_interval.tv_usec = diff_us;
 
+        int row = item->row();
         dataChanged(createIndex(row, 0, item), createIndex(row, column_count-1, item));
 
     }
@@ -53,32 +67,50 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
 
 QModelIndex AggregatedTraceViewModel::index(int row, int column, const QModelIndex &parent) const
 {
-    (void) parent;
-    if (row<_list.size()) {
-        return createIndex(row, column, _list[row]);
+    if (!hasIndex(row, column, parent)) {
+        return QModelIndex();
+    }
+
+    const AggregatedTraceViewItem *parentItem = parent.isValid() ? static_cast<AggregatedTraceViewItem*>(parent.internalPointer()) : _rootItem;
+    const AggregatedTraceViewItem *childItem = parentItem->child(row);
+
+    if (childItem) {
+        return createIndex(row, column, const_cast<AggregatedTraceViewItem*>(childItem));
     } else {
-        return createIndex(row, column);
+        return QModelIndex();
     }
 }
 
-QModelIndex AggregatedTraceViewModel::parent(const QModelIndex &child) const
+QModelIndex AggregatedTraceViewModel::parent(const QModelIndex &index) const
 {
-    (void) child;
-    return QModelIndex();
+    if (!index.isValid()) {
+        return QModelIndex();
+    }
+
+    AggregatedTraceViewItem *childItem = (AggregatedTraceViewItem*) index.internalPointer();
+    AggregatedTraceViewItem *parentItem = childItem->parent();
+
+    if (parentItem == _rootItem) {
+        return QModelIndex();
+    }
+
+    return createIndex(parentItem->row(), 0, parentItem);
 }
 
-bool AggregatedTraceViewModel::hasChildren(const QModelIndex &parent) const
-{
-    return !parent.isValid();
-}
 
 int AggregatedTraceViewModel::rowCount(const QModelIndex &parent) const
 {
-    if (parent.isValid()) {
+    if (parent.column() > 0) {
         return 0;
-    } else {
-        return _list.size();
     }
+
+    AggregatedTraceViewItem *parentItem;
+    if (parent.isValid()) {
+        parentItem = (AggregatedTraceViewItem*)parent.internalPointer();
+    } else {
+        parentItem = _rootItem;
+    }
+    return parentItem->childCount();
 }
 
 int AggregatedTraceViewModel::columnCount(const QModelIndex &parent) const
@@ -128,18 +160,34 @@ QVariant AggregatedTraceViewModel::data(const QModelIndex &index, int role) cons
 
 QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
-    (void) index;
     (void) role;
 
-    if (index.row()>=_list.size()) {
+    AggregatedTraceViewItem *item = (AggregatedTraceViewItem *)index.internalPointer();
+
+    if (index.column() == column_name) {
+        return item->_name;
+    }
+
+    if (item->parent() != _rootItem) {
+
+        if (index.column() == column_data) {
+            const CanMessage *msg = &item->parent()->_lastmsg;
+
+            CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
+            if (!dbmsg) { return QVariant(); }
+
+            CanDbSignal *dbsignal = dbmsg->getSignal(item->row());
+            if (!dbsignal) { return QVariant(); }
+
+            return (int)(msg->extractSignal(dbsignal->startBit(), dbsignal->length(), false));
+
+        }
         return QVariant();
     }
 
-    AggregatedTraceViewItem *item = _list[index.row()];
-
     const CanMessage *msg = &item->_lastmsg;
 
-    CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
+    //CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
 
     struct timeval tv = item->_interval;
     double intervalD;
@@ -147,12 +195,19 @@ QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, in
         case column_timestamp:
             intervalD = (double)tv.tv_sec + ((double)tv.tv_usec/1000000);
             return (intervalD==0) ? "" : QString().sprintf("%.04f", intervalD);
-        case column_channel: return msg->getInterfaceId();
-        case column_direction: return (msg->getId() % 7)==0 ? "tx" : "rx";
-        case column_canid: return msg->getIdString();
-        case column_dlc: return msg->getLength();
-        case column_data: return msg->getDataHexString();
-        case column_name: return dbmsg ? dbmsg->getName() : "unknown";
+        case column_channel:
+            return msg->getInterfaceId();
+        case column_direction:
+            return (msg->getId() % 7)==0 ? "tx" : "rx";
+        case column_canid:
+            return msg->getIdString();
+        case column_dlc:
+            return msg->getLength();
+        case column_data:
+            return msg->getDataHexString();
+        case column_name:
+            //return dbmsg ? dbmsg->getName() : "unknown";
+            return item->_name;
     }
 
 
@@ -174,3 +229,43 @@ QVariant AggregatedTraceViewModel::data_TextAlignmentRole(const QModelIndex &ind
     }
 }
 
+
+AggregatedTraceViewItem::AggregatedTraceViewItem(AggregatedTraceViewItem *parent)
+  : _parent(parent)
+{
+
+}
+
+AggregatedTraceViewItem::~AggregatedTraceViewItem()
+{
+    qDeleteAll(_children);
+}
+
+void AggregatedTraceViewItem::appendChild(AggregatedTraceViewItem *child)
+{
+    _children.append(child);
+}
+
+AggregatedTraceViewItem *AggregatedTraceViewItem::child(int row) const
+{
+    return _children.value(row);
+}
+
+int AggregatedTraceViewItem::childCount() const
+{
+    return _children.count();
+}
+
+int AggregatedTraceViewItem::row() const
+{
+    if (_parent) {
+        return _parent->_children.indexOf(const_cast<AggregatedTraceViewItem*>(this));
+    } else {
+        return 0;
+    }
+}
+
+AggregatedTraceViewItem *AggregatedTraceViewItem::parent()
+{
+    return _parent;
+}

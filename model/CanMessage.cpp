@@ -6,6 +6,7 @@
  */
 
 #include "CanMessage.h"
+#include <endian.h>
 
 enum {
 	id_flag_extended = 0x80000000,
@@ -126,7 +127,21 @@ uint8_t CanMessage::getByte(const uint8_t index) const {
 void CanMessage::setByte(const uint8_t index, const uint8_t value) {
 	if (index<sizeof(_u8)) {
 		_u8[index] = value;
-	}
+    }
+}
+
+uint64_t CanMessage::getU64() const
+{
+    return _u64;
+}
+
+uint64_t CanMessage::extractSignal(const uint8_t start_bit, const uint8_t length, const bool isBigEndian) const
+{
+    uint64_t result = isBigEndian ? be64toh(_u64) : le64toh(_u64);
+    result >>= start_bit;
+    uint64_t mask = 0xFFFFFFFFFFFFFFFF;
+    mask <<= length;
+    return result & ~mask;
 }
 
 void CanMessage::setData(const uint8_t d0) {

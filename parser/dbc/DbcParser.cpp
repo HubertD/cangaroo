@@ -418,7 +418,7 @@ bool DbcParser::parseSectionBo(CanDb *candb, DbcTokenList &tokens)
                 return false;
             }
 
-            if (!parseSectionBoSg(tokens)) {
+            if (!parseSectionBoSg(candb, msg, tokens)) {
                 return false;
             }
         }
@@ -427,8 +427,10 @@ bool DbcParser::parseSectionBo(CanDb *candb, DbcTokenList &tokens)
 
 }
 
-bool DbcParser::parseSectionBoSg(DbcTokenList &tokens)
+bool DbcParser::parseSectionBoSg(CanDb *candb, CanDbMessage *msg, DbcTokenList &tokens)
 {
+    (void)candb;
+
     QString signal_name;
     QString mux_indicator;
     bool is_muxer = false;
@@ -446,8 +448,12 @@ bool DbcParser::parseSectionBoSg(DbcTokenList &tokens)
     QString receiver;
     QStringList receivers;
 
+    CanDbSignal *signal = new CanDbSignal(msg);
+    msg->addSignal(signal);
 
     if (!expectIdentifier(tokens, &signal_name)) { return false; }
+    signal->setName(signal_name);
+
 
     if (expectIdentifier(tokens, &mux_indicator)) {
         if (mux_indicator=="M") {
@@ -464,8 +470,12 @@ bool DbcParser::parseSectionBoSg(DbcTokenList &tokens)
 
     if (!expectAndSkipToken(tokens, dbc_tok_colon)) { return false; }
     if (!expectInt(tokens, &start_bit)) { return false; }
+    signal->setStartBit(start_bit);
+
     if (!expectAndSkipToken(tokens, dbc_tok_pipe)) { return false; }
     if (!expectInt(tokens, &length)) { return false; }
+    signal->setLength(length);
+
     if (!expectAndSkipToken(tokens, dbc_tok_at)) { return false; }
     if (!expectInt(tokens, &byte_order)) { return false; }
 

@@ -7,6 +7,7 @@
 #include "DbcTokens.h"
 
 class CanDb;
+class CanDbMessage;
 
 class DbcParser
 {
@@ -57,7 +58,7 @@ private:
     bool parseSectionVersion(CanDb *candb, DbcTokenList &tokens);
     bool parseSectionBs(DbcTokenList &tokens);
     bool parseSectionBo(CanDb *candb, DbcTokenList &tokens);
-    bool parseSectionBoSg(DbcTokenList &tokens);
+    bool parseSectionBoSg(CanDb *candb, CanDbMessage *msg, DbcTokenList &tokens);
 
 };
 

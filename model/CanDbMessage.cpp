@@ -44,3 +44,17 @@ void CanDbMessage::setSender(CanDbNode *sender)
 {
     _sender = sender;
 }
+
+void CanDbMessage::addSignal(CanDbSignal *signal)
+{
+    _signals.append(signal);
+}
+
+CanDbSignal *CanDbMessage::getSignal(int num)
+{
+    if (_signals.size()>num) {
+        return _signals[num];
+    } else {
+        return 0;
+    }
+}

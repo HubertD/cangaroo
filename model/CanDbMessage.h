@@ -4,9 +4,11 @@
 #include <stdint.h>
 #include <QString>
 #include "CanDb.h"
+#include "CanDbSignal.h"
 
 class CanDbNode;
 class CanDbSignal;
+
 typedef QList<CanDbSignal*> CanDbSignalList;
 
 class CanDbMessage
@@ -25,6 +27,9 @@ class CanDbMessage
 
         CanDbNode *getSender() const;
         void setSender(CanDbNode *sender);
+
+        void addSignal(CanDbSignal *signal);
+        CanDbSignal *getSignal(int num);
 
         CanDbSignalList getSignals() { return _signals; }
 

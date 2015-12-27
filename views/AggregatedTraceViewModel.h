@@ -2,8 +2,8 @@
 #define AGGREGATEDTRACEVIEWMODEL_H
 
 #include <QAbstractItemModel>
-#include <map>
-#include <vector>
+#include <QMap>
+#include <QList>
 
 #include <sys/time.h>
 #include "model/CanMessage.h"
@@ -13,8 +13,24 @@
 class AggregatedTraceViewItem
 {
 public:
+    AggregatedTraceViewItem(AggregatedTraceViewItem *parent);
+    virtual ~AggregatedTraceViewItem();
+
+    void appendChild(AggregatedTraceViewItem *child);
+    AggregatedTraceViewItem *child(int row) const;
+    int childCount() const;
+    int row() const;
+    AggregatedTraceViewItem *parent();
+
+    QString _name;
     CanMessage _lastmsg;
     struct timeval _interval;
+
+private:
+    AggregatedTraceViewItem *_parent;
+    QList<AggregatedTraceViewItem *> _children;
+
+
 };
 
 class AggregatedTraceViewModel : public QAbstractItemModel
@@ -33,9 +49,7 @@ public:
         column_count
     };
 
-    typedef std::map<uint32_t, AggregatedTraceViewItem*> CanIdMap;
-    typedef std::vector<AggregatedTraceViewItem*> ItemList;
-
+    typedef QMap<uint32_t, AggregatedTraceViewItem*> CanIdMap;
 
 public:
     AggregatedTraceViewModel(CanDb *candb, CanTrace *trace);
@@ -44,7 +58,6 @@ public:
     virtual QModelIndex parent(const QModelIndex &child) const;
     virtual int rowCount(const QModelIndex &parent) const;
     virtual int columnCount(const QModelIndex &parent) const;
-    virtual bool hasChildren(const QModelIndex &parent) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
 
@@ -55,9 +68,12 @@ private:
     CanDb *_candb;
     CanTrace *_trace;
     CanIdMap _map;
-    ItemList _list;
+    AggregatedTraceViewItem *_rootItem;
+
     QVariant data_DisplayRole(const QModelIndex &index, int role) const;
     QVariant data_TextAlignmentRole(const QModelIndex &index, int role) const;
+
+    int getChildCountForItem(const AggregatedTraceViewItem *item) const;
 
 };
 
