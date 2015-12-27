@@ -20,11 +20,15 @@ public:
     int length() const;
     void setLength(int length);
 
+    QString comment() const;
+    void setComment(const QString &comment);
+
 private:
     CanDbMessage *_parent;
     QString _name;
     int _startBit;
     int _length;
+    QString _comment;
 };
 
 #endif // CANDBSIGNAL_H

@@ -30,8 +30,12 @@ class CanDbMessage
 
         void addSignal(CanDbSignal *signal);
         CanDbSignal *getSignal(int num);
+        CanDbSignal *getSignalByName(QString signal_name);
 
         CanDbSignalList getSignals() { return _signals; }
+
+        QString getComment() const;
+        void setComment(const QString &comment);
 
 private:
         CanDb *_parent;
@@ -40,6 +44,7 @@ private:
         uint8_t _dlc;
         CanDbNode *_sender;
         CanDbSignalList _signals;
+        QString _comment;
 
 };
 

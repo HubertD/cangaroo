@@ -28,9 +28,13 @@ class CanDb
         CanDbMessage *getMessageById(uint32_t raw_id);
         void addMessage(CanDbMessage *msg);
 
-    private:
+        QString getComment() const;
+        void setComment(const QString &comment);
+
+private:
         QString _filename;
         QString _version;
+        QString _comment;
         CanDbNodeMap _nodes;
         CanDbMessageList _messages;
 

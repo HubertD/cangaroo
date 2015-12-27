@@ -58,3 +58,24 @@ CanDbSignal *CanDbMessage::getSignal(int num)
         return 0;
     }
 }
+
+CanDbSignal *CanDbMessage::getSignalByName(QString signal_name)
+{
+    CanDbSignal *signal;
+    foreach (signal, _signals) {
+        if (signal->name() == signal_name) {
+            return signal;
+        }
+    }
+    return 0;
+}
+
+QString CanDbMessage::getComment() const
+{
+    return _comment;
+}
+
+void CanDbMessage::setComment(const QString &comment)
+{
+    _comment = comment;
+}

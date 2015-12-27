@@ -31,3 +31,13 @@ void CanDb::addMessage(CanDbMessage *msg)
     _messages[msg->getRaw_id()] = msg;
 }
 
+QString CanDb::getComment() const
+{
+    return _comment;
+}
+
+void CanDb::setComment(const QString &comment)
+{
+    _comment = comment;
+}
+

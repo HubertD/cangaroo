@@ -332,19 +332,11 @@ bool DbcParser::parseSection(CanDb *candb, DbcTokenList &tokens) {
             } else if (sectionName == "BS_") {
                 retval &= parseSectionBs(tokens);
             } else if (sectionName == "BU_") {
-
-                strings.clear();
-                if (parseIdentifierList(tokens, &strings)) {
-                    QString s;
-                    foreach(s, strings) {
-                        candb->getOrCreateNode(s);
-                    }
-                } else {
-                    retval = false;
-                }
-
+                retval &= parseSectionBu(candb, tokens);
             } else if (sectionName == "BO_") {
                 retval &= parseSectionBo(candb, tokens);
+            } else if (sectionName == "CM_") {
+                retval &= parseSectionCm(candb, tokens);
             } else {
                 skipUntilSectionEnding(tokens);
             }
@@ -357,7 +349,6 @@ bool DbcParser::parseSection(CanDb *candb, DbcTokenList &tokens) {
     return retval;
 
     /*
-    if (sectionName == "CM_")             { return tokSectionCm; }
     if (sectionName == "BA_")             { return tokSectionBa; }
     if (sectionName == "BA_REL_")         { return tokSectionBaRel; }
     if (sectionName == "BA_DEF_")         { return tokSectionBaDef; }
@@ -382,6 +373,22 @@ bool DbcParser::parseSectionBs(DbcParser::DbcTokenList &tokens)
     }
 
     return expectSectionEnding(tokens);
+}
+
+bool DbcParser::parseSectionBu(CanDb *candb, DbcParser::DbcTokenList &tokens)
+{
+    QStringList strings;
+    QString s;
+
+    if (!parseIdentifierList(tokens, &strings)) {
+        return false;
+    }
+
+    foreach(s, strings) {
+        candb->getOrCreateNode(s);
+    }
+
+    return true;
 }
 
 
@@ -507,5 +514,59 @@ bool DbcParser::parseSectionBoSg(CanDb *candb, CanDbMessage *msg, DbcTokenList &
 
 
     return true;
+}
+
+bool DbcParser::parseSectionCm(CanDb *candb, DbcParser::DbcTokenList &tokens)
+{
+    QString s;
+    QString idtype;
+    QString id;
+    long long ll;
+
+    if (expectString(tokens, &s)) { // DBC file comment
+        candb->setComment(s);
+        return true;
+    }
+
+    if (!expectIdentifier(tokens, &idtype)) { return false; }
+
+    if (idtype=="BU_") {
+
+        if (!expectIdentifier(tokens, &id)) { return false; }
+        if (!expectString(tokens, &s)) { return false; }
+        candb->getOrCreateNode(id)->setComment(s);
+        return expectSectionEnding(tokens);
+
+    } else if (idtype=="BO_") {
+
+        if (!expectLongLong(tokens, &ll)) { return false; }
+        if (!expectString(tokens, &s)) { return false; }
+        CanDbMessage *msg = candb->getMessageById(ll);
+        if (!msg) { return false; }
+        msg->setComment(s);
+        return expectSectionEnding(tokens);
+
+    } else if (idtype=="SG_") {
+
+        if (!expectLongLong(tokens, &ll)) { return false; }
+        CanDbMessage *msg = candb->getMessageById(ll);
+        if (!msg) { return false; }
+
+        if (!expectIdentifier(tokens, &id)) { return false; }
+        CanDbSignal *signal = msg->getSignalByName(id);
+        if (!signal) { return false; }
+
+        if (!expectString(tokens, &s)) { return false; }
+        signal->setComment(s);
+
+        return expectSectionEnding(tokens);
+
+    } else {
+
+        return false;
+
+    }
+
+
 }
 

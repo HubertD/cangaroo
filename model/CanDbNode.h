@@ -13,9 +13,13 @@ public:
     QString name() const;
     void setName(const QString &name);
 
+    QString comment() const;
+    void setComment(const QString &comment);
+
 private:
     CanDb *_parent;
     QString _name;
+    QString _comment;
 };
 
 #endif // CANDBNODE_H

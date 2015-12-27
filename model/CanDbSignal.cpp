@@ -36,3 +36,13 @@ void CanDbSignal::setLength(int length)
     _length = length;
 }
 
+QString CanDbSignal::comment() const
+{
+    return _comment;
+}
+
+void CanDbSignal::setComment(const QString &comment)
+{
+    _comment = comment;
+}
+

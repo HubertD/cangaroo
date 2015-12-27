@@ -139,6 +139,8 @@ QVariant AggregatedTraceViewModel::headerData(int section, Qt::Orientation orien
                     return QString("DLC");
                 case column_data:
                     return QString("Data");
+                case column_comment:
+                    return QString("Comment");
             }
         }
 
@@ -164,30 +166,34 @@ QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, in
 
     AggregatedTraceViewItem *item = (AggregatedTraceViewItem *)index.internalPointer();
 
-    if (index.column() == column_name) {
-        return item->_name;
-    }
-
     if (item->parent() != _rootItem) {
 
-        if (index.column() == column_data) {
-            const CanMessage *msg = &item->parent()->_lastmsg;
+        const CanMessage *msg = &item->parent()->_lastmsg;
 
-            CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
-            if (!dbmsg) { return QVariant(); }
+        CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
+        if (!dbmsg) { return QVariant(); }
 
-            CanDbSignal *dbsignal = dbmsg->getSignal(item->row());
-            if (!dbsignal) { return QVariant(); }
+        CanDbSignal *dbsignal = dbmsg->getSignal(item->row());
+        if (!dbsignal) { return QVariant(); }
 
-            return (int)(msg->extractSignal(dbsignal->startBit(), dbsignal->length(), false));
+        uint32_t raw_data;
+        switch (index.column()) {
+
+            case column_name:
+                return dbsignal->name();
+            case column_data:
+                raw_data = msg->extractSignal(dbsignal->startBit(), dbsignal->length(), false);
+                return raw_data;
+            case column_comment:
+                return dbsignal->comment();
+            default:
+                return QVariant();
 
         }
-        return QVariant();
     }
 
     const CanMessage *msg = &item->_lastmsg;
-
-    //CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
+    CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
 
     struct timeval tv = item->_interval;
     double intervalD;
@@ -201,13 +207,15 @@ QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, in
             return (msg->getId() % 7)==0 ? "tx" : "rx";
         case column_canid:
             return msg->getIdString();
+        case column_name:
+            return (dbmsg) ? dbmsg->getName() : "";
         case column_dlc:
             return msg->getLength();
         case column_data:
             return msg->getDataHexString();
-        case column_name:
-            //return dbmsg ? dbmsg->getName() : "unknown";
-            return item->_name;
+        case column_comment:
+            return (dbmsg) ? dbmsg->getComment() : "";
+
     }
 
 
@@ -225,6 +233,7 @@ QVariant AggregatedTraceViewModel::data_TextAlignmentRole(const QModelIndex &ind
         case column_name: return Qt::AlignLeft + Qt::AlignVCenter;
         case column_dlc: return Qt::AlignCenter + Qt::AlignVCenter;
         case column_data: return Qt::AlignLeft + Qt::AlignVCenter;
+        case column_comment: return Qt::AlignLeft + Qt::AlignVCenter;
        default: return QVariant();
     }
 }

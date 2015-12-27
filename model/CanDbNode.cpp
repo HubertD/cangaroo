@@ -16,3 +16,13 @@ void CanDbNode::setName(const QString &name)
     _name = name;
 }
 
+QString CanDbNode::comment() const
+{
+    return _comment;
+}
+
+void CanDbNode::setComment(const QString &comment)
+{
+    _comment = comment;
+}
+
