@@ -66,6 +66,9 @@
       <property name="uniformRowHeights">
        <bool>true</bool>
       </property>
+      <attribute name="headerDefaultSectionSize">
+       <number>80</number>
+      </attribute>
      </widget>
     </item>
    </layout>

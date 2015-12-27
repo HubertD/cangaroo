@@ -28,6 +28,13 @@ MainWindow::MainWindow(QWidget *parent) :
     //model = new LinearTraceViewModel(trace);
     ui->tree->setModel(new AggregatedTraceViewModel(&_candb, trace));
     ui->tree->setUniformRowHeights(true);
+    ui->tree->setColumnWidth(0, 80);
+    ui->tree->setColumnWidth(1, 70);
+    ui->tree->setColumnWidth(2, 50);
+    ui->tree->setColumnWidth(3, 90);
+    ui->tree->setColumnWidth(4, 200);
+    ui->tree->setColumnWidth(5, 50);
+    ui->tree->setColumnWidth(6, 200);
 
     SocketCanInterfaceProvider prov;
     prov.update();
