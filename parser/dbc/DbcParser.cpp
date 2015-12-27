@@ -337,6 +337,8 @@ bool DbcParser::parseSection(CanDb *candb, DbcTokenList &tokens) {
                 retval &= parseSectionBo(candb, tokens);
             } else if (sectionName == "CM_") {
                 retval &= parseSectionCm(candb, tokens);
+            } else if (sectionName == "VAL_") {
+                retval &= parseSectionVal(candb, tokens);
             } else {
                 skipUntilSectionEnding(tokens);
             }
@@ -568,5 +570,29 @@ bool DbcParser::parseSectionCm(CanDb *candb, DbcParser::DbcTokenList &tokens)
     }
 
 
+}
+
+bool DbcParser::parseSectionVal(CanDb *candb, DbcParser::DbcTokenList &tokens)
+{
+    long long can_id;
+    QString signal_id;
+    long long value;
+    QString name;
+
+    if (!expectLongLong(tokens, &can_id)) { return false; }
+    CanDbMessage *msg = candb->getMessageById(can_id);
+    if (!msg) { return false; }
+
+    if (!expectIdentifier(tokens, &signal_id)) { return false; }
+    CanDbSignal *signal = msg->getSignalByName(signal_id);
+    if (!signal) { return false; }
+
+    while (!expectAndSkipToken(tokens, dbc_tok_semicolon)) {
+        if (!expectLongLong(tokens, &value)) { return false; }
+        if (!expectString(tokens, &name)) { return false; }
+        signal->setValueName(value, name);
+    }
+
+    return true;
 }
 

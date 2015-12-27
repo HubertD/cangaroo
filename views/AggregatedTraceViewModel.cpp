@@ -177,15 +177,25 @@ QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, in
         if (!dbsignal) { return QVariant(); }
 
         uint32_t raw_data;
+        QString value_name;
         switch (index.column()) {
 
             case column_name:
                 return dbsignal->name();
+
             case column_data:
                 raw_data = msg->extractSignal(dbsignal->startBit(), dbsignal->length(), false);
-                return raw_data;
+                value_name = dbsignal->getValueName(raw_data);
+
+                if (value_name.isEmpty()) {
+                    return raw_data;
+                } else {
+                    return QString().number(raw_data) + " - " + value_name;
+                }
+
             case column_comment:
                 return dbsignal->comment();
+
             default:
                 return QVariant();
 

@@ -46,3 +46,17 @@ void CanDbSignal::setComment(const QString &comment)
     _comment = comment;
 }
 
+QString CanDbSignal::getValueName(const uint32_t value) const
+{
+    if (_valueTable.contains(value)) {
+        return _valueTable[value];
+    } else {
+        return QString();
+    }
+}
+
+void CanDbSignal::setValueName(const uint32_t value, const QString &name)
+{
+    _valueTable[value] = name;
+}
+
