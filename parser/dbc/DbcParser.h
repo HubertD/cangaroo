@@ -43,7 +43,7 @@ private:
 
     bool expectData(DbcTokenList &tokens, dbc_token_type_t type, QString *data, bool skipWhitespace=true, bool skipSectionEnding=false);
     bool expectIdentifier(DbcTokenList &tokens, QString *id, bool skipWhitespace=true, bool skipSectionEnding=false);
-    bool expectString(DbcTokenList &tokens, QString *id, bool skipWhitespace=true);
+    bool expectString(DbcTokenList &tokens, QString *str, bool skipWhitespace=true);
     bool expectInt(DbcTokenList &tokens, int *i, int base=10, bool skipWhitespace=true);
     bool expectLongLong(DbcTokenList &tokens, long long *i, int base=10, bool skipWhitespace=true);
     bool expectDouble(DbcTokenList &tokens, double *df, bool skipWhitespace=true);

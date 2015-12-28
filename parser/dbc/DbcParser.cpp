@@ -237,9 +237,16 @@ bool DbcParser::expectIdentifier(DbcParser::DbcTokenList &tokens, QString *id, b
     return expectData(tokens, dbc_tok_identifier, id, skipWhitespace, skipSectionEnding);
 }
 
-bool DbcParser::expectString(DbcParser::DbcTokenList &tokens, QString *id, bool skipWhitespace)
+bool DbcParser::expectString(DbcParser::DbcTokenList &tokens, QString *str, bool skipWhitespace)
 {
-    return expectData(tokens, dbc_tok_string, id, skipWhitespace);
+    QString quotedStr;
+    bool ok = expectData(tokens, dbc_tok_string, &quotedStr, skipWhitespace);
+    if (ok && quotedStr.length()>=2) {
+        *str = quotedStr.mid(1, quotedStr.length()-2);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool DbcParser::expectInt(DbcParser::DbcTokenList &tokens, int *i, int base, bool skipWhitespace)
