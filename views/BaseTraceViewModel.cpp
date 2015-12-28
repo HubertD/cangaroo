@@ -1,9 +1,8 @@
 #include "BaseTraceViewModel.h"
 
-BaseTraceViewModel::BaseTraceViewModel(CanDb *candb, CanTrace *trace)
-  : _candb(candb), _trace(trace)
+BaseTraceViewModel::BaseTraceViewModel(MeasurementSetup *setup)
+  : _setup(setup)
 {
-
 }
 
 int BaseTraceViewModel::columnCount(const QModelIndex &parent) const
@@ -65,7 +64,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
 {
     (void) role;
     double intervalD;
-    CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
+    CanDbMessage *dbmsg = _setup->findDbMessage(msg);
 
     switch (index.column()) {
 
@@ -106,7 +105,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, i
     uint32_t raw_data;
     QString value_name;
 
-    CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
+    CanDbMessage *dbmsg = _setup->findDbMessage(msg);
     if (!dbmsg) { return QVariant(); }
 
     CanDbSignal *dbsignal = dbmsg->getSignal(index.row());

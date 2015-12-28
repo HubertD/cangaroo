@@ -8,14 +8,14 @@
 #ifndef BASE_CANINTERFACEPROVIDER_H_
 #define BASE_CANINTERFACEPROVIDER_H_
 
-#include <vector>
+#include <QList>
 #include "CanInterface.h"
 
 using namespace std;
 
 class CanInterface;
 
-typedef vector<CanInterface*> CanInterfaceList;
+typedef QList<CanInterface*> CanInterfaceList;
 
 class CanInterfaceProvider {
 public:

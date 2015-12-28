@@ -2,6 +2,7 @@
 #define LINEARTRACEVIEWMODEL_H
 
 #include <QAbstractItemModel>
+#include <setup/MeasurementSetup.h>
 #include <model/CanDb.h>
 #include <model/CanTrace.h>
 #include "BaseTraceViewModel.h"
@@ -11,7 +12,7 @@ class LinearTraceViewModel : public BaseTraceViewModel
     Q_OBJECT
 
 public:
-    LinearTraceViewModel(CanDb *candb, CanTrace *trace);
+    LinearTraceViewModel(MeasurementSetup *setup);
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
     virtual QModelIndex parent(const QModelIndex &child) const;

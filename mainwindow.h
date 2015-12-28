@@ -7,6 +7,7 @@
 #include <model/CanTrace.h>
 #include <views/LinearTraceViewModel.h>
 #include <views/AggregatedTraceViewModel.h>
+#include <setup/MeasurementSetup.h>
 
 namespace Ui {
 class MainWindow;
@@ -26,8 +27,10 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
+    MeasurementSetup *setup;
+
     CanDb _candb;
-    CanTrace *_trace;
+
     SocketCanInterfaceProvider *_provider;
     LinearTraceViewModel *_linearTraceViewModel;
     AggregatedTraceViewModel *_aggregatedTraceViewModel;

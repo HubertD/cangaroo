@@ -1,10 +1,10 @@
 #include "AggregatedTraceViewModel.h"
 
-AggregatedTraceViewModel::AggregatedTraceViewModel(CanDb *candb, CanTrace *trace)
-  : BaseTraceViewModel(candb, trace)
+AggregatedTraceViewModel::AggregatedTraceViewModel(MeasurementSetup *setup)
+  : BaseTraceViewModel(setup)
 {
     _rootItem = new AggregatedTraceViewItem(0);
-    connect(trace, SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
+    connect(_setup->getTrace(), SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
 }
 
 void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
@@ -12,6 +12,7 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
     AggregatedTraceViewItem *item;
     struct timeval tv_last, tv_now;
 
+    // FIXME rawid is only unique per channel/network, not for the whole measurement
     uint32_t raw_id = msg.getRawId();
 
     if (!_map.contains(raw_id)) {
@@ -20,7 +21,7 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
         item = new AggregatedTraceViewItem(_rootItem);
         item->_lastmsg = msg;
 
-        CanDbMessage *dbmsg = _candb->getMessageById(raw_id);
+        CanDbMessage *dbmsg = _setup->findDbMessage(&msg);
         if (dbmsg) {
             for (int i=0; i<dbmsg->getSignals().length(); i++) {
                 item->appendChild(new AggregatedTraceViewItem(item));

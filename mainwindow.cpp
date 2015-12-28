@@ -3,15 +3,16 @@
 #include <QTimer>
 #include <QThread>
 
-#include "views/LinearTraceViewModel.h"
-#include "views/AggregatedTraceViewModel.h"
+#include <views/LinearTraceViewModel.h>
+#include <views/AggregatedTraceViewModel.h>
 
-#include "drivers/socketcan/SocketCanInterface.h"
-#include "drivers/socketcan/SocketCanInterfaceProvider.h"
-#include "drivers/CanListener.h"
+#include <drivers/socketcan/SocketCanInterface.h>
+#include <drivers/socketcan/SocketCanInterfaceProvider.h>
+#include <drivers/CanListener.h>
 
-#include "parser/dbc/DbcParser.h"
-#include "model/CanDb.h"
+#include <parser/dbc/DbcParser.h>
+#include <model/CanDb.h>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -19,14 +20,27 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+
     DbcParser parser;
     QFile *dbc = new QFile("test.dbc");
     parser.parseFile(dbc, &_candb);
 
-    _trace = new CanTrace(this, 100);
+    _provider = new SocketCanInterfaceProvider();
+    _provider->update();
 
-    _linearTraceViewModel = new LinearTraceViewModel(&_candb, _trace);
-    _aggregatedTraceViewModel = new AggregatedTraceViewModel(&_candb, _trace);
+    CanInterface *intf;
+    MeasurementNetwork *network;
+    setup = new MeasurementSetup();
+    foreach (intf, _provider->getInterfaceList()) {
+        network = setup->createNetwork();
+        network->addCanInterface(intf);
+        network->addCanDb(&_candb);
+    }
+
+    setup->startMeasurement();
+
+    _linearTraceViewModel = new LinearTraceViewModel(setup);
+    _aggregatedTraceViewModel = new AggregatedTraceViewModel(setup);
 
     ui->tree->setModel(_linearTraceViewModel);
     ui->tree->setUniformRowHeights(true);
@@ -40,28 +54,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(_linearTraceViewModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
     connect(ui->cbAggregate, SIGNAL(stateChanged(int)), this, SLOT(onCbTraceTypeChanged(int)));
-
-    _provider = new SocketCanInterfaceProvider();
-    _provider->update();
-
-    qRegisterMetaType<CanMessage>("CanMessage");
-
-    CanInterfaceList interfaces = _provider->getInterfaceList();
-    int i=0;
-    for (CanInterfaceList::iterator it=interfaces.begin(); it!=interfaces.end(); ++it) {
-        CanInterface *intf = *it;
-        intf->open();
-        intf->setId(i++);
-
-        QThread* thread = new QThread;
-        CanListener *listener = new CanListener(0, intf);
-        listener->moveToThread(thread);
-        connect(thread, SIGNAL(started()), listener, SLOT(run()));
-        connect(listener, SIGNAL(messageReceived(CanMessage)), _trace, SLOT(enqueueMessage(CanMessage)));
-        thread->start();
-    }
-
-
 }
 
 MainWindow::~MainWindow()
