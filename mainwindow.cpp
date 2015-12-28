@@ -40,12 +40,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->cbAggregate, SIGNAL(stateChanged(int)), this, SLOT(onCbTraceTypeChanged(int)));
 
-    SocketCanInterfaceProvider prov;
-    prov.update();
+    _provider = new SocketCanInterfaceProvider();
+    _provider->update();
 
     qRegisterMetaType<CanMessage>("CanMessage");
 
-    CanInterfaceList interfaces = prov.getInterfaceList();
+    CanInterfaceList interfaces = _provider->getInterfaceList();
     int i=0;
     for (CanInterfaceList::iterator it=interfaces.begin(); it!=interfaces.end(); ++it) {
         CanInterface *intf = *it;
@@ -59,6 +59,8 @@ MainWindow::MainWindow(QWidget *parent) :
         connect(listener, SIGNAL(messageReceived(CanMessage)), _trace, SLOT(enqueueMessage(CanMessage)));
         thread->start();
     }
+
+
 }
 
 MainWindow::~MainWindow()

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <drivers/socketcan/SocketCanInterfaceProvider.h>
 #include <model/CanDb.h>
 #include <model/CanTrace.h>
 #include <views/LinearTraceViewModel.h>
@@ -26,6 +27,7 @@ private:
     Ui::MainWindow *ui;
     CanDb _candb;
     CanTrace *_trace;
+    SocketCanInterfaceProvider *_provider;
     LinearTraceViewModel *_linearTraceViewModel;
     AggregatedTraceViewModel *_aggregatedTraceViewModel;
 

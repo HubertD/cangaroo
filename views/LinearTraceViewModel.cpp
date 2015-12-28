@@ -37,7 +37,8 @@ int LinearTraceViewModel::rowCount(const QModelIndex &parent) const
         } else { // a message
             const CanMessage *msg = _trace->getMessage(id-1);
             if (msg) {
-                return msg->getLength();
+                CanDbMessage *dbmsg = _candb->getMessageById(msg->getRawId());
+                return (dbmsg!=0) ? dbmsg->getSignals().length() : 0;
             } else {
                 return 0;
             }
