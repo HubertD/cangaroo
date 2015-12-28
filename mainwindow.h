@@ -22,6 +22,7 @@ public:
 
 public slots:
     void onCbTraceTypeChanged(int i);
+    void rowsInserted(const QModelIndex & parent, int first, int last);
 
 private:
     Ui::MainWindow *ui;

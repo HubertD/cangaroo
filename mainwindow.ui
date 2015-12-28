@@ -52,6 +52,13 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QCheckBox" name="cbAutoScroll">
+        <property name="text">
+         <string>auto scroll</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>

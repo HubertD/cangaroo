@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tree->setColumnWidth(5, 50);
     ui->tree->setColumnWidth(6, 200);
 
+    connect(_linearTraceViewModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
     connect(ui->cbAggregate, SIGNAL(stateChanged(int)), this, SLOT(onCbTraceTypeChanged(int)));
 
     _provider = new SocketCanInterfaceProvider();
@@ -76,4 +77,17 @@ void MainWindow::onCbTraceTypeChanged(int i)
         ui->tree->setModel(_linearTraceViewModel);
     }
 
+}
+
+void MainWindow::rowsInserted(const QModelIndex &parent, int first, int last)
+{
+    (void) parent;
+    (void) first;
+    (void) last;
+
+    if (ui->cbAutoScroll->checkState() == Qt::Checked) {
+        if (ui->tree->model()==_linearTraceViewModel) {
+            ui->tree->scrollToBottom();
+        }
+    }
 }
