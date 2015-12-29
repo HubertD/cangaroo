@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QRegExp>
 #include <QList>
+#include <qstringlist.h>
 #include "DbcTokens.h"
 
 class CanDb;

@@ -26,7 +26,7 @@
  * @brief API overview
  */
 
-#include <can_netlink.h>
+#include "can_netlink.h"
 
 #ifdef __cplusplus
 extern "C" {

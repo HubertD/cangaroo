@@ -12,7 +12,7 @@ LinearTraceViewModel::LinearTraceViewModel(MeasurementSetup *setup)
 QModelIndex LinearTraceViewModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid() && parent.internalId()) {
-        return createIndex(row, column, 0x80000000 | parent.internalId());
+        return createIndex(row, column, (unsigned int)(0x80000000 | parent.internalId()));
     } else {
         return createIndex(row, column, row+1);
     }
@@ -23,7 +23,7 @@ QModelIndex LinearTraceViewModel::parent(const QModelIndex &child) const
     (void) child;
     quintptr id = child.internalId();
     if (id & 0x80000000) {
-        return createIndex(id & 0x7FFFFFFF, 0, id & 0x7FFFFFFF);
+        return createIndex(id & 0x7FFFFFFF, 0, (unsigned int)(id & 0x7FFFFFFF));
     }
     return QModelIndex();
 }

@@ -2,6 +2,7 @@
 
 #include <QThread>
 #include <drivers/CanListener.h>
+#include <QMetaType>
 
 MeasurementSetup::MeasurementSetup()
   : QObject()

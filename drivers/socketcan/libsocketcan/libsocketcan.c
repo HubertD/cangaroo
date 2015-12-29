@@ -33,7 +33,7 @@
 #include <linux/rtnetlink.h>
 #include <linux/netlink.h>
 
-#include <libsocketcan.h>
+#include "libsocketcan.h"
 
 #define parse_rtattr_nested(tb, max, rta) \
 	(parse_rtattr((tb), (max), RTA_DATA(rta), RTA_PAYLOAD(rta)))
