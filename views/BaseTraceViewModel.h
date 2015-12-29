@@ -34,6 +34,7 @@ protected:
     virtual QVariant data_DisplayRole_Message(const QModelIndex &index, int role, const CanMessage *msg, struct timeval tv) const;
     virtual QVariant data_DisplayRole_Signal(const QModelIndex &index, int role, const CanMessage *msg) const;
     virtual QVariant data_TextAlignmentRole(const QModelIndex &index, int role) const;
+    virtual QVariant data_TextColorRole(const QModelIndex &index, int role) const;
 
 };
 

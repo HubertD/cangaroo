@@ -48,6 +48,8 @@ QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
             return data_DisplayRole(index, role);
         case Qt::TextAlignmentRole:
             return data_TextAlignmentRole(index, role);
+        case Qt::TextColorRole:
+            return data_TextColorRole(index, role);
         default:
             return QVariant();
     }
@@ -149,4 +151,11 @@ QVariant BaseTraceViewModel::data_TextAlignmentRole(const QModelIndex &index, in
         case column_comment: return Qt::AlignLeft + Qt::AlignVCenter;
         default: return QVariant();
     }
+}
+
+QVariant BaseTraceViewModel::data_TextColorRole(const QModelIndex &index, int role) const
+{
+    (void) index;
+    (void) role;
+    return QVariant();
 }

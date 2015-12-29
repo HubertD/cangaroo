@@ -17,6 +17,8 @@ public:
     int childCount() const;
     int row() const;
     AggregatedTraceViewItem *parent() const;
+    AggregatedTraceViewItem *firstChild() const;
+    AggregatedTraceViewItem *lastChild() const;
 
     CanMessage _lastmsg;
     struct timeval _interval;
@@ -24,7 +26,6 @@ public:
 private:
     AggregatedTraceViewItem *_parent;
     QList<AggregatedTraceViewItem *> _children;
-
 
 };
 

@@ -4,6 +4,7 @@
 #include <QAbstractItemModel>
 #include <QMap>
 #include <QList>
+#include <QTimer>
 
 #include <sys/time.h>
 
@@ -32,16 +33,20 @@ public:
 
 public slots:
     void messageReceived(const CanMessage &msg);
+    void onFadeoutTimer();
 
 private:
     CanIdMap _map;
     AggregatedTraceViewItem *_rootItem;
-    unique_key_t makeUniqueKey(const CanMessage &msg);
+    QTimer *_fadeoutTimer;
 
+    unique_key_t makeUniqueKey(const CanMessage &msg);
     void createItem(const CanMessage &msg, AggregatedTraceViewItem *item, unique_key_t key);
+    double getTimeDiff(const timeval t1, const timeval t2) const;
     
 protected:
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;
+    virtual QVariant data_TextColorRole(const QModelIndex &index, int role) const;
 
 private slots:
     void createItem(const CanMessage &msg);

@@ -1,10 +1,16 @@
 #include "AggregatedTraceViewModel.h"
+#include <QColor>
 
 AggregatedTraceViewModel::AggregatedTraceViewModel(MeasurementSetup *setup)
   : BaseTraceViewModel(setup)
 {
     _rootItem = new AggregatedTraceViewItem(0);
+    _fadeoutTimer = new QTimer(this);
+    connect(_fadeoutTimer, SIGNAL(timeout()), this, SLOT(onFadeoutTimer()));
     connect(_setup->getTrace(), SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
+
+    _fadeoutTimer->setInterval(100);
+    _fadeoutTimer->start();
 }
 
 void AggregatedTraceViewModel::createItem(const CanMessage &msg)
@@ -63,6 +69,13 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
 AggregatedTraceViewModel::unique_key_t AggregatedTraceViewModel::makeUniqueKey(const CanMessage &msg)
 {
     return ((uint64_t)msg.getInterface()->getId() << 32) | msg.getRawId();
+}
+
+double AggregatedTraceViewModel::getTimeDiff(const timeval t1, const timeval t2) const
+{
+    double diff = t2.tv_sec - t1.tv_sec;
+    diff += ((double)(t2.tv_usec - t1.tv_usec)) / 1000000;
+    return diff;
 }
 
 
@@ -125,4 +138,25 @@ QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, in
     }
 }
 
+QVariant AggregatedTraceViewModel::data_TextColorRole(const QModelIndex &index, int role) const
+{
+    (void) role;
+    AggregatedTraceViewItem *item = (AggregatedTraceViewItem *)index.internalPointer();
+    if (!item) { return QVariant(); }
 
+    struct timeval now;
+    gettimeofday(&now, 0);
+
+    int color = getTimeDiff(item->_lastmsg.getTimestamp(), now)*100;
+    if (color>200) { color = 200; }
+
+    return QVariant::fromValue(QColor(color, color, color));
+}
+
+
+void AggregatedTraceViewModel::onFadeoutTimer()
+{
+    if (_rootItem->childCount()>0) {
+        dataChanged(createIndex(0, 0, _rootItem->firstChild()), createIndex(_rootItem->childCount()-1, column_count-1, _rootItem->lastChild()));
+    }
+}

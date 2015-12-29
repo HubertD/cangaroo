@@ -40,3 +40,13 @@ AggregatedTraceViewItem *AggregatedTraceViewItem::parent() const
 {
     return _parent;
 }
+
+AggregatedTraceViewItem *AggregatedTraceViewItem::firstChild() const
+{
+    return _children.first();
+}
+
+AggregatedTraceViewItem *AggregatedTraceViewItem::lastChild() const
+{
+    return _children.last();
+}
