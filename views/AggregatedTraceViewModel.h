@@ -38,9 +38,14 @@ private:
     AggregatedTraceViewItem *_rootItem;
     unique_key_t makeUniqueKey(const CanMessage &msg);
 
+    void createItem(const CanMessage &msg, AggregatedTraceViewItem *item, unique_key_t key);
+    
 protected:
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;
 
+private slots:
+    void createItem(const CanMessage &msg);
+    void updateItem(const CanMessage &msg);
 };
 
 #endif // AGGREGATEDTRACEVIEWMODEL_H

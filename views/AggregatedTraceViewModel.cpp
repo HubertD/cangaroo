@@ -7,53 +7,55 @@ AggregatedTraceViewModel::AggregatedTraceViewModel(MeasurementSetup *setup)
     connect(_setup->getTrace(), SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
 }
 
-void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
+void AggregatedTraceViewModel::createItem(const CanMessage &msg)
 {
-    AggregatedTraceViewItem *item;
+    AggregatedTraceViewItem *item = new AggregatedTraceViewItem(_rootItem);
+    item->_lastmsg = msg;
+
+    CanDbMessage *dbmsg = _setup->findDbMessage(&msg);
+    if (dbmsg) {
+        for (int i=0; i<dbmsg->getSignals().length(); i++) {
+            item->appendChild(new AggregatedTraceViewItem(item));
+        }
+    }
+
+    beginResetModel();
+    _rootItem->appendChild(item);
+    _map[makeUniqueKey(msg)] = item;
+    endResetModel();
+}
+
+void AggregatedTraceViewModel::updateItem(const CanMessage &msg)
+{
     struct timeval tv_last, tv_now;
 
-    // FIXME rawid is only unique per channel/network, not for the whole measurement
-    unique_key_t key = makeUniqueKey(msg);
+    if (!_map.contains(makeUniqueKey(msg))) { return; }
+    AggregatedTraceViewItem *item = _map[makeUniqueKey(msg)];
 
-    if (!_map.contains(key)) {
+    tv_last = item->_lastmsg.getTimestamp();
+    tv_now = msg.getTimestamp();
 
-        // create new row
-        item = new AggregatedTraceViewItem(_rootItem);
-        item->_lastmsg = msg;
+    item->_lastmsg = msg;
 
-        CanDbMessage *dbmsg = _setup->findDbMessage(&msg);
-        if (dbmsg) {
-            for (int i=0; i<dbmsg->getSignals().length(); i++) {
-                item->appendChild(new AggregatedTraceViewItem(item));
-            }
-        }
+    int diff_us = tv_now.tv_usec - tv_last.tv_usec;
+    item->_interval.tv_sec = tv_now.tv_sec - tv_last.tv_sec;
+    if (diff_us<0) {
+        item->_interval.tv_sec--;
+        diff_us += 1000000;
+    }
+    item->_interval.tv_usec = diff_us;
 
-        beginResetModel();
-        _rootItem->appendChild(item);
-        _map[key] = item;
-        endResetModel();
+    int row = item->row();
+    dataChanged(createIndex(row, 0, item), createIndex(row, column_count-1, item));
+}
 
+void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
+{
+
+    if (_map.contains(makeUniqueKey(msg))) {
+        updateItem(msg);
     } else {
-
-        // update row
-
-        item = _map[key];
-        tv_last = item->_lastmsg.getTimestamp();
-        tv_now = msg.getTimestamp();
-
-        item->_lastmsg = msg;
-
-        int diff_us = tv_now.tv_usec - tv_last.tv_usec;
-        item->_interval.tv_sec = tv_now.tv_sec - tv_last.tv_sec;
-        if (diff_us<0) {
-            item->_interval.tv_sec--;
-            diff_us += 1000000;
-        }
-        item->_interval.tv_usec = diff_us;
-
-        int row = item->row();
-        dataChanged(createIndex(row, 0, item), createIndex(row, column_count-1, item));
-
+        createItem(msg);
     }
 
 }
@@ -95,7 +97,6 @@ QModelIndex AggregatedTraceViewModel::parent(const QModelIndex &index) const
 
     return createIndex(parentItem->row(), 0, parentItem);
 }
-
 
 int AggregatedTraceViewModel::rowCount(const QModelIndex &parent) const
 {
