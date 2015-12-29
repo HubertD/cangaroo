@@ -56,16 +56,7 @@ int LinearTraceViewModel::columnCount(const QModelIndex &parent) const
 
 bool LinearTraceViewModel::hasChildren(const QModelIndex &parent) const
 {
-    quintptr id = parent.internalId();
-    if (id) {
-        if (id & 0x80000000) {
-            return false;
-        } else {
-            return _setup->getTrace()->getMessage(id-1)->getLength()>0;
-        }
-    } else {
-        return !parent.isValid();
-    }
+    return rowCount(parent)>0;
 }
 
 void LinearTraceViewModel::beforeAppend(int num_messages)
