@@ -1,9 +1,13 @@
 #include "CanDbSignal.h"
 
 CanDbSignal::CanDbSignal(CanDbMessage *parent)
-  : _parent(parent)
+  : _parent(parent),
+    _isUnsigned(false),
+    _factor(1),
+    _offset(0),
+    _min(0),
+    _max(0)
 {
-
 }
 
 QString CanDbSignal::name() const
@@ -58,5 +62,68 @@ QString CanDbSignal::getValueName(const uint32_t value) const
 void CanDbSignal::setValueName(const uint32_t value, const QString &name)
 {
     _valueTable[value] = name;
+}
+
+double CanDbSignal::convertRawValueToPhysical(const uint32_t rawValue)
+{
+    int v;
+    if (isUnsigned()) {
+        v = rawValue;
+    } else {
+        // TODO check with DBC that actually contains signed values?!
+        v = (int32_t)(rawValue<<(32-_length));
+        v>>=(32-_length);
+    }
+    return v * _factor + _offset;
+}
+
+double CanDbSignal::getFactor() const
+{
+    return _factor;
+}
+
+void CanDbSignal::setFactor(double factor)
+{
+    _factor = factor;
+}
+
+double CanDbSignal::getOffset() const
+{
+    return _offset;
+}
+
+void CanDbSignal::setOffset(double offset)
+{
+    _offset = offset;
+}
+
+double CanDbSignal::getMinimumValue() const
+{
+    return _min;
+}
+
+void CanDbSignal::setMinimumValue(double min)
+{
+    _min = min;
+}
+
+double CanDbSignal::getMaximumValue() const
+{
+    return _max;
+}
+
+void CanDbSignal::setMaximumValue(double max)
+{
+    _max = max;
+}
+
+bool CanDbSignal::isUnsigned() const
+{
+    return _isUnsigned;
+}
+
+void CanDbSignal::setUnsigned(bool isUnsigned)
+{
+    _isUnsigned = isUnsigned;
 }
 

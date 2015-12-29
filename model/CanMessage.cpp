@@ -134,7 +134,7 @@ uint64_t CanMessage::getU64() const
     return _u64;
 }
 
-uint64_t CanMessage::extractSignal(const uint8_t start_bit, const uint8_t length, const bool isBigEndian) const
+uint64_t CanMessage::extractRawSignal(const uint8_t start_bit, const uint8_t length, const bool isBigEndian) const
 {
     uint64_t result = isBigEndian ? be64toh(_u64) : le64toh(_u64);
     result >>= start_bit;

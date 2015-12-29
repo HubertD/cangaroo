@@ -117,11 +117,11 @@ QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, i
             return dbsignal->name();
 
         case column_data:
-            raw_data = msg->extractSignal(dbsignal->startBit(), dbsignal->length(), false);
+            raw_data = msg->extractRawSignal(dbsignal->startBit(), dbsignal->length(), false);
             value_name = dbsignal->getValueName(raw_data);
 
             if (value_name.isEmpty()) {
-                return raw_data;
+                return dbsignal->convertRawValueToPhysical(raw_data);
             } else {
                 return QString().number(raw_data) + " - " + value_name;
             }

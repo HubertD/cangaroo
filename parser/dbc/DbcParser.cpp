@@ -369,7 +369,6 @@ bool DbcParser::parseSection(CanDb *candb, DbcTokenList &tokens) {
     if (sectionName == "BA_DEF_")         { return tokSectionBaDef; }
     if (sectionName == "BA_DEF_DEF_")     { return tokSectionBaDefDef; }
     if (sectionName == "BA_DEF_DEF_REL_") { return tokSectionBaDefDefRel; }
-    if (sectionName == "VAL_")            { return tokSectionVal; }
 */
 }
 
@@ -461,7 +460,6 @@ bool DbcParser::parseSectionBoSg(CanDb *candb, CanDbMessage *msg, DbcTokenList &
     int start_bit = 0;
     int length = 0;
     int byte_order = 0;
-    bool is_unsigned = false;
     double factor = 1;
     double offset = 0;
     double minimum = 0;
@@ -502,19 +500,26 @@ bool DbcParser::parseSectionBoSg(CanDb *candb, CanDbMessage *msg, DbcTokenList &
     if (!expectInt(tokens, &byte_order)) { return false; }
 
     if (expectAndSkipToken(tokens, dbc_tok_plus)) {
-        is_unsigned = true;
+        signal->setUnsigned(true);
+    } else {
+        // TODO check with DBC that actually contains signed values?!
+        signal->setUnsigned(false);
     }
 
     if (!expectAndSkipToken(tokens, dbc_tok_parenth_open)) { return false; }
     if (!expectDouble(tokens, &factor)) { return false; }
+    signal->setFactor(factor);
     if (!expectAndSkipToken(tokens, dbc_tok_comma)) { return false; }
     if (!expectDouble(tokens, &offset)) { return false; }
+    signal->setOffset(offset);
     if (!expectAndSkipToken(tokens, dbc_tok_parenth_close)) { return false; }
 
     if (!expectAndSkipToken(tokens, dbc_tok_bracket_open)) { return false; }
     if (!expectDouble(tokens, &minimum)) { return false; }
+    signal->setMinimumValue(minimum);
     if (!expectAndSkipToken(tokens, dbc_tok_pipe)) { return false; }
     if (!expectDouble(tokens, &maximum)) { return false; }
+    signal->setMaximumValue(maximum);
     if (!expectAndSkipToken(tokens, dbc_tok_bracket_close)) { return false; }
 
     if (!expectString(tokens, &unit)) { return false; }
