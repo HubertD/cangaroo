@@ -2,16 +2,19 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <drivers/socketcan/SocketCanInterfaceProvider.h>
-#include <model/CanDb.h>
-#include <model/CanTrace.h>
-#include <views/LinearTraceViewModel.h>
-#include <views/AggregatedTraceViewModel.h>
-#include <setup/MeasurementSetup.h>
 
-namespace Ui {
-class MainWindow;
-}
+class TraceView;
+
+QT_BEGIN_NAMESPACE
+class QAction;
+class QMenu;
+class QMdiArea;
+class QMdiSubWindow;
+class QSignalMapper;
+QT_END_NAMESPACE
+
+class MeasurementSetup;
+class SocketCanInterfaceProvider;
 
 class MainWindow : public QMainWindow
 {
@@ -21,19 +24,23 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-public slots:
-    void onCbTraceTypeChanged(int i);
-    void rowsInserted(const QModelIndex & parent, int first, int last);
+protected:
+    void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+
+private slots:
+    TraceView *createMdiChild();
+    void setActiveSubWindow(QWidget *window);
+    void updateMenus();
 
 private:
-    Ui::MainWindow *ui;
     MeasurementSetup *setup;
-
-    CanDb _candb;
-
     SocketCanInterfaceProvider *_provider;
-    LinearTraceViewModel *_linearTraceViewModel;
-    AggregatedTraceViewModel *_aggregatedTraceViewModel;
+
+    TraceView *activeMdiChild();
+    QMdiArea *mdiArea;
+    QSignalMapper *windowMapper;
+
+    void startup();
 
 };
 

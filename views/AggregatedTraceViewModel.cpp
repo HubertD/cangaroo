@@ -9,7 +9,7 @@ AggregatedTraceViewModel::AggregatedTraceViewModel(MeasurementSetup *setup)
     connect(_fadeoutTimer, SIGNAL(timeout()), this, SLOT(onFadeoutTimer()));
     connect(_setup->getTrace(), SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
 
-    _fadeoutTimer->setInterval(100);
+    _fadeoutTimer->setInterval(500);
     _fadeoutTimer->start();
 }
 

@@ -1,29 +1,79 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include <QTimer>
-#include <QThread>
 
-#include <views/LinearTraceViewModel.h>
-#include <views/AggregatedTraceViewModel.h>
+#include <QtWidgets>
+#include <QMdiArea>
+#include <QSignalMapper>
+#include <QCloseEvent>
 
 #include <drivers/socketcan/SocketCanInterface.h>
 #include <drivers/socketcan/SocketCanInterfaceProvider.h>
-#include <drivers/CanListener.h>
+#include <setup/MeasurementSetup.h>
+#include <setup/MeasurementNetwork.h>
 
 #include <parser/dbc/DbcParser.h>
 #include <model/CanDb.h>
 
+#include <views/TraceView.h>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    QMainWindow(parent)
 {
-    ui->setupUi(this);
+    mdiArea = new QMdiArea;
+    mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    setCentralWidget(mdiArea);
+    connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(updateMenus()));
 
+    windowMapper = new QSignalMapper(this);
+    connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
+    updateMenus();
+    setWindowTitle(tr("MDI"));
+    setUnifiedTitleAndToolBarOnMac(true);
+
+    startup();
+
+    createMdiChild();
+}
+
+MainWindow::~MainWindow()
+{
+    delete mdiArea;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+    mdiArea->closeAllSubWindows();
+    if (mdiArea->currentSubWindow()) {
+        event->ignore();
+    } else {
+        //writeSettings();
+        event->accept();
+    }
+
+}
+
+TraceView *MainWindow::createMdiChild() {
+    TraceView *child = new TraceView(this, setup);
+    mdiArea->addSubWindow(child);
+    return child;
+}
+
+void MainWindow::setActiveSubWindow(QWidget *window) {
+    if (window) {
+        mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
+    }
+}
+
+void MainWindow::updateMenus() {
+
+}
+
+void MainWindow::startup()
+{
     DbcParser parser;
     QFile *dbc = new QFile("test.dbc");
-    parser.parseFile(dbc, &_candb);
+    CanDb *candb = new CanDb();
+    parser.parseFile(dbc, candb);
 
     _provider = new SocketCanInterfaceProvider();
     _provider->update();
@@ -34,52 +84,8 @@ MainWindow::MainWindow(QWidget *parent) :
     foreach (intf, _provider->getInterfaceList()) {
         network = setup->createNetwork();
         network->addCanInterface(intf);
-        network->addCanDb(&_candb);
+        network->addCanDb(candb);
     }
 
     setup->startMeasurement();
-
-    _linearTraceViewModel = new LinearTraceViewModel(setup);
-    _aggregatedTraceViewModel = new AggregatedTraceViewModel(setup);
-
-    ui->tree->setModel(_linearTraceViewModel);
-    ui->tree->setUniformRowHeights(true);
-    ui->tree->setColumnWidth(0, 80);
-    ui->tree->setColumnWidth(1, 70);
-    ui->tree->setColumnWidth(2, 50);
-    ui->tree->setColumnWidth(3, 90);
-    ui->tree->setColumnWidth(4, 200);
-    ui->tree->setColumnWidth(5, 50);
-    ui->tree->setColumnWidth(6, 200);
-
-    connect(_linearTraceViewModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
-    connect(ui->cbAggregate, SIGNAL(stateChanged(int)), this, SLOT(onCbTraceTypeChanged(int)));
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
-void MainWindow::onCbTraceTypeChanged(int i)
-{
-    if (i==Qt::Checked) {
-        ui->tree->setModel(_aggregatedTraceViewModel);
-    } else {
-        ui->tree->setModel(_linearTraceViewModel);
-    }
-
-}
-
-void MainWindow::rowsInserted(const QModelIndex &parent, int first, int last)
-{
-    (void) parent;
-    (void) first;
-    (void) last;
-
-    if (ui->cbAutoScroll->checkState() == Qt::Checked) {
-        if (ui->tree->model()==_linearTraceViewModel) {
-            ui->tree->scrollToBottom();
-        }
-    }
 }
