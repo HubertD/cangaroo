@@ -13,9 +13,9 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
     struct timeval tv_last, tv_now;
 
     // FIXME rawid is only unique per channel/network, not for the whole measurement
-    uint32_t raw_id = msg.getRawId();
+    unique_key_t key = makeUniqueKey(msg);
 
-    if (!_map.contains(raw_id)) {
+    if (!_map.contains(key)) {
 
         // create new row
         item = new AggregatedTraceViewItem(_rootItem);
@@ -30,14 +30,14 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
 
         beginResetModel();
         _rootItem->appendChild(item);
-        _map[raw_id] = item;
+        _map[key] = item;
         endResetModel();
 
     } else {
 
         // update row
 
-        item = _map[raw_id];
+        item = _map[key];
         tv_last = item->_lastmsg.getTimestamp();
         tv_now = msg.getTimestamp();
 
@@ -56,6 +56,11 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
 
     }
 
+}
+
+AggregatedTraceViewModel::unique_key_t AggregatedTraceViewModel::makeUniqueKey(const CanMessage &msg)
+{
+    return ((uint64_t)msg.getInterface()->getId() << 32) | msg.getRawId();
 }
 
 

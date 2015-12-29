@@ -121,7 +121,7 @@ bool SocketCanInterface::readMessage(CanMessage &msg) {
     msg.setExtended((frame.can_id & CAN_EFF_FLAG)!=0);
     msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
     msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);
-    msg.setInterfaceId(getId());
+    msg.setInterface(this);
 
 	uint8_t len = frame.can_dlc;
 	if (len>8) { len = 8; }

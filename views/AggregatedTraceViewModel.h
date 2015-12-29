@@ -9,7 +9,9 @@
 
 #include <views/BaseTraceViewModel.h>
 #include <model/CanMessage.h>
-#include <setup/MeasurementSetup.h>
+#include <drivers/CanInterface.h>
+#include <setup/MeasurementNetwork.h>
+
 #include "AggregatedTraceViewItem.h"
 
 
@@ -18,7 +20,8 @@ class AggregatedTraceViewModel : public BaseTraceViewModel
     Q_OBJECT
 
 public:
-    typedef QMap<uint32_t, AggregatedTraceViewItem*> CanIdMap;
+    typedef uint64_t unique_key_t;
+    typedef QMap<unique_key_t, AggregatedTraceViewItem*> CanIdMap;
 
 public:
     AggregatedTraceViewModel(MeasurementSetup *setup);
@@ -33,6 +36,7 @@ public slots:
 private:
     CanIdMap _map;
     AggregatedTraceViewItem *_rootItem;
+    unique_key_t makeUniqueKey(const CanMessage &msg);
 
 protected:
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;

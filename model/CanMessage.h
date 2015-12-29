@@ -12,6 +12,8 @@
 
 #include <QString>
 
+class CanInterface;
+
 class CanMessage {
 public:
 	CanMessage();
@@ -33,8 +35,8 @@ public:
 	bool isErrorFrame() const;
 	void setErrorFrame(const bool isErrorFrame);
 
-    uint16_t getInterfaceId() const;
-    void setInterfaceId(const uint16_t interface_id);
+    CanInterface *getInterface() const;
+    void setInterface(CanInterface *interface);
 
 	uint8_t getLength() const;
 	void setLength(const uint8_t dlc);
@@ -62,7 +64,6 @@ public:
 
 private:
 	uint32_t _raw_id;
-    uint16_t _interface_id;
     uint8_t _dlc;
 	union {
 		uint8_t _u8[8];
@@ -70,6 +71,7 @@ private:
 		uint32_t _u32[2];
 		uint64_t _u64;
 	};
+    CanInterface *_interface;
     struct timeval _timestamp;
 
 };
