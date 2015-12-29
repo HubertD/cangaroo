@@ -7,7 +7,7 @@
 
 #include "SocketCanInterface.h"
 #include "model/CanMessage.h"
-#include <libsocketcan.h>
+#include "libsocketcan/libsocketcan.h"
 
 #include <stdio.h>
 #include <unistd.h>
