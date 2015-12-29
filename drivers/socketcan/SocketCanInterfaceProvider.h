@@ -12,16 +12,14 @@
 
 #include <sys/types.h>
 #include <linux/netlink.h>
-#include <string>
-
-using namespace std;
+#include <QString>
 
 class SocketCanInterfaceProvider: public CanInterfaceProvider {
 public:
 	SocketCanInterfaceProvider();
 	virtual ~SocketCanInterfaceProvider();
 
-	virtual string getName();
+    virtual QString getName();
 	virtual CanInterfaceList getInterfaceList();
 	virtual void update();
 
@@ -29,7 +27,7 @@ private:
 	CanInterfaceList _interfaces;
 
 	void addNetlinkInterface(struct nlmsghdr *h);
-	void createOrUpdateInterface(int index, string name);
+    void createOrUpdateInterface(int index, QString name);
 };
 
 #endif /* SOCKETCAN_SOCKETCANINTERFACEPROVIDER_H_ */

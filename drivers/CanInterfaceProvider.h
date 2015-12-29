@@ -9,9 +9,8 @@
 #define BASE_CANINTERFACEPROVIDER_H_
 
 #include <QList>
+#include <QString>
 #include "CanInterface.h"
-
-using namespace std;
 
 class CanInterface;
 
@@ -22,7 +21,7 @@ public:
 	CanInterfaceProvider();
 	virtual ~CanInterfaceProvider();
 
-	virtual string getName() = 0;
+    virtual QString getName() = 0;
 	virtual CanInterfaceList getInterfaceList() = 0;
 	virtual void update() = 0;
 };

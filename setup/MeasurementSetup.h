@@ -24,7 +24,7 @@ public:
 
     CanTrace *getTrace();
     CanDbMessage *findDbMessage(const CanMessage *msg);
-
+    QString getInterfaceName(CanInterface *interface);
 private:
     CanTrace _trace;
     QList<MeasurementNetwork*> _networks;

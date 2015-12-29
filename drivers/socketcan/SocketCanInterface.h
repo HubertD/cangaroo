@@ -14,11 +14,11 @@ class SocketCanInterfaceProvider;
 
 class SocketCanInterface: public CanInterface {
 public:
-	SocketCanInterface(SocketCanInterfaceProvider *provider, int index, string name);
+    SocketCanInterface(SocketCanInterfaceProvider *provider, int index, QString name);
 	virtual ~SocketCanInterface();
 
-	virtual string getName();
-	void setName(string name);
+    virtual QString getName();
+    void setName(QString name);
 
 	virtual int getBitrate();
 	virtual void setBitrate(int bitrate);
@@ -35,7 +35,7 @@ public:
 private:
 	int _idx;
 	int _fd;
-	string _name;
+    QString _name;
 };
 
 #endif /* SOCKETCAN_SOCKETCANINTERFACE_H_ */

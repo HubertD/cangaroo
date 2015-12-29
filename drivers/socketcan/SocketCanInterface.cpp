@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
-#include <string.h>
+#include <QString>
 
 #include <net/if.h>
 #include <sys/types.h>
@@ -22,7 +22,7 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
-SocketCanInterface::SocketCanInterface(SocketCanInterfaceProvider *provider, int index, string name)
+SocketCanInterface::SocketCanInterface(SocketCanInterfaceProvider *provider, int index, QString name)
   : CanInterface((CanInterfaceProvider *)provider),
 	_idx(index),
 	_fd(0),
@@ -33,17 +33,17 @@ SocketCanInterface::SocketCanInterface(SocketCanInterfaceProvider *provider, int
 SocketCanInterface::~SocketCanInterface() {
 }
 
-string SocketCanInterface::getName() {
+QString SocketCanInterface::getName() {
 	return _name;
 }
 
-void SocketCanInterface::setName(string name) {
+void SocketCanInterface::setName(QString name) {
 	_name = name;
 }
 
 int SocketCanInterface::getBitrate() {
 	struct can_bittiming bt;
-	if (can_get_bittiming(_name.c_str(), &bt) == 0) {
+    if (can_get_bittiming(_name.toStdString().c_str(), &bt) == 0) {
 		return bt.bitrate;
 	} else {
 		return 0;
@@ -51,7 +51,7 @@ int SocketCanInterface::getBitrate() {
 }
 
 void SocketCanInterface::setBitrate(int bitrate) {
-	can_set_bitrate(_name.c_str(), bitrate);
+    can_set_bitrate(_name.toStdString().c_str(), bitrate);
 }
 
 int SocketCanInterface::getIfIndex() {
@@ -65,7 +65,7 @@ void SocketCanInterface::open() {
 
 	struct ifreq ifr;
     struct sockaddr_can addr;
-	strcpy(ifr.ifr_name, _name.c_str());
+    strcpy(ifr.ifr_name, _name.toStdString().c_str());
 	ioctl(_fd, SIOCGIFINDEX, &ifr);
 
 	addr.can_family  = AF_CAN;

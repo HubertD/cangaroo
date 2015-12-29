@@ -137,7 +137,7 @@ void SocketCanInterfaceProvider::addNetlinkInterface(struct nlmsghdr* h) {
 		for (attribute = IFLA_RTA(iface); RTA_OK(attribute, len); attribute = RTA_NEXT(attribute, len)) {
 			switch(attribute->rta_type) {
 				case IFLA_IFNAME:
-					createOrUpdateInterface(iface->ifi_index, string((char *) RTA_DATA(attribute)));
+                    createOrUpdateInterface(iface->ifi_index, QString((char *) RTA_DATA(attribute)));
 					break;
 				default:
 					break;
@@ -146,11 +146,11 @@ void SocketCanInterfaceProvider::addNetlinkInterface(struct nlmsghdr* h) {
 	}
 }
 
-string SocketCanInterfaceProvider::getName() {
+QString SocketCanInterfaceProvider::getName() {
 	return "SocketCAN";
 }
 
-void SocketCanInterfaceProvider::createOrUpdateInterface(int index, string name) {
+void SocketCanInterfaceProvider::createOrUpdateInterface(int index, QString name) {
 
 	for (CanInterfaceList::iterator it = _interfaces.begin() ; it != _interfaces.end(); ++it) {
 		SocketCanInterface *scif = dynamic_cast<SocketCanInterface *>(*it);

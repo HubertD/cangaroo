@@ -72,3 +72,12 @@ CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage *msg)
     return result;
 }
 
+QString MeasurementSetup::getInterfaceName(CanInterface *interface)
+{
+    if (interface) {
+        return QString(interface->getName());
+    } else {
+        return "none";
+    }
+}
+

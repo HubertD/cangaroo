@@ -8,10 +8,8 @@
 #ifndef BASE_CANINTERFACE_H_
 #define BASE_CANINTERFACE_H_
 
-#include <string>
+#include <QString>
 #include <stdint.h>
-
-using namespace std;
 
 class CanInterfaceProvider;
 class CanMessage;
@@ -21,7 +19,7 @@ public:
 	CanInterface(CanInterfaceProvider *provider);
 	virtual ~CanInterface();
 	virtual CanInterfaceProvider *getProvider();
-	virtual string getName() = 0;
+    virtual QString getName() = 0;
 
 	virtual int getBitrate() = 0;
 	virtual void setBitrate(int bitrate) = 0;
