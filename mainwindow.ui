@@ -50,6 +50,7 @@
       <string>&amp;New</string>
      </property>
      <addaction name="action_Trace_View"/>
+     <addaction name="actionLog_View"/>
     </widget>
     <addaction name="menu_New"/>
    </widget>
@@ -65,6 +66,11 @@
   <action name="action_Trace_View">
    <property name="text">
     <string>&amp;Trace View</string>
+   </property>
+  </action>
+  <action name="actionLog_View">
+   <property name="text">
+    <string>Log View</string>
    </property>
   </action>
  </widget>

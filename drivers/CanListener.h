@@ -9,6 +9,7 @@ class CanMessage;
 class CanListener : public QObject
 {
     Q_OBJECT
+
 public:
     explicit CanListener(QObject *parent, CanInterface *intf);
 

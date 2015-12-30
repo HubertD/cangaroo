@@ -4,19 +4,19 @@
 #include <drivers/CanListener.h>
 #include <QMetaType>
 
-MeasurementSetup::MeasurementSetup()
-  : QObject()
+MeasurementSetup::MeasurementSetup(QObject *parent)
+  : QObject(parent)
 {
 
 }
 
 MeasurementSetup::~MeasurementSetup()
 {
-    MeasurementNetwork *network;
-    foreach (network, _networks) {
+    foreach (MeasurementNetwork *network, _networks) {
         delete network;
     }
 }
+
 
 MeasurementNetwork *MeasurementSetup::createNetwork()
 {
@@ -80,5 +80,10 @@ QString MeasurementSetup::getInterfaceName(CanInterface *interface)
     } else {
         return "none";
     }
+}
+
+void MeasurementSetup::log(log_level_t level, QString s)
+{
+    //emit appendLog(level, s);
 }
 

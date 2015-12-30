@@ -4,12 +4,14 @@
 #include <QMainWindow>
 
 class TraceView;
+class LogView;
 
 QT_BEGIN_NAMESPACE
 class QAction;
 class QMenu;
 class QMdiArea;
 class QMdiSubWindow;
+class QWidget;
 class QSignalMapper;
 QT_END_NAMESPACE
 
@@ -32,7 +34,9 @@ protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
-    TraceView *createMdiChild();
+    QWidget *createSubWindow(QWidget *window);
+    TraceView *createTraceView();
+    LogView *createLogView();
     void setActiveSubWindow(QWidget *window);
 
 private:

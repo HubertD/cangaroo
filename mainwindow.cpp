@@ -15,6 +15,7 @@
 #include <model/CanDb.h>
 
 #include <views/TraceView.h>
+#include <views/LogView.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,13 +25,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-    connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createMdiChild()));
+    connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createTraceView()));
+    connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(createLogView()));
+
+
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
     startup();
 
-    createMdiChild();
+    createTraceView();
+    createLogView();
 }
 
 MainWindow::~MainWindow()
@@ -49,11 +54,21 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 }
 
-TraceView *MainWindow::createMdiChild() {
-    TraceView *child = new TraceView(ui->mdiArea, setup);
-    ui->mdiArea->addSubWindow(child);
-    child->show();
-    return child;
+QWidget *MainWindow::createSubWindow(QWidget *window)
+{
+    ui->mdiArea->addSubWindow(window);
+    window->show();
+    return window;
+}
+
+
+TraceView *MainWindow::createTraceView() {
+    return (TraceView*)createSubWindow(new TraceView(ui->mdiArea, setup));
+}
+
+LogView *MainWindow::createLogView()
+{
+    return (LogView*)createSubWindow(new LogView(ui->mdiArea, setup));
 }
 
 void MainWindow::setActiveSubWindow(QWidget *window) {
@@ -74,7 +89,7 @@ void MainWindow::startup()
 
     CanInterface *intf;
     MeasurementNetwork *network;
-    setup = new MeasurementSetup();
+    setup = new MeasurementSetup(this);
     foreach (intf, _provider->getInterfaceList()) {
         network = setup->createNetwork();
         network->addCanInterface(intf);
