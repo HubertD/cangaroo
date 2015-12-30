@@ -3,10 +3,6 @@
 
 #include <QObject>
 #include <QList>
-#include <model/CanTrace.h>
-#include <model/CanDbMessage.h>
-
-#include "MeasurementNetwork.h"
 
 typedef enum {
     log_level_info,
@@ -15,9 +11,15 @@ typedef enum {
     log_level_critical
 } log_level_t;
 
+class MeasurementNetwork;
+class CanTrace;
+class CanMessage;
+class CanInterface;
+class CanDbMessage;
+
 class MeasurementSetup : public QObject
 {
-    //Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit MeasurementSetup(QObject *parent);
@@ -37,7 +39,7 @@ signals:
     void appendLog(log_level_t level, QString s);
 
 private:
-    CanTrace _trace;
+    CanTrace *_trace;
     QList<MeasurementNetwork*> _networks;
 };
 

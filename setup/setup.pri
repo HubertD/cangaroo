@@ -1,6 +1,6 @@
 SOURCES += \ 
-    $$PWD/MeasurementSetup.cpp \
-    $$PWD/MeasurementNetwork.cpp
+    $$PWD/MeasurementNetwork.cpp \
+    $$PWD/MeasurementSetup.cpp
 HEADERS += \ 
-    $$PWD/MeasurementSetup.h \
-    $$PWD/MeasurementNetwork.h
+    $$PWD/MeasurementNetwork.h \
+    $$PWD/MeasurementSetup.h

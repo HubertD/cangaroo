@@ -32,10 +32,12 @@ MainWindow::MainWindow(QWidget *parent) :
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
-    startup();
 
-    createTraceView();
+    setup = new MeasurementSetup(this);
     createLogView();
+
+    startup();
+    createTraceView();
 }
 
 MainWindow::~MainWindow()
@@ -89,7 +91,6 @@ void MainWindow::startup()
 
     CanInterface *intf;
     MeasurementNetwork *network;
-    setup = new MeasurementSetup(this);
     foreach (intf, _provider->getInterfaceList()) {
         network = setup->createNetwork();
         network->addCanInterface(intf);

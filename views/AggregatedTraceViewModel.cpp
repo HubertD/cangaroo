@@ -1,5 +1,6 @@
 #include "AggregatedTraceViewModel.h"
 #include <QColor>
+#include <model/CanTrace.h>
 
 AggregatedTraceViewModel::AggregatedTraceViewModel(MeasurementSetup *setup)
   : BaseTraceViewModel(setup)

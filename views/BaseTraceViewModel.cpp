@@ -1,5 +1,8 @@
 #include "BaseTraceViewModel.h"
 
+#include <model/CanMessage.h>
+#include <model/CanDbMessage.h>
+
 BaseTraceViewModel::BaseTraceViewModel(MeasurementSetup *setup)
   : _setup(setup)
 {
