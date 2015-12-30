@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
     updateMenus();
-    setWindowTitle(tr("MDI"));
+    setWindowTitle(tr("procan"));
     setUnifiedTitleAndToolBarOnMac(true);
 
     startup();

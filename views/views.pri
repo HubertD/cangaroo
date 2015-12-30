@@ -12,3 +12,5 @@ HEADERS  += \
     $$PWD/AggregatedTraceViewItem.h \
     $$PWD/TraceView.h
 
+FORMS    += \
+    $$PWD/TraceView.ui
