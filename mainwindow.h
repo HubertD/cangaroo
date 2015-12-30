@@ -16,6 +16,10 @@ QT_END_NAMESPACE
 class MeasurementSetup;
 class SocketCanInterfaceProvider;
 
+namespace Ui {
+class MainWindow;
+}
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -27,17 +31,17 @@ public:
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
-private slots:
+public slots:
     TraceView *createMdiChild();
     void setActiveSubWindow(QWidget *window);
-    void updateMenus();
 
 private:
+    Ui::MainWindow *ui;
+
     MeasurementSetup *setup;
     SocketCanInterfaceProvider *_provider;
 
     TraceView *activeMdiChild();
-    QMdiArea *mdiArea;
     QSignalMapper *windowMapper;
 
     void startup();

@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 
 #include <QtWidgets>
 #include <QMdiArea>
@@ -16,20 +17,16 @@
 #include <views/TraceView.h>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
 {
-    mdiArea = new QMdiArea;
-    mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    setCentralWidget(mdiArea);
-    connect(mdiArea, SIGNAL(subWindowActivated(QMdiSubWindow*)), this, SLOT(updateMenus()));
+    ui->setupUi(this);
+    ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
+    connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createMdiChild()));
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
-
-    updateMenus();
-    setWindowTitle(tr("procan"));
-    setUnifiedTitleAndToolBarOnMac(true);
 
     startup();
 
@@ -38,12 +35,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete mdiArea;
+    delete ui;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    mdiArea->closeAllSubWindows();
-    if (mdiArea->currentSubWindow()) {
+    ui->mdiArea->closeAllSubWindows();
+    if (ui->mdiArea->currentSubWindow()) {
         event->ignore();
     } else {
         //writeSettings();
@@ -53,19 +50,16 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 TraceView *MainWindow::createMdiChild() {
-    TraceView *child = new TraceView(this, setup);
-    mdiArea->addSubWindow(child);
+    TraceView *child = new TraceView(ui->mdiArea, setup);
+    ui->mdiArea->addSubWindow(child);
+    child->show();
     return child;
 }
 
 void MainWindow::setActiveSubWindow(QWidget *window) {
     if (window) {
-        mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
+        ui->mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
     }
-}
-
-void MainWindow::updateMenus() {
-
 }
 
 void MainWindow::startup()
