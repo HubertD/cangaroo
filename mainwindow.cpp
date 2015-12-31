@@ -34,10 +34,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     setup = new MeasurementSetup(this);
-    createLogView();
-
+    QMdiSubWindow *logView = createLogView();
+    QMdiSubWindow *traceViewWindow = createTraceView();
+    traceViewWindow->setGeometry(0, 0, 1000, 500);
+    logView->setGeometry(0, 500, 1000, 200);
     startup();
-    createTraceView();
 }
 
 MainWindow::~MainWindow()
@@ -56,21 +57,21 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 }
 
-QWidget *MainWindow::createSubWindow(QWidget *window)
+QMdiSubWindow *MainWindow::createSubWindow(QWidget *window)
 {
-    ui->mdiArea->addSubWindow(window);
+    QMdiSubWindow *retval = ui->mdiArea->addSubWindow(window);
     window->show();
-    return window;
+    return retval;
 }
 
 
-TraceView *MainWindow::createTraceView() {
-    return (TraceView*)createSubWindow(new TraceView(ui->mdiArea, setup));
+QMdiSubWindow *MainWindow::createTraceView() {
+    return createSubWindow(new TraceView(ui->mdiArea, setup));
 }
 
-LogView *MainWindow::createLogView()
+QMdiSubWindow *MainWindow::createLogView()
 {
-    return (LogView*)createSubWindow(new LogView(ui->mdiArea, setup));
+    return createSubWindow(new LogView(ui->mdiArea, setup));
 }
 
 void MainWindow::setActiveSubWindow(QWidget *window) {

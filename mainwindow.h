@@ -34,9 +34,8 @@ protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
-    QWidget *createSubWindow(QWidget *window);
-    TraceView *createTraceView();
-    LogView *createLogView();
+    QMdiSubWindow *createTraceView();
+    QMdiSubWindow *createLogView();
     void setActiveSubWindow(QWidget *window);
 
 private:
@@ -49,6 +48,7 @@ private:
     QSignalMapper *windowMapper;
 
     void startup();
+    QMdiSubWindow *createSubWindow(QWidget *window);
 
 };
 
