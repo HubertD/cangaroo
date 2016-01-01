@@ -16,6 +16,7 @@
 
 #include <views/TraceView.h>
 #include <views/LogView.h>
+#include <views/GraphView.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -36,8 +37,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setup = new MeasurementSetup(this);
     QMdiSubWindow *logView = createLogView();
     QMdiSubWindow *traceViewWindow = createTraceView();
+    QMdiSubWindow *graphViewWindow = createGraphView();
     traceViewWindow->setGeometry(0, 0, 1000, 500);
     logView->setGeometry(0, 500, 1000, 200);
+    graphViewWindow->setGeometry(0, 500, 1000, 200);
     startup();
 }
 
@@ -72,6 +75,11 @@ QMdiSubWindow *MainWindow::createTraceView() {
 QMdiSubWindow *MainWindow::createLogView()
 {
     return createSubWindow(new LogView(ui->mdiArea, setup));
+}
+
+QMdiSubWindow *MainWindow::createGraphView()
+{
+    return createSubWindow(new GraphView(ui->mdiArea, setup));
 }
 
 void MainWindow::setActiveSubWindow(QWidget *window) {

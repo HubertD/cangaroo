@@ -36,6 +36,7 @@ protected:
 public slots:
     QMdiSubWindow *createTraceView();
     QMdiSubWindow *createLogView();
+    QMdiSubWindow *createGraphView();
     void setActiveSubWindow(QWidget *window);
 
 private:

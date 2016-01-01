@@ -4,7 +4,8 @@ SOURCES += \
     $$PWD/BaseTraceViewModel.cpp \
     $$PWD/AggregatedTraceViewItem.cpp \
     $$PWD/TraceView.cpp \
-    $$PWD/LogView.cpp
+    $$PWD/LogView.cpp \
+    $$PWD/GraphView.cpp
 
 HEADERS  += \
     $$PWD/LinearTraceViewModel.h \
@@ -12,8 +13,10 @@ HEADERS  += \
     $$PWD/BaseTraceViewModel.h \
     $$PWD/AggregatedTraceViewItem.h \
     $$PWD/TraceView.h \
-    $$PWD/LogView.h
+    $$PWD/LogView.h \
+    $$PWD/GraphView.h
 
 FORMS    += \
     $$PWD/TraceView.ui \
-    $$PWD/LogView.ui
+    $$PWD/LogView.ui \
+    $$PWD/GraphView.ui
