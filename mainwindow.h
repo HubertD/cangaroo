@@ -38,6 +38,7 @@ public slots:
     QMdiSubWindow *createLogView();
     QMdiSubWindow *createGraphView();
     void setActiveSubWindow(QWidget *window);
+    void showSetupDialog();
 
 private:
     Ui::MainWindow *ui;

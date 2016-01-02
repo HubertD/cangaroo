@@ -35,6 +35,10 @@ public:
 
     void log(log_level_t level, QString s);
 
+    int countNetworks() const;
+    MeasurementNetwork *getNetwork(int index) const;
+    QList<MeasurementNetwork*> getNetworks();
+
 signals:
     void appendLog(log_level_t level, QString s);
 

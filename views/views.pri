@@ -5,7 +5,10 @@ SOURCES += \
     $$PWD/AggregatedTraceViewItem.cpp \
     $$PWD/TraceView.cpp \
     $$PWD/LogView.cpp \
-    $$PWD/GraphView.cpp
+    $$PWD/GraphView.cpp \
+    $$PWD/SetupDialog.cpp \
+    $$PWD/SetupDialogTreeModel.cpp \
+    $$PWD/SetupDialogTreeItem.cpp
 
 HEADERS  += \
     $$PWD/LinearTraceViewModel.h \
@@ -14,9 +17,13 @@ HEADERS  += \
     $$PWD/AggregatedTraceViewItem.h \
     $$PWD/TraceView.h \
     $$PWD/LogView.h \
-    $$PWD/GraphView.h
+    $$PWD/GraphView.h \
+    $$PWD/SetupDialog.h \
+    $$PWD/SetupDialogTreeModel.h \
+    $$PWD/SetupDialogTreeItem.h
 
 FORMS    += \
     $$PWD/TraceView.ui \
     $$PWD/LogView.ui \
-    $$PWD/GraphView.ui
+    $$PWD/GraphView.ui \
+    $$PWD/SetupDialog.ui

@@ -17,6 +17,7 @@
 #include <views/TraceView.h>
 #include <views/LogView.h>
 #include <views/GraphView.h>
+#include <views/SetupDialog.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -28,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createTraceView()));
     connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(createLogView()));
+    connect(ui->actionSetup, SIGNAL(triggered()), this, SLOT(showSetupDialog()));
 
 
     windowMapper = new QSignalMapper(this);
@@ -41,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     traceViewWindow->setGeometry(0, 0, 1000, 500);
     logView->setGeometry(0, 500, 1000, 200);
     graphViewWindow->setGeometry(0, 500, 1000, 200);
+
     startup();
 }
 
@@ -88,6 +91,12 @@ void MainWindow::setActiveSubWindow(QWidget *window) {
     }
 }
 
+void MainWindow::showSetupDialog()
+{
+    SetupDialog dlg(this);
+    dlg.showSetupDialog(setup);
+}
+
 void MainWindow::startup()
 {
     DbcParser parser;
@@ -100,8 +109,10 @@ void MainWindow::startup()
 
     CanInterface *intf;
     MeasurementNetwork *network;
+    int i = 1;
     foreach (intf, _provider->getInterfaceList()) {
         network = setup->createNetwork();
+        network->setName(QString().sprintf("Network %d", i++));
         network->addCanInterface(intf);
         network->addCanDb(candb);
     }

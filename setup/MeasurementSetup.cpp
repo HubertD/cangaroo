@@ -94,3 +94,18 @@ void MeasurementSetup::log(log_level_t level, QString s)
     emit appendLog(level, s);
 }
 
+int MeasurementSetup::countNetworks() const
+{
+    return _networks.length();
+}
+
+MeasurementNetwork *MeasurementSetup::getNetwork(int index) const
+{
+    return _networks.value(index);
+}
+
+QList<MeasurementNetwork *> MeasurementSetup::getNetworks()
+{
+    return _networks;
+}
+

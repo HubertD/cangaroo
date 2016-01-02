@@ -39,6 +39,8 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionSetup"/>
+    <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
@@ -71,6 +73,14 @@
   <action name="actionLog_View">
    <property name="text">
     <string>Log View</string>
+   </property>
+  </action>
+  <action name="actionSetup">
+   <property name="text">
+    <string>Setup...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+S</string>
    </property>
   </action>
  </widget>
