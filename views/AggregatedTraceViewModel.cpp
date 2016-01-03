@@ -6,12 +6,11 @@ AggregatedTraceViewModel::AggregatedTraceViewModel(MeasurementSetup *setup)
   : BaseTraceViewModel(setup)
 {
     _rootItem = new AggregatedTraceViewItem(0);
-    _fadeoutTimer = new QTimer(this);
-    connect(_fadeoutTimer, SIGNAL(timeout()), this, SLOT(onFadeoutTimer()));
+    _updateTimer = new QTimer(this);
+    connect(_updateTimer, SIGNAL(timeout()), this, SLOT(onUpdateTimer()));
     connect(_setup->getTrace(), SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
 
-    _fadeoutTimer->setInterval(500);
-    _fadeoutTimer->start();
+    _updateTimer->setSingleShot(true);
 }
 
 void AggregatedTraceViewModel::createItem(const CanMessage &msg)
@@ -26,45 +25,67 @@ void AggregatedTraceViewModel::createItem(const CanMessage &msg)
         }
     }
 
-    beginResetModel();
     _rootItem->appendChild(item);
     _map[makeUniqueKey(msg)] = item;
-    endResetModel();
 }
 
 void AggregatedTraceViewModel::updateItem(const CanMessage &msg)
 {
     struct timeval tv_last, tv_now;
 
-    if (!_map.contains(makeUniqueKey(msg))) { return; }
-    AggregatedTraceViewItem *item = _map[makeUniqueKey(msg)];
+    AggregatedTraceViewItem *item = _map.value(makeUniqueKey(msg));
+    if (item) {
+        tv_last = item->_lastmsg.getTimestamp();
+        tv_now = msg.getTimestamp();
 
-    tv_last = item->_lastmsg.getTimestamp();
-    tv_now = msg.getTimestamp();
+        item->_lastmsg = msg;
 
-    item->_lastmsg = msg;
-
-    int diff_us = tv_now.tv_usec - tv_last.tv_usec;
-    item->_interval.tv_sec = tv_now.tv_sec - tv_last.tv_sec;
-    if (diff_us<0) {
-        item->_interval.tv_sec--;
-        diff_us += 1000000;
+        int diff_us = tv_now.tv_usec - tv_last.tv_usec;
+        item->_interval.tv_sec = tv_now.tv_sec - tv_last.tv_sec;
+        if (diff_us<0) {
+            item->_interval.tv_sec--;
+            diff_us += 1000000;
+        }
+        item->_interval.tv_usec = diff_us;
     }
-    item->_interval.tv_usec = diff_us;
+}
 
-    int row = item->row();
-    dataChanged(createIndex(row, 0, item), createIndex(row, column_count-1, item));
+void AggregatedTraceViewModel::onUpdateTimer()
+{
+
+    if (_pendingMessageUpdates.length()) {
+        foreach (CanMessage msg, _pendingMessageUpdates) {
+            updateItem(msg);
+        }
+        _pendingMessageUpdates.clear();
+    }
+
+    if (_pendingMessageInserts.length()) {
+        beginInsertRows(QModelIndex(), _rootItem->childCount(), _rootItem->childCount()+_pendingMessageInserts.length()-1);
+        foreach (CanMessage msg, _pendingMessageInserts) {
+            createItem(msg);
+        }
+        endInsertRows();
+        _pendingMessageInserts.clear();
+    }
+
+    if (_rootItem->childCount()>0) {
+        dataChanged(createIndex(0, 0, _rootItem->firstChild()), createIndex(_rootItem->childCount()-1, column_count-1, _rootItem->lastChild()));
+    }
+
 }
 
 void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
 {
-
     if (_map.contains(makeUniqueKey(msg))) {
-        updateItem(msg);
+        _pendingMessageUpdates.append(msg);
     } else {
-        createItem(msg);
+        _pendingMessageInserts.append(msg);
     }
 
+    if (!_updateTimer->isActive()) {
+        _updateTimer->start(100);
+    }
 }
 
 AggregatedTraceViewModel::unique_key_t AggregatedTraceViewModel::makeUniqueKey(const CanMessage &msg)
@@ -155,9 +176,3 @@ QVariant AggregatedTraceViewModel::data_TextColorRole(const QModelIndex &index, 
 }
 
 
-void AggregatedTraceViewModel::onFadeoutTimer()
-{
-    if (_rootItem->childCount()>0) {
-        dataChanged(createIndex(0, 0, _rootItem->firstChild()), createIndex(_rootItem->childCount()-1, column_count-1, _rootItem->lastChild()));
-    }
-}

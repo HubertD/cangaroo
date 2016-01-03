@@ -33,12 +33,14 @@ public:
 
 public slots:
     void messageReceived(const CanMessage &msg);
-    void onFadeoutTimer();
+    void onUpdateTimer();
 
 private:
     CanIdMap _map;
     AggregatedTraceViewItem *_rootItem;
-    QTimer *_fadeoutTimer;
+    QTimer *_updateTimer;
+    QList<CanMessage> _pendingMessageUpdates;
+    QList<CanMessage> _pendingMessageInserts;
 
     unique_key_t makeUniqueKey(const CanMessage &msg);
     void createItem(const CanMessage &msg, AggregatedTraceViewItem *item, unique_key_t key);
