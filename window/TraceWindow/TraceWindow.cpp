@@ -1,7 +1,5 @@
 #include "TraceWindow.h"
 #include "ui_TraceView.h"
-
-#include <model/MeasurementSetup.h>
 #include "LinearTraceViewModel.h"
 #include "AggregatedTraceViewModel.h"
 

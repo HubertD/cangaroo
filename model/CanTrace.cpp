@@ -1,6 +1,7 @@
 #include "CanTrace.h"
 #include <QMutexLocker>
 #include <model/CanMessage.h>
+#include <model/MeasurementSetup.h>
 
 CanTrace::CanTrace(QObject *parent, MeasurementSetup *setup, int flushInterval)
   : QObject(parent),
@@ -29,6 +30,11 @@ void CanTrace::clear()
     emit afterClear();
 }
 
+void CanTrace::setSetup(MeasurementSetup *setup)
+{
+    _setup = setup;
+}
+
 const CanMessage *CanTrace::getMessage(unsigned long idx)
 {
     QMutexLocker dataLocker(&_dataMutex);
@@ -37,6 +43,16 @@ const CanMessage *CanTrace::getMessage(unsigned long idx)
     } else {
         return _data[idx];
     }
+}
+
+CanDbMessage *CanTrace::findDbMessage(const CanMessage &msg)
+{
+    return _setup->findDbMessage(msg);
+}
+
+QString CanTrace::getInterfaceName(const CanInterface &interface)
+{
+    return _setup->getInterfaceName(interface);
 }
 
 void CanTrace::enqueueMessage(const CanMessage &msg, bool more_to_follow)
@@ -70,9 +86,4 @@ void CanTrace::flushQueue()
         emit afterAppend(num_msg);
     }
 
-}
-
-MeasurementSetup *CanTrace::setup() const
-{
-    return _setup;
 }

@@ -1,7 +1,6 @@
 #include "LinearTraceViewModel.h"
 #include <iostream>
 #include <stddef.h>
-#include <model/MeasurementSetup.h>
 
 LinearTraceViewModel::LinearTraceViewModel(CanTrace *trace)
   : BaseTraceViewModel(trace)
@@ -38,7 +37,7 @@ int LinearTraceViewModel::rowCount(const QModelIndex &parent) const
         } else { // a message
             const CanMessage *msg = trace()->getMessage(id-1);
             if (msg) {
-                CanDbMessage *dbmsg = trace()->setup()->findDbMessage(msg);
+                CanDbMessage *dbmsg = trace()->findDbMessage(*msg);
                 return (dbmsg!=0) ? dbmsg->getSignals().length() : 0;
             } else {
                 return 0;

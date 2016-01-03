@@ -20,7 +20,7 @@ public:
 	CanInterface(CanInterfaceProvider *provider);
 	virtual ~CanInterface();
 	virtual CanInterfaceProvider *getProvider();
-    virtual QString getName() = 0;
+    virtual QString getName() const = 0;
 
 	virtual int getBitrate() = 0;
 	virtual void setBitrate(int bitrate) = 0;

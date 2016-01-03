@@ -76,17 +76,25 @@ void SetupDialogTreeModel::addCanDb(const QModelIndex &parent, pCanDb db)
     SetupDialogTreeItem *parentItem = static_cast<SetupDialogTreeItem*>(parent.internalPointer());
     SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb, parentItem);
     item->candb = db;
-    beginInsertRows(parent, rowCount(parent), rowCount(parent));
-    parentItem->appendChild(item);
-    endInsertRows();
+
+    if (parentItem->network) {
+        parentItem->network->addCanDb(db);
+        beginInsertRows(parent, rowCount(parent), rowCount(parent));
+        parentItem->appendChild(item);
+        endInsertRows();
+    }
 }
 
 void SetupDialogTreeModel::deleteCanDb(const QModelIndex &index)
 {
     SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem*>(index.internalPointer());
-    beginRemoveRows(index.parent(), item->row(), item->row());
-    item->getParentItem()->removeChild(item);
-    endRemoveRows();
+    SetupDialogTreeItem *parentItem = item->getParentItem();
+    if (parentItem && parentItem->network && parentItem->network->_canDbs.contains(item->candb)) {
+        parentItem->network->_canDbs.removeAll(item->candb);
+        beginRemoveRows(index.parent(), item->row(), item->row());
+        item->getParentItem()->removeChild(item);
+        endRemoveRows();
+    }
 }
 
 SetupDialogTreeItem *SetupDialogTreeModel::itemOrRoot(const QModelIndex &index) const
@@ -106,7 +114,7 @@ void SetupDialogTreeModel::load(MeasurementSetup *setup)
         item_network->network = network;
 
         SetupDialogTreeItem *item_intf_root = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface_root, item_network);
-        item_network->network = network;
+        item_intf_root->network = network;
         item_network->appendChild(item_intf_root);
 
         foreach (pCanInterface intf, network->_canInterfaces) {
@@ -116,7 +124,7 @@ void SetupDialogTreeModel::load(MeasurementSetup *setup)
         }
 
         SetupDialogTreeItem *item_candb_root = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb_root, item_network);
-        item_network->network = network;
+        item_candb_root->network = network;
         item_network->appendChild(item_candb_root);
 
         foreach (pCanDb candb, network->_canDbs) {

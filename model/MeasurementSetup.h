@@ -19,12 +19,14 @@ public:
     virtual ~MeasurementSetup();
     MeasurementNetwork *createNetwork();
 
-    CanDbMessage *findDbMessage(const CanMessage *msg);
-    QString getInterfaceName(CanInterface *interface);
+    CanDbMessage *findDbMessage(const CanMessage &msg);
+    QString getInterfaceName(const CanInterface &interface);
 
     int countNetworks() const;
     MeasurementNetwork *getNetwork(int index) const;
     QList<MeasurementNetwork*> getNetworks();
+
+    void cloneFrom(MeasurementSetup &origin);
 
 private:
     QList<MeasurementNetwork*> _networks;

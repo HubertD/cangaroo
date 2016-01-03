@@ -30,14 +30,19 @@ SetupDialog::~SetupDialog()
     delete ui;
 }
 
-void SetupDialog::showSetupDialog(MeasurementSetup *setup)
+MeasurementSetup *SetupDialog::showSetupDialog(MeasurementSetup &setup)
 {
-    SetupDialogTreeModel model(setup, this);
+    MeasurementSetup *mySetup = new MeasurementSetup(0);
+    mySetup->cloneFrom(setup);
+
+    SetupDialogTreeModel model(mySetup, this);
     ui->treeView->setModel(&model);
     connect(ui->treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(treeViewSelectionChanged(QItemSelection,QItemSelection)));
     ui->treeView->expandAll();
     if (exec()==QDialog::Accepted) {
-        // TODO detect changes, update MeasurementSetup
+        return mySetup;
+    } else {
+        return 0;
     }
 }
 
@@ -89,13 +94,7 @@ void SetupDialog::treeViewContextMenu(const QPoint &pos)
 
 
     QPoint globalPos = ui->treeView->mapToGlobal(pos);
-    QAction* selectedItem = contextMenu.exec(globalPos);
-    if (selectedItem)
-    {
-    }
-    else
-    {
-    }
+    contextMenu.exec(globalPos);
 }
 
 void SetupDialog::addInterface()

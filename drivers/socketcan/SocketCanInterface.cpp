@@ -33,7 +33,7 @@ SocketCanInterface::SocketCanInterface(SocketCanInterfaceProvider *provider, int
 SocketCanInterface::~SocketCanInterface() {
 }
 
-QString SocketCanInterface::getName() {
+QString SocketCanInterface::getName() const {
 	return _name;
 }
 

@@ -14,8 +14,18 @@ MeasurementSetup::MeasurementSetup(QObject *parent)
 
 MeasurementSetup::~MeasurementSetup()
 {
-    foreach (MeasurementNetwork *network, _networks) {
-        delete network;
+    qDeleteAll(_networks);
+}
+
+void MeasurementSetup::cloneFrom(MeasurementSetup &origin)
+{
+    qDeleteAll(_networks);
+    _networks.clear();
+
+    foreach (MeasurementNetwork *network, origin._networks) {
+        MeasurementNetwork *network_copy = new MeasurementNetwork();
+        network_copy->cloneFrom(*network);
+        _networks.append(network_copy);
     }
 }
 
@@ -28,14 +38,13 @@ MeasurementNetwork *MeasurementSetup::createNetwork()
 }
 
 
-CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage *msg)
+CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage &msg)
 {
     CanDbMessage *result = 0;
-    if (!msg) { return 0; }
 
     foreach (MeasurementNetwork *network, _networks) {
         foreach (pCanDb db, network->_canDbs) {
-            result = db->getMessageById(msg->getRawId());
+            result = db->getMessageById(msg.getRawId());
             if (result != 0) {
                 return result;
             }
@@ -44,13 +53,9 @@ CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage *msg)
     return result;
 }
 
-QString MeasurementSetup::getInterfaceName(CanInterface *interface)
+QString MeasurementSetup::getInterfaceName(const CanInterface &interface)
 {
-    if (interface) {
-        return QString(interface->getName());
-    } else {
-        return "none";
-    }
+    return interface.getName();
 }
 
 int MeasurementSetup::countNetworks() const

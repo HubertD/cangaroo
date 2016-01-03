@@ -4,6 +4,13 @@ MeasurementNetwork::MeasurementNetwork()
 {
 }
 
+void MeasurementNetwork::cloneFrom(MeasurementNetwork &origin)
+{
+    _name = origin._name;
+    _canInterfaces = origin._canInterfaces;
+    _canDbs = origin._canDbs;
+}
+
 void MeasurementNetwork::addCanInterface(QSharedPointer<CanInterface> intf)
 {
     _canInterfaces.append(intf);

@@ -17,7 +17,7 @@ public:
     SocketCanInterface(SocketCanInterfaceProvider *provider, int index, QString name);
 	virtual ~SocketCanInterface();
 
-    virtual QString getName();
+    virtual QString getName() const;
     void setName(QString name);
 
 	virtual int getBitrate();

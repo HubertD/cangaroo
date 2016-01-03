@@ -8,6 +8,7 @@
 
 class CanInterface;
 class CanMessage;
+class CanDbMessage;
 class MeasurementSetup;
 
 class CanTrace : public QObject
@@ -19,8 +20,11 @@ public:
     unsigned long size();
     void clear();
 
+    void setSetup(MeasurementSetup *setup);
+
     const CanMessage *getMessage(unsigned long idx);
-    MeasurementSetup *setup() const;
+    CanDbMessage *findDbMessage(const CanMessage &msg);
+    QString getInterfaceName(const CanInterface &interface);
 
 signals:
     void messageEnqueued(const CanMessage &msg);
