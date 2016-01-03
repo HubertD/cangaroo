@@ -11,7 +11,7 @@ DbcParser::DbcParser()
 {
 }
 
-bool DbcParser::parseFile(QFile *file, CanDb *candb)
+bool DbcParser::parseFile(QFile *file, CanDb &candb)
 {
     DbcTokenList tokens;
     if (tokenize(file, tokens) != err_ok) {
@@ -23,7 +23,7 @@ bool DbcParser::parseFile(QFile *file, CanDb *candb)
         return false;
     }
 
-    candb->setFilename(file->fileName());
+    candb.setFilename(file->fileName());
     return parse(candb, tokens);
 }
 
@@ -309,7 +309,7 @@ bool DbcParser::parseIdentifierList(DbcTokenList &tokens, QStringList *list)
     return expectSectionEnding(tokens);
 }
 
-bool DbcParser::parse(CanDb *candb, DbcTokenList &tokens)
+bool DbcParser::parse(CanDb &candb, DbcTokenList &tokens)
 {
     _dbcVersion.clear();
     _nsEntries.clear();
@@ -324,7 +324,7 @@ bool DbcParser::parse(CanDb *candb, DbcTokenList &tokens)
     return true;
 }
 
-bool DbcParser::parseSection(CanDb *candb, DbcTokenList &tokens) {
+bool DbcParser::parseSection(CanDb &candb, DbcTokenList &tokens) {
     bool retval = true;
 
     QString sectionName;
@@ -372,11 +372,11 @@ bool DbcParser::parseSection(CanDb *candb, DbcTokenList &tokens) {
 */
 }
 
-bool DbcParser::parseSectionVersion(CanDb *candb, DbcTokenList &tokens)
+bool DbcParser::parseSectionVersion(CanDb &candb, DbcTokenList &tokens)
 {
     QString version;
     if (!expectString(tokens, &version)) { return false; }
-    candb->setVersion(version);
+    candb.setVersion(version);
     return expectSectionEnding(tokens);
 }
 
@@ -389,7 +389,7 @@ bool DbcParser::parseSectionBs(DbcParser::DbcTokenList &tokens)
     return expectSectionEnding(tokens);
 }
 
-bool DbcParser::parseSectionBu(CanDb *candb, DbcParser::DbcTokenList &tokens)
+bool DbcParser::parseSectionBu(CanDb &candb, DbcParser::DbcTokenList &tokens)
 {
     QStringList strings;
     QString s;
@@ -399,14 +399,14 @@ bool DbcParser::parseSectionBu(CanDb *candb, DbcParser::DbcTokenList &tokens)
     }
 
     foreach(s, strings) {
-        candb->getOrCreateNode(s);
+        candb.getOrCreateNode(s);
     }
 
     return true;
 }
 
 
-bool DbcParser::parseSectionBo(CanDb *candb, DbcTokenList &tokens)
+bool DbcParser::parseSectionBo(CanDb &candb, DbcTokenList &tokens)
 {
     long long can_id;
     int dlc;
@@ -419,12 +419,12 @@ bool DbcParser::parseSectionBo(CanDb *candb, DbcTokenList &tokens)
     if (!expectInt(tokens, &dlc)) { return false; }
     if (!expectIdentifier(tokens, &sender)) { return false; }
 
-    CanDbMessage *msg = new CanDbMessage(candb);
+    CanDbMessage *msg = new CanDbMessage(&candb);
     msg->setRaw_id(can_id);
     msg->setName(msg_name);
     msg->setDlc(dlc);
-    msg->setSender(candb->getOrCreateNode(sender));
-    candb->addMessage(msg);
+    msg->setSender(candb.getOrCreateNode(sender));
+    candb.addMessage(msg);
 
     QString subsect;
     while (true) {
@@ -448,7 +448,7 @@ bool DbcParser::parseSectionBo(CanDb *candb, DbcTokenList &tokens)
 
 }
 
-bool DbcParser::parseSectionBoSg(CanDb *candb, CanDbMessage *msg, DbcTokenList &tokens)
+bool DbcParser::parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &tokens)
 {
     (void)candb;
 
@@ -536,7 +536,7 @@ bool DbcParser::parseSectionBoSg(CanDb *candb, CanDbMessage *msg, DbcTokenList &
     return true;
 }
 
-bool DbcParser::parseSectionCm(CanDb *candb, DbcParser::DbcTokenList &tokens)
+bool DbcParser::parseSectionCm(CanDb &candb, DbcParser::DbcTokenList &tokens)
 {
     QString s;
     QString idtype;
@@ -544,7 +544,7 @@ bool DbcParser::parseSectionCm(CanDb *candb, DbcParser::DbcTokenList &tokens)
     long long ll;
 
     if (expectString(tokens, &s)) { // DBC file comment
-        candb->setComment(s);
+        candb.setComment(s);
         return true;
     }
 
@@ -554,14 +554,14 @@ bool DbcParser::parseSectionCm(CanDb *candb, DbcParser::DbcTokenList &tokens)
 
         if (!expectIdentifier(tokens, &id)) { return false; }
         if (!expectString(tokens, &s)) { return false; }
-        candb->getOrCreateNode(id)->setComment(s);
+        candb.getOrCreateNode(id)->setComment(s);
         return expectSectionEnding(tokens);
 
     } else if (idtype=="BO_") {
 
         if (!expectLongLong(tokens, &ll)) { return false; }
         if (!expectString(tokens, &s)) { return false; }
-        CanDbMessage *msg = candb->getMessageById(ll);
+        CanDbMessage *msg = candb.getMessageById(ll);
         if (!msg) { return false; }
         msg->setComment(s);
         return expectSectionEnding(tokens);
@@ -569,7 +569,7 @@ bool DbcParser::parseSectionCm(CanDb *candb, DbcParser::DbcTokenList &tokens)
     } else if (idtype=="SG_") {
 
         if (!expectLongLong(tokens, &ll)) { return false; }
-        CanDbMessage *msg = candb->getMessageById(ll);
+        CanDbMessage *msg = candb.getMessageById(ll);
         if (!msg) { return false; }
 
         if (!expectIdentifier(tokens, &id)) { return false; }
@@ -590,7 +590,7 @@ bool DbcParser::parseSectionCm(CanDb *candb, DbcParser::DbcTokenList &tokens)
 
 }
 
-bool DbcParser::parseSectionVal(CanDb *candb, DbcParser::DbcTokenList &tokens)
+bool DbcParser::parseSectionVal(CanDb &candb, DbcParser::DbcTokenList &tokens)
 {
     long long can_id;
     QString signal_id;
@@ -598,7 +598,7 @@ bool DbcParser::parseSectionVal(CanDb *candb, DbcParser::DbcTokenList &tokens)
     QString name;
 
     if (!expectLongLong(tokens, &can_id)) { return false; }
-    CanDbMessage *msg = candb->getMessageById(can_id);
+    CanDbMessage *msg = candb.getMessageById(can_id);
     if (!msg) { return false; }
 
     if (!expectIdentifier(tokens, &signal_id)) { return false; }

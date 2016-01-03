@@ -4,13 +4,17 @@
 #include <QString>
 #include <QList>
 #include <QMap>
+#include <QSharedPointer>
+
 #include "CanDbNode.h"
 #include "CanDbMessage.h"
 
+class CanDb;
 class CanDbMessage;
 
 typedef QMap<QString,CanDbNode*> CanDbNodeMap;
 typedef QMap<uint32_t, CanDbMessage*> CanDbMessageList;
+typedef QSharedPointer<CanDb> pCanDb;
 
 class CanDb
 {

@@ -9,6 +9,7 @@
 #define BASE_CANINTERFACE_H_
 
 #include <QString>
+#include <QSharedPointer>
 #include <stdint.h>
 
 class CanInterfaceProvider;
@@ -37,5 +38,7 @@ private:
     uint16_t _id;
 	CanInterfaceProvider *_provider;
 };
+
+typedef QSharedPointer<CanInterface> pCanInterface;
 
 #endif /* BASE_CANINTERFACE_H_ */

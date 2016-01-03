@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QList>
+#include <QSharedPointer>
 #include <drivers/CanInterface.h>
 #include <model/CanDb.h>
 
@@ -11,10 +12,10 @@ class MeasurementNetwork
 public:
     MeasurementNetwork();
 
-    void addCanInterface(CanInterface *intf);
-    void addCanDb(CanDb *candb);
-    QList<CanInterface*> _canInterfaces;
-    QList<CanDb*> _canDbs;
+    void addCanInterface(QSharedPointer<CanInterface>intf);
+    void addCanDb(QSharedPointer<CanDb> candb);
+    QList<QSharedPointer<CanInterface> > _canInterfaces;
+    QList<QSharedPointer<CanDb> > _canDbs;
 
     QString name() const;
     void setName(const QString &name);

@@ -152,14 +152,14 @@ QString SocketCanInterfaceProvider::getName() {
 
 void SocketCanInterfaceProvider::createOrUpdateInterface(int index, QString name) {
 
-	for (CanInterfaceList::iterator it = _interfaces.begin() ; it != _interfaces.end(); ++it) {
-		SocketCanInterface *scif = dynamic_cast<SocketCanInterface *>(*it);
+    foreach (pCanInterface intf, _interfaces) {
+        QSharedPointer<SocketCanInterface> scif = qSharedPointerCast<SocketCanInterface>(intf);
 		if (scif->getIfIndex() == index) {
 			scif->setName(name);
 			return;
 		}
 	}
 
-	SocketCanInterface *scif = new SocketCanInterface(this, index, name);
-	_interfaces.push_back(scif);
+    SocketCanInterface *scif = new SocketCanInterface(this, index, name);
+    _interfaces.push_back(pCanInterface(scif));
 }

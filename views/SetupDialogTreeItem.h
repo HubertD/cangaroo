@@ -28,8 +28,8 @@ public:
 
     MeasurementSetup *setup;
     MeasurementNetwork *network;
-    CanInterface *intf;
-    CanDb *candb;
+    pCanInterface intf;
+    pCanDb candb;
 
     SetupDialogTreeItem *getParentItem() const;
     int getChildCount() const;

@@ -71,7 +71,7 @@ int SetupDialogTreeModel::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
-void SetupDialogTreeModel::addCanDb(const QModelIndex &parent, CanDb *db)
+void SetupDialogTreeModel::addCanDb(const QModelIndex &parent, pCanDb db)
 {
     SetupDialogTreeItem *parentItem = static_cast<SetupDialogTreeItem*>(parent.internalPointer());
     SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb, parentItem);
@@ -109,7 +109,7 @@ void SetupDialogTreeModel::load(MeasurementSetup *setup)
         item_network->network = network;
         item_network->appendChild(item_intf_root);
 
-        foreach (CanInterface *intf, network->_canInterfaces) {
+        foreach (pCanInterface intf, network->_canInterfaces) {
             SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface, item_intf_root);
             item->intf = intf;
             item_intf_root->appendChild(item);
@@ -119,7 +119,7 @@ void SetupDialogTreeModel::load(MeasurementSetup *setup)
         item_network->network = network;
         item_network->appendChild(item_candb_root);
 
-        foreach (CanDb *candb, network->_canDbs) {
+        foreach (pCanDb candb, network->_canDbs) {
             SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb, item_candb_root);
             item->candb = candb;
             item_candb_root->appendChild(item);

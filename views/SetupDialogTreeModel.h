@@ -21,7 +21,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
     int columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
-    void addCanDb(const QModelIndex &parent, CanDb *db);
+    void addCanDb(const QModelIndex &parent, pCanDb db);
     void deleteCanDb(const QModelIndex &index);
 
 private:

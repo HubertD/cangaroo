@@ -4,12 +4,12 @@ MeasurementNetwork::MeasurementNetwork()
 {
 }
 
-void MeasurementNetwork::addCanInterface(CanInterface *intf)
+void MeasurementNetwork::addCanInterface(QSharedPointer<CanInterface> intf)
 {
     _canInterfaces.append(intf);
 }
 
-void MeasurementNetwork::addCanDb(CanDb *candb)
+void MeasurementNetwork::addCanDb(QSharedPointer<CanDb> candb)
 {
     _canDbs.append(candb);
 }

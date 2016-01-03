@@ -3,7 +3,7 @@
 #include "model/CanMessage.h"
 #include "CanInterface.h"
 
-CanListener::CanListener(QObject *parent, CanInterface *intf)
+CanListener::CanListener(QObject *parent, pCanInterface intf)
   : QObject(parent),
     _intf(intf)
 {

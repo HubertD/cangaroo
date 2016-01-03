@@ -114,8 +114,8 @@ void SetupDialog::addCanDb()
     if (!filename.isNull()) {
         DbcParser parser;
         QFile *dbc = new QFile(filename);
-        CanDb *candb = new CanDb();
-        parser.parseFile(dbc, candb);
+        pCanDb candb(new CanDb());
+        parser.parseFile(dbc, *candb);
         delete dbc;
         model->addCanDb(getSelectedIndex(), candb);
     }

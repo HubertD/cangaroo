@@ -34,7 +34,7 @@ CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage *msg)
     if (!msg) { return 0; }
 
     foreach (MeasurementNetwork *network, _networks) {
-        foreach (CanDb *db, network->_canDbs) {
+        foreach (pCanDb db, network->_canDbs) {
             result = db->getMessageById(msg->getRawId());
             if (result != 0) {
                 return result;

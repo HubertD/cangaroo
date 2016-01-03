@@ -14,7 +14,7 @@
 
 class CanInterface;
 
-typedef QList<CanInterface*> CanInterfaceList;
+typedef QList<pCanInterface> CanInterfaceList;
 
 class CanInterfaceProvider {
 public:

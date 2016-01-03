@@ -121,7 +121,7 @@ void MainWindow::startMeasurement(MeasurementSetup *setup)
     int i=0;
     foreach (MeasurementNetwork *network, setup->getNetworks()) {
         i++;
-        foreach (CanInterface *intf, network->_canInterfaces) {
+        foreach (pCanInterface intf, network->_canInterfaces) {
             intf->setId(i);
             intf->open();
 
@@ -147,16 +147,15 @@ void MainWindow::startup()
 {
     DbcParser parser;
     QFile *dbc = new QFile("test.dbc");
-    CanDb *candb = new CanDb();
-    parser.parseFile(dbc, candb);
+    pCanDb candb(new CanDb());
+    parser.parseFile(dbc, *candb);
 
     CanInterfaceProvider *provider = new SocketCanInterfaceProvider();
     provider->update();
 
-    CanInterface *intf;
     MeasurementNetwork *network;
     int i = 1;
-    foreach (intf, provider->getInterfaceList()) {
+    foreach (pCanInterface intf, provider->getInterfaceList()) {
         network = setup->createNetwork();
         network->setName(QString().sprintf("Network %d", i++));
         network->addCanInterface(intf);
