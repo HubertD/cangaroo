@@ -1,23 +1,21 @@
 #include "LogView.h"
 #include "ui_LogView.h"
+#include "Logger.h"
 
-LogView::LogView(QWidget *parent, MeasurementSetup *setup) :
+LogView::LogView(QWidget *parent, Logger *logger) :
     QWidget(parent),
-    ui(new Ui::LogView),
-    _setup(setup)
+    ui(new Ui::LogView)
 {
     ui->setupUi(this);
-
-//    connect(setup, SIGNAL(appendLog(log_level_t, QString)), this, SLOT(appendLog(log_level_t,QString)));
+    connect(logger, SIGNAL(onLogMessage(QtMsgType,QString)), this, SLOT(onLogMessage(QtMsgType,QString)));
 }
 
 LogView::~LogView()
 {
     delete ui;
 }
-/*
-void LogView::appendLog(log_level_t level, QString s)
+
+void LogView::onLogMessage(QtMsgType type, const QString &msg)
 {
-    ui->loglist->addItem(s);
+    ui->loglist->addItem(msg);
 }
-*/

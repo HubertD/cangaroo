@@ -2,25 +2,27 @@
 #define LOGVIEW_H
 
 #include <QWidget>
-#include <setup/MeasurementSetup.h>
+
 
 namespace Ui {
 class LogView;
 }
 
-class MeasurementSetup;
+class Logger;
 
 class LogView : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit LogView(QWidget *parent, MeasurementSetup *setup);
+    explicit LogView(QWidget *parent, Logger *logger);
     ~LogView();
+
+public slots:
+    void onLogMessage(QtMsgType type, const QString &msg);
 
 private:
     Ui::LogView *ui;
-    MeasurementSetup *_setup;
 };
 
 #endif // LOGVIEW_H

@@ -7,6 +7,7 @@
 #include <QCloseEvent>
 #include <QDebug>
 
+#include "Logger.h"
 #include <drivers/socketcan/SocketCanInterface.h>
 #include <drivers/socketcan/SocketCanInterfaceProvider.h>
 #include <setup/MeasurementSetup.h>
@@ -22,9 +23,10 @@
 #include <views/GraphView.h>
 #include <views/SetupDialog.h>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    _logger(logger)
 {
     ui->setupUi(this);
     ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -89,7 +91,7 @@ QMdiSubWindow *MainWindow::createTraceView() {
 
 QMdiSubWindow *MainWindow::createLogView()
 {
-    return createSubWindow(new LogView(ui->mdiArea, setup));
+    return createSubWindow(new LogView(ui->mdiArea, _logger));
 }
 
 QMdiSubWindow *MainWindow::createGraphView()

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 
+class Logger;
 class TraceView;
 class LogView;
 
@@ -28,7 +29,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(Logger *logger, QWidget *parent = 0);
     ~MainWindow();
 
 protected:
@@ -47,6 +48,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
 
+    Logger *_logger;
     MeasurementSetup *setup;
     CanTrace *_trace;
 
