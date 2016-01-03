@@ -41,7 +41,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
 
-    setup = new MeasurementSetup(this);
+    setup = createDefaultSetup();
     _trace = new CanTrace(this, setup, 100);
 
     QMdiSubWindow *logView = createLogView();
@@ -53,7 +53,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     /*QMdiSubWindow *graphViewWindow = createGraphView();
     graphViewWindow->setGeometry(0, 500, 1000, 200);
 */
-    startup();
+    startMeasurement(setup);
 }
 
 MainWindow::~MainWindow()
@@ -78,12 +78,6 @@ QMdiSubWindow *MainWindow::createSubWindow(QWidget *window)
     window->show();
     return retval;
 }
-
-CanTrace *MainWindow::getTrace()
-{
-    return _trace;
-}
-
 
 QMdiSubWindow *MainWindow::createTraceView() {
     return createSubWindow(new TraceWindow(ui->mdiArea, _trace));
@@ -149,24 +143,19 @@ void MainWindow::stopMeasurement()
     qDebug("stopping measurement");
 }
 
-void MainWindow::startup()
+MeasurementSetup *MainWindow::createDefaultSetup()
 {
-    DbcParser parser;
-    QFile *dbc = new QFile("test.dbc");
-    pCanDb candb(new CanDb());
-    parser.parseFile(dbc, *candb);
 
     CanInterfaceProvider *provider = new SocketCanInterfaceProvider();
     provider->update();
 
-    MeasurementNetwork *network;
+    MeasurementSetup *defaultSetup = new MeasurementSetup(this);
     int i = 1;
     foreach (pCanInterface intf, provider->getInterfaceList()) {
-        network = setup->createNetwork();
+        MeasurementNetwork *network = defaultSetup->createNetwork();
         network->setName(QString().sprintf("Network %d", i++));
         network->addCanInterface(intf);
-        network->addCanDb(candb);
     }
 
-    startMeasurement(setup);
+    return defaultSetup;
 }

@@ -55,10 +55,8 @@ private:
     TraceWindow *activeMdiChild();
     QSignalMapper *windowMapper;
 
-    void startup();
     QMdiSubWindow *createSubWindow(QWidget *window);
-
-    CanTrace *getTrace();
+    MeasurementSetup *createDefaultSetup();
 
 };
 
