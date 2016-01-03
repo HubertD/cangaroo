@@ -5,15 +5,15 @@
 #include <views/LinearTraceViewModel.h>
 #include <views/AggregatedTraceViewModel.h>
 
-TraceView::TraceView(QWidget *parent, MeasurementSetup *setup) :
+TraceView::TraceView(QWidget *parent, CanTrace *trace) :
     QWidget(parent),
     ui(new Ui::TraceView),
-    _setup(setup)
+    _trace(trace)
 {
     ui->setupUi(this);
 
-    _linearTraceViewModel = new LinearTraceViewModel(_setup);
-    _aggregatedTraceViewModel = new AggregatedTraceViewModel(_setup);
+    _linearTraceViewModel = new LinearTraceViewModel(_trace);
+    _aggregatedTraceViewModel = new AggregatedTraceViewModel(_trace);
 
     ui->tree->setModel(_linearTraceViewModel);
     ui->tree->setUniformRowHeights(true);
@@ -35,11 +35,6 @@ TraceView::~TraceView()
     delete ui;
     delete _aggregatedTraceViewModel;
     delete _linearTraceViewModel;
-}
-
-MeasurementSetup *TraceView::getSetup() const
-{
-    return _setup;
 }
 
 void TraceView::onCbTraceTypeChanged(int i)

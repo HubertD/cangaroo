@@ -2,9 +2,10 @@
 
 #include <model/CanMessage.h>
 #include <model/CanDbMessage.h>
+#include <setup/MeasurementSetup.h>
 
-BaseTraceViewModel::BaseTraceViewModel(MeasurementSetup *setup)
-  : _setup(setup)
+BaseTraceViewModel::BaseTraceViewModel(CanTrace *trace)
+  : _trace(trace)
 {
 }
 
@@ -58,6 +59,11 @@ QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
     }
 }
 
+CanTrace *BaseTraceViewModel::trace() const
+{
+    return _trace;
+}
+
 QVariant BaseTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
     (void) index;
@@ -69,7 +75,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
 {
     (void) role;
     double intervalD;
-    CanDbMessage *dbmsg = _setup->findDbMessage(msg);
+    CanDbMessage *dbmsg = trace()->setup()->findDbMessage(msg);
 
     switch (index.column()) {
 
@@ -78,7 +84,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
             return (intervalD==0) ? "" : QString().sprintf("%.04f", intervalD);
 
         case column_channel:
-            return _setup->getInterfaceName(msg->getInterface());
+            return _trace->setup()->getInterfaceName(msg->getInterface());
 
         case column_direction:
             return (msg->getId() % 7)==0 ? "tx" : "rx";
@@ -110,7 +116,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, i
     uint32_t raw_data;
     QString value_name;
 
-    CanDbMessage *dbmsg = _setup->findDbMessage(msg);
+    CanDbMessage *dbmsg = _trace->setup()->findDbMessage(msg);
     if (!dbmsg) { return QVariant(); }
 
     CanDbSignal *dbsignal = dbmsg->getSignal(index.row());

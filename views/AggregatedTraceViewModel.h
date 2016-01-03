@@ -11,10 +11,11 @@
 #include <views/BaseTraceViewModel.h>
 #include <model/CanMessage.h>
 #include <drivers/CanInterface.h>
-#include <setup/MeasurementNetwork.h>
 
 #include "AggregatedTraceViewItem.h"
 
+
+class CanTrace;
 
 class AggregatedTraceViewModel : public BaseTraceViewModel
 {
@@ -25,7 +26,7 @@ public:
     typedef QMap<unique_key_t, AggregatedTraceViewItem*> CanIdMap;
 
 public:
-    AggregatedTraceViewModel(MeasurementSetup *setup);
+    AggregatedTraceViewModel(CanTrace *trace);
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
     virtual QModelIndex parent(const QModelIndex &child) const;

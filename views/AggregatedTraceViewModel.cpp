@@ -1,14 +1,17 @@
 #include "AggregatedTraceViewModel.h"
 #include <QColor>
-#include <model/CanTrace.h>
 
-AggregatedTraceViewModel::AggregatedTraceViewModel(MeasurementSetup *setup)
-  : BaseTraceViewModel(setup)
+#include <model/CanTrace.h>
+#include <model/CanDbMessage.h>
+#include <setup/MeasurementSetup.h>
+
+AggregatedTraceViewModel::AggregatedTraceViewModel(CanTrace *trace)
+  : BaseTraceViewModel(trace)
 {
     _rootItem = new AggregatedTraceViewItem(0);
     _updateTimer = new QTimer(this);
     connect(_updateTimer, SIGNAL(timeout()), this, SLOT(onUpdateTimer()));
-    connect(_setup->getTrace(), SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
+    connect(trace, SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
 
     _updateTimer->setSingleShot(true);
 }
@@ -18,7 +21,7 @@ void AggregatedTraceViewModel::createItem(const CanMessage &msg)
     AggregatedTraceViewItem *item = new AggregatedTraceViewItem(_rootItem);
     item->_lastmsg = msg;
 
-    CanDbMessage *dbmsg = _setup->findDbMessage(&msg);
+    CanDbMessage *dbmsg = _trace->setup()->findDbMessage(&msg);
     if (dbmsg) {
         for (int i=0; i<dbmsg->getSignals().length(); i++) {
             item->appendChild(new AggregatedTraceViewItem(item));

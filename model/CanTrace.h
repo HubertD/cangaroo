@@ -4,22 +4,24 @@
 #include <QObject>
 #include <QMutex>
 #include <QTimer>
-
-#include "CanMessage.h"
-#include <vector>
+#include <QVector>
 
 class CanInterface;
+class CanMessage;
+class MeasurementSetup;
 
 class CanTrace : public QObject
 {
     Q_OBJECT
 public:
-    explicit CanTrace(QObject *parent = 0, int flushInterval=100);
+    explicit CanTrace(QObject *parent, MeasurementSetup *setup, int flushInterval);
 
     unsigned long size();
     void clear();
 
     const CanMessage *getMessage(unsigned long idx);
+
+    MeasurementSetup *setup() const;
 
 signals:
     void messageEnqueued(const CanMessage &msg);
@@ -33,9 +35,9 @@ public slots:
     void flushQueue();
 
 private:
-    typedef std::vector<CanMessage*> CanMessageList;
-    CanMessageList _data;
-    CanMessageList _queue;
+    MeasurementSetup *_setup;
+    QVector<CanMessage*> _data;
+    QVector<CanMessage*> _queue;
 
     QMutex _dataMutex;
     QMutex _queueMutex;

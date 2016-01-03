@@ -7,7 +7,7 @@ namespace Ui {
 class TraceView;
 }
 
-class MeasurementSetup;
+class CanTrace;
 class LinearTraceViewModel;
 class AggregatedTraceViewModel;
 
@@ -16,10 +16,8 @@ class TraceView : public QWidget
     Q_OBJECT
 
 public:
-    explicit TraceView(QWidget *parent, MeasurementSetup *setup);
+    explicit TraceView(QWidget *parent, CanTrace *trace);
     ~TraceView();
-
-    MeasurementSetup *getSetup() const;
 
 public slots:
     void onCbTraceTypeChanged(int i);
@@ -27,7 +25,7 @@ public slots:
 
 private:
     Ui::TraceView *ui;
-    MeasurementSetup *_setup;
+    CanTrace *_trace;
     LinearTraceViewModel *_linearTraceViewModel;
     AggregatedTraceViewModel *_aggregatedTraceViewModel;
 };

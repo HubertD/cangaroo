@@ -1,8 +1,10 @@
 #include "CanTrace.h"
 #include <QMutexLocker>
+#include <model/CanMessage.h>
 
-CanTrace::CanTrace(QObject *parent, int flushInterval)
+CanTrace::CanTrace(QObject *parent, MeasurementSetup *setup, int flushInterval)
   : QObject(parent),
+    _setup(setup),
     _dataMutex(QMutex::Recursive),
     _queueMutex(QMutex::Recursive)
 {
@@ -60,12 +62,17 @@ void CanTrace::flushQueue()
     if (num_msg) {
         emit beforeAppend(num_msg);
         _dataMutex.lock();
-        for (CanMessageList::iterator it=_queue.begin(); it!=_queue.end(); ++it) {
-            _data.push_back(*it);
+        foreach (CanMessage *msg, _queue) {
+            _data.push_back(msg);
         }
         _dataMutex.unlock();
         _queue.clear();
         emit afterAppend(num_msg);
     }
 
+}
+
+MeasurementSetup *CanTrace::setup() const
+{
+    return _setup;
 }

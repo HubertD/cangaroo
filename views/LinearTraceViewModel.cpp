@@ -1,12 +1,13 @@
 #include "LinearTraceViewModel.h"
 #include <iostream>
 #include <stddef.h>
+#include <setup/MeasurementSetup.h>
 
-LinearTraceViewModel::LinearTraceViewModel(MeasurementSetup *setup)
-  : BaseTraceViewModel(setup)
+LinearTraceViewModel::LinearTraceViewModel(CanTrace *trace)
+  : BaseTraceViewModel(trace)
 {
-    connect(setup->getTrace(), SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
-    connect(setup->getTrace(), SIGNAL(afterAppend(int)), this, SLOT(afterAppend(int)));
+    connect(trace, SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
+    connect(trace, SIGNAL(afterAppend(int)), this, SLOT(afterAppend(int)));
 }
 
 QModelIndex LinearTraceViewModel::index(int row, int column, const QModelIndex &parent) const
@@ -35,16 +36,16 @@ int LinearTraceViewModel::rowCount(const QModelIndex &parent) const
         if (id & 0x80000000) { // node of a message
             return 0;
         } else { // a message
-            const CanMessage *msg = _setup->getTrace()->getMessage(id-1);
+            const CanMessage *msg = trace()->getMessage(id-1);
             if (msg) {
-                CanDbMessage *dbmsg = _setup->findDbMessage(msg);
+                CanDbMessage *dbmsg = trace()->setup()->findDbMessage(msg);
                 return (dbmsg!=0) ? dbmsg->getSignals().length() : 0;
             } else {
                 return 0;
             }
         }
     } else {
-        return _setup->getTrace()->size();
+        return trace()->size();
     }
 }
 
@@ -61,7 +62,7 @@ bool LinearTraceViewModel::hasChildren(const QModelIndex &parent) const
 
 void LinearTraceViewModel::beforeAppend(int num_messages)
 {
-    beginInsertRows(QModelIndex(), _setup->getTrace()->size(), _setup->getTrace()->size()+num_messages-1);
+    beginInsertRows(QModelIndex(), trace()->size(), trace()->size()+num_messages-1);
 }
 
 void LinearTraceViewModel::afterAppend(int num_messages)
@@ -73,7 +74,7 @@ void LinearTraceViewModel::afterAppend(int num_messages)
 QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
     quintptr id = index.internalId();
-    const CanMessage *msg = _setup->getTrace()->getMessage((id & ~0x80000000)-1);
+    const CanMessage *msg = trace()->getMessage((id & ~0x80000000)-1);
     if (!msg) { return QVariant(); }
 
     if (id & 0x80000000) {

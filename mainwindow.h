@@ -15,6 +15,7 @@ class QWidget;
 class QSignalMapper;
 QT_END_NAMESPACE
 
+class CanTrace;
 class MeasurementSetup;
 class SocketCanInterfaceProvider;
 
@@ -40,17 +41,22 @@ public slots:
     void setActiveSubWindow(QWidget *window);
     void showSetupDialog();
 
+    void startMeasurement(MeasurementSetup *setup);
+    void stopMeasurement();
+
 private:
     Ui::MainWindow *ui;
 
     MeasurementSetup *setup;
-    SocketCanInterfaceProvider *_provider;
+    CanTrace *_trace;
 
     TraceView *activeMdiChild();
     QSignalMapper *windowMapper;
 
     void startup();
     QMdiSubWindow *createSubWindow(QWidget *window);
+
+    CanTrace *getTrace();
 
 };
 

@@ -18,9 +18,6 @@ public:
     explicit LogView(QWidget *parent, MeasurementSetup *setup);
     ~LogView();
 
-public slots:
-    void appendLog(log_level_t level, QString s);
-
 private:
     Ui::LogView *ui;
     MeasurementSetup *_setup;

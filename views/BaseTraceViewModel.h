@@ -2,7 +2,7 @@
 #define BASETRACEVIEWMODEL_H
 
 #include <QAbstractItemModel>
-#include <setup/MeasurementSetup.h>
+#include <model/CanTrace.h>
 
 class BaseTraceViewModel : public QAbstractItemModel
 {
@@ -22,13 +22,15 @@ public:
     };
 
 public:
-    BaseTraceViewModel(MeasurementSetup *setup);
+    BaseTraceViewModel(CanTrace *trace);
     virtual int columnCount(const QModelIndex &parent) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
 
+    CanTrace *trace() const;
+
 protected:
-    MeasurementSetup *_setup;
+    CanTrace *_trace;
 
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;
     virtual QVariant data_DisplayRole_Message(const QModelIndex &index, int role, const CanMessage *msg, struct timeval tv) const;

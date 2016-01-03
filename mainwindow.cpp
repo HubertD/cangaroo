@@ -5,14 +5,17 @@
 #include <QMdiArea>
 #include <QSignalMapper>
 #include <QCloseEvent>
+#include <QDebug>
 
 #include <drivers/socketcan/SocketCanInterface.h>
 #include <drivers/socketcan/SocketCanInterfaceProvider.h>
 #include <setup/MeasurementSetup.h>
 #include <setup/MeasurementNetwork.h>
 
+#include <model/CanTrace.h>
 #include <parser/dbc/DbcParser.h>
 #include <model/CanDb.h>
+#include <drivers/CanListener.h>
 
 #include <views/TraceView.h>
 #include <views/LogView.h>
@@ -37,13 +40,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     setup = new MeasurementSetup(this);
-    QMdiSubWindow *logView = createLogView();
-    QMdiSubWindow *traceViewWindow = createTraceView();
-    QMdiSubWindow *graphViewWindow = createGraphView();
-    traceViewWindow->setGeometry(0, 0, 1000, 500);
-    logView->setGeometry(0, 500, 1000, 200);
-    graphViewWindow->setGeometry(0, 500, 1000, 200);
+    _trace = new CanTrace(this, setup, 100);
 
+    QMdiSubWindow *logView = createLogView();
+    logView->setGeometry(0, 500, 1000, 200);
+
+    QMdiSubWindow *traceViewWindow = createTraceView();
+    traceViewWindow->setGeometry(0, 0, 1000, 500);
+
+    /*QMdiSubWindow *graphViewWindow = createGraphView();
+    graphViewWindow->setGeometry(0, 500, 1000, 200);
+*/
     startup();
 }
 
@@ -70,9 +77,14 @@ QMdiSubWindow *MainWindow::createSubWindow(QWidget *window)
     return retval;
 }
 
+CanTrace *MainWindow::getTrace()
+{
+    return _trace;
+}
+
 
 QMdiSubWindow *MainWindow::createTraceView() {
-    return createSubWindow(new TraceView(ui->mdiArea, setup));
+    return createSubWindow(new TraceView(ui->mdiArea, _trace));
 }
 
 QMdiSubWindow *MainWindow::createLogView()
@@ -97,6 +109,38 @@ void MainWindow::showSetupDialog()
     dlg.showSetupDialog(setup);
 }
 
+void MainWindow::startMeasurement(MeasurementSetup *setup)
+{
+    QThread* thread;
+    qRegisterMetaType<CanMessage>("CanMessage");
+
+    qDebug("starting measurement");
+
+    int i=0;
+    foreach (MeasurementNetwork *network, setup->getNetworks()) {
+        i++;
+        foreach (CanInterface *intf, network->_canInterfaces) {
+            intf->setId(i);
+            intf->open();
+
+            qDebug() << "listening on interface" << intf->getName();
+
+            thread = new QThread;
+            CanListener *listener = new CanListener(0, intf);
+            listener->moveToThread(thread);
+            connect(thread, SIGNAL(started()), listener, SLOT(run()));
+            connect(listener, SIGNAL(messageReceived(CanMessage)), _trace, SLOT(enqueueMessage(CanMessage)));
+            thread->start();
+        }
+    }
+
+}
+
+void MainWindow::stopMeasurement()
+{
+    qDebug("stopping measurement");
+}
+
 void MainWindow::startup()
 {
     DbcParser parser;
@@ -104,18 +148,18 @@ void MainWindow::startup()
     CanDb *candb = new CanDb();
     parser.parseFile(dbc, candb);
 
-    _provider = new SocketCanInterfaceProvider();
-    _provider->update();
+    CanInterfaceProvider *provider = new SocketCanInterfaceProvider();
+    provider->update();
 
     CanInterface *intf;
     MeasurementNetwork *network;
     int i = 1;
-    foreach (intf, _provider->getInterfaceList()) {
+    foreach (intf, provider->getInterfaceList()) {
         network = setup->createNetwork();
         network->setName(QString().sprintf("Network %d", i++));
         network->addCanInterface(intf);
         network->addCanDb(candb);
     }
 
-    setup->startMeasurement();
+    startMeasurement(setup);
 }
