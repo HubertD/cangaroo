@@ -1,5 +1,6 @@
-<!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file>assets/mdibg.png</file>
-</qresource>
+<RCC>
+    <qresource prefix="/">
+        <file>assets/mdibg.png</file>
+        <file>assets/icon.png</file>
+    </qresource>
 </RCC>
