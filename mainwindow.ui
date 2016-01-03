@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>procan</string>
+   <string>cangaroo</string>
   </property>
   <property name="documentMode">
    <bool>false</bool>

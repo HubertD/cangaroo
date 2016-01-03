@@ -1,5 +1,5 @@
 #include "TraceWindow.h"
-#include "ui_TraceView.h"
+#include "ui_TraceWindow.h"
 #include "LinearTraceViewModel.h"
 #include "AggregatedTraceViewModel.h"
 
