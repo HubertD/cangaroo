@@ -1,33 +1,33 @@
-#ifndef TRACEVIEW_H
-#define TRACEVIEW_H
+#ifndef TRACEWINDOW_H
+#define TRACEWINDOW_H
 
 #include <QWidget>
 
 namespace Ui {
-class TraceView;
+class TraceWindow;
 }
 
 class CanTrace;
 class LinearTraceViewModel;
 class AggregatedTraceViewModel;
 
-class TraceView : public QWidget
+class TraceWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit TraceView(QWidget *parent, CanTrace *trace);
-    ~TraceView();
+    explicit TraceWindow(QWidget *parent, CanTrace *trace);
+    ~TraceWindow();
 
 public slots:
     void onCbTraceTypeChanged(int i);
     void rowsInserted(const QModelIndex & parent, int first, int last);
 
 private:
-    Ui::TraceView *ui;
+    Ui::TraceWindow *ui;
     CanTrace *_trace;
     LinearTraceViewModel *_linearTraceViewModel;
     AggregatedTraceViewModel *_aggregatedTraceViewModel;
 };
 
-#endif // TRACEVIEW_H
+#endif // TRACEWINDOW_H

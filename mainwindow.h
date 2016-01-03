@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 class Logger;
-class TraceView;
+class TraceWindow;
 class LogView;
 
 QT_BEGIN_NAMESPACE
@@ -52,7 +52,7 @@ private:
     MeasurementSetup *setup;
     CanTrace *_trace;
 
-    TraceView *activeMdiChild();
+    TraceWindow *activeMdiChild();
     QSignalMapper *windowMapper;
 
     void startup();

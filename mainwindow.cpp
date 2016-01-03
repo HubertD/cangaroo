@@ -18,7 +18,7 @@
 #include <parser/dbc/DbcParser.h>
 #include <drivers/CanListener.h>
 
-#include <views/TraceView.h>
+#include <window/TraceWindow/TraceWindow.h>
 #include <views/LogView.h>
 #include <views/GraphView.h>
 #include <views/SetupDialog.h>
@@ -86,7 +86,7 @@ CanTrace *MainWindow::getTrace()
 
 
 QMdiSubWindow *MainWindow::createTraceView() {
-    return createSubWindow(new TraceView(ui->mdiArea, _trace));
+    return createSubWindow(new TraceWindow(ui->mdiArea, _trace));
 }
 
 QMdiSubWindow *MainWindow::createLogView()

@@ -1,13 +1,13 @@
-#include "TraceView.h"
+#include "TraceWindow.h"
 #include "ui_TraceView.h"
 
 #include <model/MeasurementSetup.h>
-#include <views/LinearTraceViewModel.h>
-#include <views/AggregatedTraceViewModel.h>
+#include "LinearTraceViewModel.h"
+#include "AggregatedTraceViewModel.h"
 
-TraceView::TraceView(QWidget *parent, CanTrace *trace) :
+TraceWindow::TraceWindow(QWidget *parent, CanTrace *trace) :
     QWidget(parent),
-    ui(new Ui::TraceView),
+    ui(new Ui::TraceWindow),
     _trace(trace)
 {
     ui->setupUi(this);
@@ -30,14 +30,14 @@ TraceView::TraceView(QWidget *parent, CanTrace *trace) :
 
 }
 
-TraceView::~TraceView()
+TraceWindow::~TraceWindow()
 {
     delete ui;
     delete _aggregatedTraceViewModel;
     delete _linearTraceViewModel;
 }
 
-void TraceView::onCbTraceTypeChanged(int i)
+void TraceWindow::onCbTraceTypeChanged(int i)
 {
     if (i==Qt::Checked) {
         ui->tree->setModel(_aggregatedTraceViewModel);
@@ -46,7 +46,7 @@ void TraceView::onCbTraceTypeChanged(int i)
     }
 }
 
-void TraceView::rowsInserted(const QModelIndex &parent, int first, int last)
+void TraceWindow::rowsInserted(const QModelIndex &parent, int first, int last)
 {
     (void) parent;
     (void) first;

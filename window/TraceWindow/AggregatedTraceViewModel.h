@@ -8,7 +8,7 @@
 
 #include <sys/time.h>
 
-#include <views/BaseTraceViewModel.h>
+#include "BaseTraceViewModel.h"
 #include <model/CanMessage.h>
 #include <drivers/CanInterface.h>
 
