@@ -29,6 +29,8 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     _logger(logger)
 {
     ui->setupUi(this);
+    QImage bgimg(":/assets/mdibg.png");
+    ui->mdiArea->setBackground(bgimg);
     ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 

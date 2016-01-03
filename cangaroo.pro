@@ -21,6 +21,8 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
+RESOURCES = cangaroo.qrc
+
 include($$PWD/model/model.pri)
 include($$PWD/drivers/drivers.pri)
 include($$PWD/views/views.pri)
