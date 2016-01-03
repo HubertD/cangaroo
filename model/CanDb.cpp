@@ -1,8 +1,15 @@
 #include "CanDb.h"
+#include <QFileInfo>
 
 CanDb::CanDb()
 {
 
+}
+
+QString CanDb::getBaseFilename()
+{
+    QFileInfo fi(getFilename());
+    return fi.baseName();
 }
 
 CanDbNode *CanDb::getOrCreateNode(QString node_name)

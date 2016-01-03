@@ -26,6 +26,11 @@ void SetupDialogTreeItem::appendChild(SetupDialogTreeItem *child)
     _children.append(child);
 }
 
+void SetupDialogTreeItem::removeChild(SetupDialogTreeItem *child)
+{
+    _children.removeAll(child);
+}
+
 SetupDialogTreeItem *SetupDialogTreeItem::child(int row) const
 {
     return _children.value(row);
@@ -48,7 +53,7 @@ QVariant SetupDialogTreeItem::dataDisplayRole() const
         case type_interface_root: return "Interfaces";
         case type_interface: return intf->getName();
         case type_candb_root: return "Can Databases";
-        case type_candb: return candb->getFilename();
+        case type_candb: return candb->getBaseFilename();
     }
 
     return QVariant();

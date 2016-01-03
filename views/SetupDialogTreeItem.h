@@ -34,6 +34,8 @@ public:
     SetupDialogTreeItem *getParentItem() const;
     int getChildCount() const;
     void appendChild(SetupDialogTreeItem *child);
+    void removeChild(SetupDialogTreeItem *child);
+
     SetupDialogTreeItem *child(int row) const;
     int row() const;
 

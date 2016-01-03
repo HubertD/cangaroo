@@ -71,6 +71,24 @@ int SetupDialogTreeModel::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
+void SetupDialogTreeModel::addCanDb(const QModelIndex &parent, CanDb *db)
+{
+    SetupDialogTreeItem *parentItem = static_cast<SetupDialogTreeItem*>(parent.internalPointer());
+    SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb, parentItem);
+    item->candb = db;
+    beginInsertRows(parent, rowCount(parent), rowCount(parent));
+    parentItem->appendChild(item);
+    endInsertRows();
+}
+
+void SetupDialogTreeModel::deleteCanDb(const QModelIndex &index)
+{
+    SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem*>(index.internalPointer());
+    beginRemoveRows(index.parent(), item->row(), item->row());
+    item->getParentItem()->removeChild(item);
+    endRemoveRows();
+}
+
 SetupDialogTreeItem *SetupDialogTreeModel::itemOrRoot(const QModelIndex &index) const
 {
     return index.isValid() ? static_cast<SetupDialogTreeItem*>(index.internalPointer()) : _rootItem;

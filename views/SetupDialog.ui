@@ -16,42 +16,56 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_3">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="QWidget" name="widget_2" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="QTreeView" name="treeView">
-            <attribute name="headerVisible">
-             <bool>false</bool>
-            </attribute>
-           </widget>
-          </item>
-         </layout>
+        <widget class="QTreeView" name="treeView">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>2</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="uniformRowHeights">
+          <bool>true</bool>
+         </property>
+         <attribute name="headerVisible">
+          <bool>false</bool>
+         </attribute>
         </widget>
-        <widget class="QFrame" name="frame">
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+        <widget class="QStackedWidget" name="stackedWidget">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>3</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
+         <property name="currentIndex">
+          <number>0</number>
          </property>
-         <widget class="QPushButton" name="pushButton">
-          <property name="geometry">
-           <rect>
-            <x>20</x>
-            <y>30</y>
-            <width>87</width>
-            <height>27</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>PushButton</string>
-          </property>
+         <widget class="QWidget" name="emptyPage"/>
+         <widget class="QWidget" name="networkPage">
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Network name:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="lineEdit"/>
+           </item>
+          </layout>
          </widget>
         </widget>
        </widget>

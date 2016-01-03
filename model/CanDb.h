@@ -19,6 +19,7 @@ class CanDb
 
         void setFilename(QString filename) { _filename = filename; }
         QString getFilename() { return _filename; }
+        QString getBaseFilename();
 
         void setVersion(QString version) { _version = version; }
         QString getVersion() { return _version; }
