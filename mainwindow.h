@@ -40,16 +40,15 @@ public slots:
     QMdiSubWindow *createLogView();
     QMdiSubWindow *createGraphView();
     void setActiveSubWindow(QWidget *window);
-    void showSetupDialog();
-
-    void startMeasurement(MeasurementSetup *setup);
+    bool showSetupDialog();
+    void startMeasurement();
     void stopMeasurement();
 
 private:
     Ui::MainWindow *ui;
 
     Logger *_logger;
-    MeasurementSetup *setup;
+    MeasurementSetup *_setup;
     CanTrace *_trace;
 
     TraceWindow *activeMdiChild();

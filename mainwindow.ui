@@ -39,7 +39,6 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionSetup"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -56,7 +55,17 @@
     </widget>
     <addaction name="menu_New"/>
    </widget>
+   <widget class="QMenu" name="menuMeasurement">
+    <property name="title">
+     <string>Measurement</string>
+    </property>
+    <addaction name="actionStart_Measurement"/>
+    <addaction name="actionStop_Measurement"/>
+    <addaction name="separator"/>
+    <addaction name="actionSetup"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuMeasurement"/>
    <addaction name="menuWindow"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -81,6 +90,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+S</string>
+   </property>
+  </action>
+  <action name="actionStart_Measurement">
+   <property name="text">
+    <string>Start Measurement</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionStop_Measurement">
+   <property name="text">
+    <string>Stop Measurement</string>
+   </property>
+   <property name="shortcut">
+    <string>Esc</string>
    </property>
   </action>
  </widget>

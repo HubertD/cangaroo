@@ -36,13 +36,15 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(createLogView()));
     connect(ui->actionSetup, SIGNAL(triggered()), this, SLOT(showSetupDialog()));
 
+    connect(ui->actionStart_Measurement, SIGNAL(triggered()), this, SLOT(startMeasurement()));
+    connect(ui->actionStop_Measurement, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
 
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
 
-    setup = createDefaultSetup();
-    _trace = new CanTrace(this, setup, 100);
+    _setup = createDefaultSetup();
+    _trace = new CanTrace(this, _setup, 100);
 
     QMdiSubWindow *logView = createLogView();
     logView->setGeometry(0, 500, 1000, 200);
@@ -53,7 +55,6 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     /*QMdiSubWindow *graphViewWindow = createGraphView();
     graphViewWindow->setGeometry(0, 500, 1000, 200);
 */
-    startMeasurement(setup);
 }
 
 MainWindow::~MainWindow()
@@ -90,7 +91,7 @@ QMdiSubWindow *MainWindow::createLogView()
 
 QMdiSubWindow *MainWindow::createGraphView()
 {
-    return createSubWindow(new GraphView(ui->mdiArea, setup));
+    return createSubWindow(new GraphView(ui->mdiArea, _setup));
 }
 
 void MainWindow::setActiveSubWindow(QWidget *window) {
@@ -99,27 +100,34 @@ void MainWindow::setActiveSubWindow(QWidget *window) {
     }
 }
 
-void MainWindow::showSetupDialog()
+bool MainWindow::showSetupDialog()
 {
     SetupDialog dlg(this);
-    MeasurementSetup *new_setup = dlg.showSetupDialog(*setup);
+    MeasurementSetup *new_setup = dlg.showSetupDialog(*_setup);
     if (new_setup) {
-        MeasurementSetup *old_setup = setup;
-        setup = new_setup;
-        _trace->setSetup(setup);
+        MeasurementSetup *old_setup = _setup;
+        _setup = new_setup;
+        _trace->setSetup(_setup);
         delete old_setup;
+        return true;
+    } else {
+        return false;
     }
 }
 
-void MainWindow::startMeasurement(MeasurementSetup *setup)
+void MainWindow::startMeasurement()
 {
+    if (!showSetupDialog()) {
+        return;
+    }
+
     QThread* thread;
     qRegisterMetaType<CanMessage>("CanMessage");
 
     qDebug("starting measurement");
 
     int i=0;
-    foreach (MeasurementNetwork *network, setup->getNetworks()) {
+    foreach (MeasurementNetwork *network, _setup->getNetworks()) {
         i++;
         foreach (pCanInterface intf, network->_canInterfaces) {
             intf->setId(i);
