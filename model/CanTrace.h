@@ -20,7 +20,6 @@ public:
     void clear();
 
     const CanMessage *getMessage(unsigned long idx);
-
     MeasurementSetup *setup() const;
 
 signals:

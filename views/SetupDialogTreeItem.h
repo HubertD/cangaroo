@@ -4,10 +4,10 @@
 #include <QList>
 #include <QVariant>
 
-#include <setup/MeasurementSetup.h>
-#include <setup/MeasurementNetwork.h>
-#include <drivers/CanInterface.h>
+#include <model/MeasurementSetup.h>
+#include <model/MeasurementNetwork.h>
 #include <model/CanDb.h>
+#include <drivers/CanInterface.h>
 
 class SetupDialogTreeItem
 {

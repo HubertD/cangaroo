@@ -1,7 +1,7 @@
 #include "LinearTraceViewModel.h"
 #include <iostream>
 #include <stddef.h>
-#include <setup/MeasurementSetup.h>
+#include <model/MeasurementSetup.h>
 
 LinearTraceViewModel::LinearTraceViewModel(CanTrace *trace)
   : BaseTraceViewModel(trace)

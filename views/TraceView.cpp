@@ -1,7 +1,7 @@
 #include "TraceView.h"
 #include "ui_TraceView.h"
 
-#include <setup/MeasurementSetup.h>
+#include <model/MeasurementSetup.h>
 #include <views/LinearTraceViewModel.h>
 #include <views/AggregatedTraceViewModel.h>
 

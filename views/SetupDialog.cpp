@@ -1,7 +1,7 @@
 #include "SetupDialog.h"
 #include "ui_SetupDialog.h"
 
-#include <setup/MeasurementSetup.h>
+#include <model/MeasurementSetup.h>
 #include "SetupDialogTreeModel.h"
 #include "SetupDialogTreeItem.h"
 #include <QItemSelectionModel>

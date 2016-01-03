@@ -3,7 +3,7 @@
 
 #include <model/CanTrace.h>
 #include <model/CanDbMessage.h>
-#include <setup/MeasurementSetup.h>
+#include <model/MeasurementSetup.h>
 
 AggregatedTraceViewModel::AggregatedTraceViewModel(CanTrace *trace)
   : BaseTraceViewModel(trace)

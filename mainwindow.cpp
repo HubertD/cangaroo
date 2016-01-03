@@ -10,12 +10,12 @@
 #include "Logger.h"
 #include <drivers/socketcan/SocketCanInterface.h>
 #include <drivers/socketcan/SocketCanInterfaceProvider.h>
-#include <setup/MeasurementSetup.h>
-#include <setup/MeasurementNetwork.h>
 
+#include <model/MeasurementSetup.h>
+#include <model/MeasurementNetwork.h>
 #include <model/CanTrace.h>
-#include <parser/dbc/DbcParser.h>
 #include <model/CanDb.h>
+#include <parser/dbc/DbcParser.h>
 #include <drivers/CanListener.h>
 
 #include <views/TraceView.h>

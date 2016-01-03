@@ -5,7 +5,7 @@
 
 #include <model/CanTrace.h>
 #include <model/CanMessage.h>
-#include <setup/MeasurementNetwork.h>
+#include <model/MeasurementNetwork.h>
 
 MeasurementSetup::MeasurementSetup(QObject *parent)
   : QObject(parent)

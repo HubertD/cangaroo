@@ -4,7 +4,9 @@ SOURCES += \
     $$PWD/CanDbMessage.cpp \
     $$PWD/CanDb.cpp \
     $$PWD/CanDbNode.cpp \
-    $$PWD/CanDbSignal.cpp
+    $$PWD/CanDbSignal.cpp \
+    $$PWD/MeasurementSetup.cpp \
+    $$PWD/MeasurementNetwork.cpp
 
 HEADERS  += \
     $$PWD/CanMessage.h \
@@ -12,4 +14,6 @@ HEADERS  += \
     $$PWD/CanDbMessage.h \
     $$PWD/CanDb.h \
     $$PWD/CanDbNode.h \
-    $$PWD/CanDbSignal.h
+    $$PWD/CanDbSignal.h \
+    $$PWD/MeasurementSetup.h \
+    $$PWD/MeasurementNetwork.h

@@ -22,7 +22,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui
 
 include($$PWD/model/model.pri)
-include($$PWD/setup/setup.pri)
 include($$PWD/drivers/drivers.pri)
 include($$PWD/views/views.pri)
 include($$PWD/parser/dbc/dbc.pri)

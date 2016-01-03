@@ -2,7 +2,7 @@
 #define GRAPHVIEW_H
 
 #include <QWidget>
-#include <setup/MeasurementSetup.h>
+#include <model/MeasurementSetup.h>
 
 namespace Ui {
 class GraphView;

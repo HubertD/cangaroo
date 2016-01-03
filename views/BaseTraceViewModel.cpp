@@ -2,7 +2,7 @@
 
 #include <model/CanMessage.h>
 #include <model/CanDbMessage.h>
-#include <setup/MeasurementSetup.h>
+#include <model/MeasurementSetup.h>
 
 BaseTraceViewModel::BaseTraceViewModel(CanTrace *trace)
   : _trace(trace)
