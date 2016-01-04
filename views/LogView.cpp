@@ -17,5 +17,7 @@ LogView::~LogView()
 
 void LogView::onLogMessage(QtMsgType type, const QString &msg)
 {
+    (void) type;
     ui->loglist->addItem(msg);
+    ui->loglist->scrollToBottom();
 }
