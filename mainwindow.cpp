@@ -46,6 +46,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     connect(ui->actionStop_Measurement, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
     ui->actionStop_Measurement->setEnabled(false);
 
+    connect(ui->actionSave_Trace_to_file, SIGNAL(triggered(bool)), this, SLOT(saveTraceToFile()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
 
     windowMapper = new QSignalMapper(this);
@@ -179,6 +180,15 @@ void MainWindow::stopMeasurement()
 
     qDebug("measurement stopped");
     ui->actionStart_Measurement->setEnabled(true);
+}
+
+void MainWindow::saveTraceToFile()
+{
+    QString filename = QFileDialog::getSaveFileName(this, "Save Trace to file", "", "Candump Files (*.candump)");
+    if (!filename.isNull()) {
+        _trace->saveCanDump(filename);
+    }
+
 }
 
 MeasurementSetup *MainWindow::createDefaultSetup()

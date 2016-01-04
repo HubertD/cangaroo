@@ -228,6 +228,11 @@ void CanMessage::setTimestamp(const timeval timestamp)
     _timestamp = timestamp;
 }
 
+double CanMessage::getFloatTimestamp() const
+{
+    return (double)_timestamp.tv_sec + ((double)_timestamp.tv_usec/1000000);
+}
+
 QString CanMessage::getIdString() const
 {
     if (isExtended()) {

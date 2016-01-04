@@ -46,6 +46,7 @@ public slots:
     void showAboutDialog();
     void startMeasurement();
     void stopMeasurement();
+    void saveTraceToFile();
 
 private:
     Ui::MainWindow *ui;

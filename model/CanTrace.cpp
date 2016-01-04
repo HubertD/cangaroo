@@ -1,6 +1,10 @@
 #include "CanTrace.h"
 #include <QMutexLocker>
+#include <QFile>
+#include <QTextStream>
+
 #include <model/CanMessage.h>
+#include <drivers/CanInterface.h>
 #include <model/MeasurementSetup.h>
 
 CanTrace::CanTrace(QObject *parent, MeasurementSetup *setup, int flushInterval)
@@ -53,6 +57,30 @@ CanDbMessage *CanTrace::findDbMessage(const CanMessage &msg)
 QString CanTrace::getInterfaceName(const CanInterface &interface)
 {
     return _setup->getInterfaceName(interface);
+}
+
+void CanTrace::saveCanDump(QString filename)
+{
+    QFile file(filename);
+    if (file.open(QIODevice::ReadWrite)) {
+        QTextStream stream(&file);
+        foreach (CanMessage *msg, _data) {
+
+            QString line;
+            line.append(QString().sprintf("(%.6f) ", msg->getFloatTimestamp()));
+            line.append(msg->getInterface()->getName());
+            if (msg->isExtended()) {
+                line.append(QString().sprintf(" %08X#", msg->getId()));
+            } else {
+                line.append(QString().sprintf(" %03X#", msg->getId()));
+            }
+            for (int i=0; i<msg->getLength(); i++) {
+                line.append(QString().sprintf("%02X", msg->getByte(i)));
+            }
+            stream << line << endl;
+        }
+        file.close();
+    }
 }
 
 void CanTrace::enqueueMessage(const CanMessage &msg, bool more_to_follow)

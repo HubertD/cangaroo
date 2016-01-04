@@ -26,6 +26,8 @@ public:
     CanDbMessage *findDbMessage(const CanMessage &msg);
     QString getInterfaceName(const CanInterface &interface);
 
+    void saveCanDump(QString filename);
+
 signals:
     void messageEnqueued(const CanMessage &msg);
     void beforeAppend(int num_messages);
