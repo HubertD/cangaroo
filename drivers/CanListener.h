@@ -4,6 +4,7 @@
 #include <QObject>
 #include <drivers/CanInterface.h>
 
+class QThread;
 class CanMessage;
 
 class CanListener : public QObject
@@ -12,6 +13,9 @@ class CanListener : public QObject
 
 public:
     explicit CanListener(QObject *parent, pCanInterface intf);
+    virtual ~CanListener();
+
+    pCanInterface getInterface();
 
 signals:
     void messageReceived(const CanMessage &msg);
@@ -19,8 +23,14 @@ signals:
 public slots:
     void run();
 
+    void startThread();
+    void requestStop();
+    void waitFinish();
+
 private:
     pCanInterface _intf;
+    bool _shouldBeRunning;
+    QThread *_thread;
 
 };
 

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QList>
 
 class Logger;
 class TraceWindow;
@@ -19,6 +20,7 @@ QT_END_NAMESPACE
 class CanTrace;
 class MeasurementSetup;
 class SocketCanInterfaceProvider;
+class CanListener;
 
 namespace Ui {
 class MainWindow;
@@ -51,6 +53,8 @@ private:
     Logger *_logger;
     MeasurementSetup *_setup;
     CanTrace *_trace;
+
+    QList<CanListener*> _listeners;
 
     TraceWindow *activeMdiChild();
     QSignalMapper *windowMapper;

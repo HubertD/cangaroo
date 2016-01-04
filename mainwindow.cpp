@@ -44,6 +44,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
 
     connect(ui->actionStart_Measurement, SIGNAL(triggered()), this, SLOT(startMeasurement()));
     connect(ui->actionStop_Measurement, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
+    ui->actionStop_Measurement->setEnabled(false);
 
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
 
@@ -135,10 +136,10 @@ void MainWindow::startMeasurement()
         return;
     }
 
-    QThread* thread;
     qRegisterMetaType<CanMessage>("CanMessage");
 
     qDebug("starting measurement");
+    ui->actionStart_Measurement->setEnabled(false);
 
     int i=0;
     foreach (MeasurementNetwork *network, _setup->getNetworks()) {
@@ -149,20 +150,35 @@ void MainWindow::startMeasurement()
 
             qDebug() << "listening on interface" << intf->getName();
 
-            thread = new QThread;
             CanListener *listener = new CanListener(0, intf);
-            listener->moveToThread(thread);
-            connect(thread, SIGNAL(started()), listener, SLOT(run()));
             connect(listener, SIGNAL(messageReceived(CanMessage)), _trace, SLOT(enqueueMessage(CanMessage)));
-            thread->start();
+            listener->startThread();
+            _listeners.append(listener);
         }
     }
 
+    ui->actionStop_Measurement->setEnabled(true);
 }
 
 void MainWindow::stopMeasurement()
 {
-    qDebug("stopping measurement");
+    ui->actionStop_Measurement->setEnabled(false);
+
+    foreach (CanListener *listener, _listeners) {
+        listener->requestStop();
+    }
+
+    foreach (CanListener *listener, _listeners) {
+        listener->waitFinish();
+        qDebug() << "closing interface" << listener->getInterface()->getName();
+        listener->getInterface()->close();
+    }
+
+    qDeleteAll(_listeners);
+    _listeners.clear();
+
+    qDebug("measurement stopped");
+    ui->actionStart_Measurement->setEnabled(true);
 }
 
 MeasurementSetup *MainWindow::createDefaultSetup()

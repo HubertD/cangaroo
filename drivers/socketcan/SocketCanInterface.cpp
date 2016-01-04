@@ -108,28 +108,42 @@ void SocketCanInterface::sendMessage(const CanMessage &msg) {
 	::write(_fd, &frame, sizeof(struct can_frame));
 }
 
-bool SocketCanInterface::readMessage(CanMessage &msg) {
+bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
 
     struct can_frame frame;
-	::read(_fd, &frame, sizeof(struct can_frame));
+    struct timeval tv_rcv;
+    struct timeval timeout;
+    fd_set fdset;
 
-    struct timeval tv;
-    ioctl(_fd, SIOCGSTAMP, &tv);
+    timeout.tv_sec = timeout_ms / 1000;
+    timeout.tv_usec = 1000 * (timeout_ms % 1000);
 
-    msg.setId(frame.can_id);
-    msg.setTimestamp(tv);
-    msg.setExtended((frame.can_id & CAN_EFF_FLAG)!=0);
-    msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
-    msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);
-    msg.setInterface(this);
+    FD_ZERO(&fdset);
+    FD_SET(_fd, &fdset);
 
-	uint8_t len = frame.can_dlc;
-	if (len>8) { len = 8; }
+    int rv = select(_fd+1, &fdset, NULL, NULL, &timeout);
+    if (rv>0) {
+        ::read(_fd, &frame, sizeof(struct can_frame));
 
-    msg.setLength(len);
-	for (int i=0; i<len; i++) {
-        msg.setByte(i, frame.data[i]);
-	}
+        ioctl(_fd, SIOCGSTAMP, &tv_rcv);
 
-    return true;
+        msg.setId(frame.can_id);
+        msg.setTimestamp(tv_rcv);
+        msg.setExtended((frame.can_id & CAN_EFF_FLAG)!=0);
+        msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
+        msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);
+        msg.setInterface(this);
+
+        uint8_t len = frame.can_dlc;
+        if (len>8) { len = 8; }
+
+        msg.setLength(len);
+        for (int i=0; i<len; i++) {
+            msg.setByte(i, frame.data[i]);
+        }
+
+        return true;
+    } else {
+        return false;
+    }
 }

@@ -27,7 +27,7 @@ public:
 	virtual void close();
 
     virtual void sendMessage(const CanMessage &msg);
-    virtual bool readMessage(CanMessage &msg);
+    virtual bool readMessage(CanMessage &msg, unsigned int timeout_ms);
 
 	int getIfIndex();
 

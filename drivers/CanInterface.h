@@ -29,7 +29,7 @@ public:
 	virtual void close();
 
     virtual void sendMessage(const CanMessage &msg) = 0;
-    virtual bool readMessage(CanMessage &msg) = 0;
+    virtual bool readMessage(CanMessage &msg, unsigned int timeout_ms) = 0;
 
     uint16_t getId();
     void setId(uint16_t id);
