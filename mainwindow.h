@@ -41,6 +41,7 @@ public slots:
     QMdiSubWindow *createGraphView();
     void setActiveSubWindow(QWidget *window);
     bool showSetupDialog();
+    void showAboutDialog();
     void startMeasurement();
     void stopMeasurement();
 

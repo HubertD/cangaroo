@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>assets/mdibg.png</file>
         <file>assets/icon.png</file>
+        <file>assets/sign.svg</file>
     </qresource>
 </RCC>

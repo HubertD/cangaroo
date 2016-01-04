@@ -45,6 +45,8 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     connect(ui->actionStart_Measurement, SIGNAL(triggered()), this, SLOT(startMeasurement()));
     connect(ui->actionStop_Measurement, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
 
+    connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
+
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
@@ -57,6 +59,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
 
     QMdiSubWindow *traceViewWindow = createTraceView();
     traceViewWindow->setGeometry(0, 0, 1000, 500);
+
 
     /*QMdiSubWindow *graphViewWindow = createGraphView();
     graphViewWindow->setGeometry(0, 500, 1000, 200);
@@ -108,7 +111,7 @@ void MainWindow::setActiveSubWindow(QWidget *window) {
 
 bool MainWindow::showSetupDialog()
 {
-    SetupDialog dlg(this);
+    SetupDialog dlg(0);
     MeasurementSetup *new_setup = dlg.showSetupDialog(*_setup);
     if (new_setup) {
         MeasurementSetup *old_setup = _setup;
@@ -119,6 +122,11 @@ bool MainWindow::showSetupDialog()
     } else {
         return false;
     }
+}
+
+void MainWindow::showAboutDialog()
+{
+    QMessageBox::about(this, "About cangaroo", "cangaroo version 0.1\n(c)2015-2016 Hubert Denkmair");
 }
 
 void MainWindow::startMeasurement()
