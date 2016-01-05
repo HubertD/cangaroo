@@ -48,6 +48,7 @@ bool Backend::startMeasurement()
     }
 
     _measurementRunning = true;
+    emit beginMeasurement();
     return true;
 }
 
@@ -69,6 +70,8 @@ bool Backend::stopMeasurement()
     qDebug("measurement stopped");
 
     _measurementRunning = false;
+
+    emit endMeasurement();
     return true;
 }
 

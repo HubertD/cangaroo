@@ -30,6 +30,8 @@ public:
     CanTrace *getTrace();
 
 signals:
+    void beginMeasurement();
+    void endMeasurement();
 
 public slots:
 

@@ -43,7 +43,10 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
 
     connect(ui->actionStart_Measurement, SIGNAL(triggered()), this, SLOT(startMeasurement()));
     connect(ui->actionStop_Measurement, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
-    ui->actionStop_Measurement->setEnabled(false);
+
+    connect(&backend, SIGNAL(beginMeasurement()), this, SLOT(updateMeasurementActions()));
+    connect(&backend, SIGNAL(endMeasurement()), this, SLOT(updateMeasurementActions()));
+    updateMeasurementActions();
 
     connect(ui->actionSave_Trace_to_file, SIGNAL(triggered(bool)), this, SLOT(saveTraceToFile()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
@@ -70,6 +73,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::updateMeasurementActions()
+{
+    bool running = backend.isMeasurementRunning();
+    ui->actionStart_Measurement->setEnabled(!running);
+    ui->actionStop_Measurement->setEnabled(running);
+}
+
 void MainWindow::closeEvent(QCloseEvent *event) {
     ui->mdiArea->closeAllSubWindows();
     if (ui->mdiArea->currentSubWindow()) {
@@ -78,7 +88,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         //writeSettings();
         event->accept();
     }
-
 }
 
 QMdiSubWindow *MainWindow::createSubWindow(QWidget *window)
@@ -128,23 +137,13 @@ void MainWindow::showAboutDialog()
 void MainWindow::startMeasurement()
 {
     if (showSetupDialog()) {
-        ui->actionStart_Measurement->setEnabled(false);
-        if (backend.startMeasurement()) {
-            ui->actionStop_Measurement->setEnabled(true);
-        } else {
-            ui->actionStart_Measurement->setEnabled(true);
-        }
+        backend.startMeasurement();
     }
 }
 
 void MainWindow::stopMeasurement()
 {
-    ui->actionStop_Measurement->setEnabled(false);
-    if (backend.stopMeasurement()) {
-        ui->actionStart_Measurement->setEnabled(true);
-    } else {
-        ui->actionStop_Measurement->setEnabled(true);
-    }
+    backend.stopMeasurement();
 }
 
 void MainWindow::saveTraceToFile()
@@ -154,3 +153,4 @@ void MainWindow::saveTraceToFile()
         backend.saveCanDump(filename);
     }
 }
+

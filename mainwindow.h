@@ -44,6 +44,8 @@ public slots:
     void stopMeasurement();
     void saveTraceToFile();
 
+    void updateMeasurementActions();
+
 private:
     Ui::MainWindow *ui;
 
