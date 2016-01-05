@@ -1,5 +1,6 @@
 #include "AggregatedTraceViewModel.h"
 #include <QColor>
+#include <QDebug>
 
 #include <model/CanTrace.h>
 #include <model/CanDbMessage.h>
@@ -168,13 +169,19 @@ QVariant AggregatedTraceViewModel::data_TextColorRole(const QModelIndex &index, 
     AggregatedTraceViewItem *item = (AggregatedTraceViewItem *)index.internalPointer();
     if (!item) { return QVariant(); }
 
-    struct timeval now;
-    gettimeofday(&now, 0);
+    if (item->parent() == _rootItem) { // CanMessage row
 
-    int color = getTimeDiff(item->_lastmsg.getTimestamp(), now)*100;
-    if (color>200) { color = 200; }
+        struct timeval now;
+        gettimeofday(&now, 0);
 
-    return QVariant::fromValue(QColor(color, color, color));
+        int color = getTimeDiff(item->_lastmsg.getTimestamp(), now)*100;
+        if (color>200) { color = 200; }
+        if (color<0) { color = 0; }
+
+        return QVariant::fromValue(QColor(color, color, color));
+    } else {
+        return QVariant();
+    }
 }
 
 
