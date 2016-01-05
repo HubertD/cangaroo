@@ -16,6 +16,9 @@ SetupDialog::SetupDialog(QWidget *parent) :
     _currentNetwork(0)
 {
     ui->setupUi(this);
+    QIcon icon(":/assets/icon.png");
+    setWindowIcon(icon);
+
     connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(treeViewContextMenu(QPoint)));
 
     _actionDeleteInterface = new QAction("Delete", this);
