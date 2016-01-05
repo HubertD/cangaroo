@@ -8,15 +8,8 @@
 #include <QDebug>
 
 #include "Logger.h"
-#include <drivers/socketcan/SocketCanInterface.h>
-#include <drivers/socketcan/SocketCanInterfaceProvider.h>
 
 #include <model/MeasurementSetup.h>
-#include <model/MeasurementNetwork.h>
-#include <model/CanTrace.h>
-#include <model/CanDb.h>
-#include <parser/dbc/DbcParser.h>
-
 #include <window/TraceWindow/TraceWindow.h>
 #include <window/SetupDialog/SetupDialog.h>
 #include <views/LogView.h>
