@@ -3,15 +3,15 @@
 #include "LinearTraceViewModel.h"
 #include "AggregatedTraceViewModel.h"
 
-TraceWindow::TraceWindow(QWidget *parent, CanTrace *trace) :
+TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     QWidget(parent),
     ui(new Ui::TraceWindow),
-    _trace(trace)
+    _backend(&backend)
 {
     ui->setupUi(this);
 
-    _linearTraceViewModel = new LinearTraceViewModel(_trace);
-    _aggregatedTraceViewModel = new AggregatedTraceViewModel(_trace);
+    _linearTraceViewModel = new LinearTraceViewModel(backend);
+    _aggregatedTraceViewModel = new AggregatedTraceViewModel(backend);
 
     ui->tree->setModel(_linearTraceViewModel);
     ui->tree->setUniformRowHeights(true);

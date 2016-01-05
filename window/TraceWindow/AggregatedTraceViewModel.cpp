@@ -2,16 +2,17 @@
 #include <QColor>
 #include <QDebug>
 
+#include <Backend.h>
 #include <model/CanTrace.h>
 #include <model/CanDbMessage.h>
 
-AggregatedTraceViewModel::AggregatedTraceViewModel(CanTrace *trace)
-  : BaseTraceViewModel(trace)
+AggregatedTraceViewModel::AggregatedTraceViewModel(Backend &backend)
+  : BaseTraceViewModel(backend)
 {
     _rootItem = new AggregatedTraceViewItem(0);
     _updateTimer = new QTimer(this);
     connect(_updateTimer, SIGNAL(timeout()), this, SLOT(onUpdateTimer()));
-    connect(trace, SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
+    connect(backend.getTrace(), SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
 
     _updateTimer->setSingleShot(true);
 }

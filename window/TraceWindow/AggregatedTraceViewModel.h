@@ -26,7 +26,7 @@ public:
     typedef QMap<unique_key_t, AggregatedTraceViewItem*> CanIdMap;
 
 public:
-    AggregatedTraceViewModel(CanTrace *trace);
+    AggregatedTraceViewModel(Backend &backend);
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
     virtual QModelIndex parent(const QModelIndex &child) const;

@@ -2,7 +2,10 @@
 #define BASETRACEVIEWMODEL_H
 
 #include <QAbstractItemModel>
-#include <model/CanTrace.h>
+
+class Backend;
+class CanTrace;
+class CanMessage;
 
 class BaseTraceViewModel : public QAbstractItemModel
 {
@@ -22,7 +25,7 @@ public:
     };
 
 public:
-    BaseTraceViewModel(CanTrace *trace);
+    BaseTraceViewModel(Backend &backend);
     virtual int columnCount(const QModelIndex &parent) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual QVariant data(const QModelIndex &index, int role) const;

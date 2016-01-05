@@ -7,16 +7,16 @@ namespace Ui {
 class TraceWindow;
 }
 
-class CanTrace;
 class LinearTraceViewModel;
 class AggregatedTraceViewModel;
+class Backend;
 
 class TraceWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit TraceWindow(QWidget *parent, CanTrace *trace);
+    explicit TraceWindow(QWidget *parent, Backend &backend);
     ~TraceWindow();
 
 public slots:
@@ -25,7 +25,7 @@ public slots:
 
 private:
     Ui::TraceWindow *ui;
-    CanTrace *_trace;
+    Backend *_backend;
     LinearTraceViewModel *_linearTraceViewModel;
     AggregatedTraceViewModel *_aggregatedTraceViewModel;
 };

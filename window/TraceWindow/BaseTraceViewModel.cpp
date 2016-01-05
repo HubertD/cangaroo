@@ -1,11 +1,13 @@
 #include "BaseTraceViewModel.h"
 
+#include <Backend.h>
+#include <model/CanTrace.h>
 #include <model/CanMessage.h>
 #include <model/CanDbMessage.h>
 
-BaseTraceViewModel::BaseTraceViewModel(CanTrace *trace)
-  : _trace(trace)
+BaseTraceViewModel::BaseTraceViewModel(Backend &backend)
 {
+    _trace = backend.getTrace();
 }
 
 int BaseTraceViewModel::columnCount(const QModelIndex &parent) const

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QList>
+#include <Backend.h>
 
 class Logger;
 class TraceWindow;
@@ -16,11 +17,6 @@ class QMdiSubWindow;
 class QWidget;
 class QSignalMapper;
 QT_END_NAMESPACE
-
-class CanTrace;
-class MeasurementSetup;
-class SocketCanInterfaceProvider;
-class CanListener;
 
 namespace Ui {
 class MainWindow;
@@ -51,17 +47,13 @@ public slots:
 private:
     Ui::MainWindow *ui;
 
+    Backend backend;
     Logger *_logger;
-    MeasurementSetup *_setup;
-    CanTrace *_trace;
-
-    QList<CanListener*> _listeners;
 
     TraceWindow *activeMdiChild();
     QSignalMapper *windowMapper;
 
     QMdiSubWindow *createSubWindow(QWidget *window);
-    MeasurementSetup *createDefaultSetup();
 
 };
 

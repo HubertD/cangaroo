@@ -1,12 +1,13 @@
 #include "LinearTraceViewModel.h"
 #include <iostream>
 #include <stddef.h>
+#include <Backend.h>
 
-LinearTraceViewModel::LinearTraceViewModel(CanTrace *trace)
-  : BaseTraceViewModel(trace)
+LinearTraceViewModel::LinearTraceViewModel(Backend &backend)
+  : BaseTraceViewModel(backend)
 {
-    connect(trace, SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
-    connect(trace, SIGNAL(afterAppend(int)), this, SLOT(afterAppend(int)));
+    connect(backend.getTrace(), SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
+    connect(backend.getTrace(), SIGNAL(afterAppend(int)), this, SLOT(afterAppend(int)));
 }
 
 QModelIndex LinearTraceViewModel::index(int row, int column, const QModelIndex &parent) const

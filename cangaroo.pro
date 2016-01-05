@@ -14,10 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    Logger.cpp
+    Logger.cpp \
+    Backend.cpp
 
 HEADERS  += mainwindow.h \
-    Logger.h
+    Logger.h \
+    Backend.h
 
 FORMS    += mainwindow.ui
 

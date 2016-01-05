@@ -16,7 +16,6 @@
 #include <model/CanTrace.h>
 #include <model/CanDb.h>
 #include <parser/dbc/DbcParser.h>
-#include <drivers/CanListener.h>
 
 #include <window/TraceWindow/TraceWindow.h>
 #include <views/LogView.h>
@@ -52,9 +51,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
-
-    _setup = createDefaultSetup();
-    _trace = new CanTrace(this, _setup, 100);
+    backend.setSetup(backend.createDefaultSetup());
 
     QMdiSubWindow *logView = createLogView();
     logView->setGeometry(0, 500, 1000, 200);
@@ -92,7 +89,7 @@ QMdiSubWindow *MainWindow::createSubWindow(QWidget *window)
 }
 
 QMdiSubWindow *MainWindow::createTraceView() {
-    return createSubWindow(new TraceWindow(ui->mdiArea, _trace));
+    return createSubWindow(new TraceWindow(ui->mdiArea, backend));
 }
 
 QMdiSubWindow *MainWindow::createLogView()
@@ -102,7 +99,7 @@ QMdiSubWindow *MainWindow::createLogView()
 
 QMdiSubWindow *MainWindow::createGraphView()
 {
-    return createSubWindow(new GraphView(ui->mdiArea, _setup));
+    //return createSubWindow(new GraphView(ui->mdiArea, _setup));
 }
 
 void MainWindow::setActiveSubWindow(QWidget *window) {
@@ -114,12 +111,9 @@ void MainWindow::setActiveSubWindow(QWidget *window) {
 bool MainWindow::showSetupDialog()
 {
     SetupDialog dlg(0);
-    MeasurementSetup *new_setup = dlg.showSetupDialog(*_setup);
+    MeasurementSetup *new_setup = dlg.showSetupDialog(*backend.getSetup());
     if (new_setup) {
-        MeasurementSetup *old_setup = _setup;
-        _setup = new_setup;
-        _trace->setSetup(_setup);
-        delete old_setup;
+        backend.setSetup(new_setup);
         return true;
     } else {
         return false;
@@ -133,77 +127,30 @@ void MainWindow::showAboutDialog()
 
 void MainWindow::startMeasurement()
 {
-    if (!showSetupDialog()) {
-        return;
-    }
-
-    qRegisterMetaType<CanMessage>("CanMessage");
-
-    qDebug("starting measurement");
-    ui->actionStart_Measurement->setEnabled(false);
-
-    int i=0;
-    foreach (MeasurementNetwork *network, _setup->getNetworks()) {
-        i++;
-        foreach (pCanInterface intf, network->_canInterfaces) {
-            intf->setId(i);
-            intf->open();
-
-            qDebug() << "listening on interface" << intf->getName();
-
-            CanListener *listener = new CanListener(0, intf);
-            connect(listener, SIGNAL(messageReceived(CanMessage)), _trace, SLOT(enqueueMessage(CanMessage)));
-            listener->startThread();
-            _listeners.append(listener);
+    if (showSetupDialog()) {
+        ui->actionStart_Measurement->setEnabled(false);
+        if (backend.startMeasurement()) {
+            ui->actionStop_Measurement->setEnabled(true);
+        } else {
+            ui->actionStart_Measurement->setEnabled(true);
         }
     }
-
-    ui->actionStop_Measurement->setEnabled(true);
 }
 
 void MainWindow::stopMeasurement()
 {
     ui->actionStop_Measurement->setEnabled(false);
-
-    foreach (CanListener *listener, _listeners) {
-        listener->requestStop();
+    if (backend.stopMeasurement()) {
+        ui->actionStart_Measurement->setEnabled(true);
+    } else {
+        ui->actionStop_Measurement->setEnabled(true);
     }
-
-    foreach (CanListener *listener, _listeners) {
-        listener->waitFinish();
-        qDebug() << "closing interface" << listener->getInterface()->getName();
-        listener->getInterface()->close();
-    }
-
-    qDeleteAll(_listeners);
-    _listeners.clear();
-
-    qDebug("measurement stopped");
-    ui->actionStart_Measurement->setEnabled(true);
 }
 
 void MainWindow::saveTraceToFile()
 {
     QString filename = QFileDialog::getSaveFileName(this, "Save Trace to file", "", "Candump Files (*.candump)");
     if (!filename.isNull()) {
-        _trace->saveCanDump(filename);
+        backend.saveCanDump(filename);
     }
-
-}
-
-MeasurementSetup *MainWindow::createDefaultSetup()
-{
-
-    CanInterfaceProvider *provider = new SocketCanInterfaceProvider();
-    provider->update();
-
-    MeasurementSetup *defaultSetup = new MeasurementSetup(this);
-    int i = 1;
-    foreach (pCanInterface intf, provider->getInterfaceList()) {
-        MeasurementNetwork *network = defaultSetup->createNetwork();
-        network->setName(QString().sprintf("Network %d", i++));
-        network->addCanInterface(intf);
-    }
-
-    return defaultSetup;
 }

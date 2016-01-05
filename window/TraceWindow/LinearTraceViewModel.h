@@ -6,12 +6,14 @@
 #include <model/CanTrace.h>
 #include "BaseTraceViewModel.h"
 
+class Backend;
+
 class LinearTraceViewModel : public BaseTraceViewModel
 {
     Q_OBJECT
 
 public:
-    LinearTraceViewModel(CanTrace *trace);
+    LinearTraceViewModel(Backend &backend);
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
     virtual QModelIndex parent(const QModelIndex &child) const;
