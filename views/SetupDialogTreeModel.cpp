@@ -1,14 +1,17 @@
 #include "SetupDialogTreeModel.h"
 
 SetupDialogTreeModel::SetupDialogTreeModel(MeasurementSetup *setup, QObject *parent)
-  : QAbstractItemModel(parent)
+  : QAbstractItemModel(parent),
+    _rootItem(0)
 {
     load(setup);
 }
 
 SetupDialogTreeModel::~SetupDialogTreeModel()
 {
-    delete _rootItem;
+    if (_rootItem) {
+        delete _rootItem;
+    }
 }
 
 QVariant SetupDialogTreeModel::data(const QModelIndex &index, int role) const

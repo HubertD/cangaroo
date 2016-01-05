@@ -11,7 +11,9 @@
 
 SetupDialog::SetupDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::SetupDialog)
+    ui(new Ui::SetupDialog),
+    tree_model(0),
+    _currentNetwork(0)
 {
     ui->setupUi(this);
     connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(treeViewContextMenu(QPoint)));
@@ -23,6 +25,7 @@ SetupDialog::SetupDialog(QWidget *parent) :
     connect(_actionAddCanDb, SIGNAL(triggered()), this, SLOT(addCanDb()));
     connect(_actionDeleteCanDb, SIGNAL(triggered()), this, SLOT(deleteCanDb()));
 
+    connect(ui->edNetworkName, SIGNAL(textChanged(QString)), this, SLOT(edNetworkNameChanged()));
 }
 
 SetupDialog::~SetupDialog()
@@ -35,10 +38,15 @@ MeasurementSetup *SetupDialog::showSetupDialog(MeasurementSetup &setup)
     MeasurementSetup *mySetup = new MeasurementSetup(0);
     mySetup->cloneFrom(setup);
 
-    SetupDialogTreeModel model(mySetup, this);
-    ui->treeView->setModel(&model);
+    if (tree_model) {
+        delete tree_model;
+    }
+    tree_model = new SetupDialogTreeModel(mySetup, this);
+
+    ui->treeView->setModel(tree_model);
     connect(ui->treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(treeViewSelectionChanged(QItemSelection,QItemSelection)));
     ui->treeView->expandAll();
+
     if (exec()==QDialog::Accepted) {
         return mySetup;
     } else {
@@ -51,12 +59,14 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
     (void) selected;
     (void) deselected;
 
+    _currentNetwork = 0;
     SetupDialogTreeItem *item = getSelectedItem();
     if (item) {
         switch (item->getType()) {
             case SetupDialogTreeItem::type_network:
                 ui->stackedWidget->setCurrentWidget(ui->networkPage);
-                ui->lineEdit->setText(item->network->name());
+                _currentNetwork = item->network;
+                ui->edNetworkName->setText(item->network->name());
                 break;
             default:
                 ui->stackedWidget->setCurrentWidget(ui->emptyPage);
@@ -95,6 +105,14 @@ void SetupDialog::treeViewContextMenu(const QPoint &pos)
 
     QPoint globalPos = ui->treeView->mapToGlobal(pos);
     contextMenu.exec(globalPos);
+}
+
+void SetupDialog::edNetworkNameChanged()
+{
+    if (_currentNetwork) {
+        _currentNetwork->setName(ui->edNetworkName->text());
+        tree_model->dataChanged(getSelectedIndex(), getSelectedIndex());
+    }
 }
 
 void SetupDialog::addInterface()

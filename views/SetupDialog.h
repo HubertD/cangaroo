@@ -5,8 +5,10 @@
 #include <QAction>
 
 class MeasurementSetup;
+class MeasurementNetwork;
 class QItemSelection;
 class SetupDialogTreeItem;
+class SetupDialogTreeModel;
 
 namespace Ui {
 class SetupDialog;
@@ -26,6 +28,8 @@ public slots:
     void treeViewSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
     void treeViewContextMenu(const QPoint& pos);
 
+    void edNetworkNameChanged();
+
     void addInterface();
     void addCanDb();
     void deleteCanDb();
@@ -38,6 +42,8 @@ private:
     QAction *_actionAddInterface;
     QAction *_actionAddCanDb;
 
+    SetupDialogTreeModel *tree_model;
+    MeasurementNetwork *_currentNetwork;
     QModelIndex getSelectedIndex();
     SetupDialogTreeItem *getSelectedItem();
 };
