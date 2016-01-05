@@ -18,9 +18,9 @@
 #include <parser/dbc/DbcParser.h>
 
 #include <window/TraceWindow/TraceWindow.h>
+#include <window/SetupDialog/SetupDialog.h>
 #include <views/LogView.h>
 #include <views/GraphView.h>
-#include <views/SetupDialog.h>
 
 MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     QMainWindow(parent),

@@ -71,6 +71,9 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
                 _currentNetwork = item->network;
                 ui->edNetworkName->setText(item->network->name());
                 break;
+            case SetupDialogTreeItem::type_interface_root:
+                ui->stackedWidget->setCurrentWidget(ui->interfacesPage);
+                break;
             default:
                 ui->stackedWidget->setCurrentWidget(ui->emptyPage);
                 break;
