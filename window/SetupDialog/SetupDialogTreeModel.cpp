@@ -1,10 +1,9 @@
 #include "SetupDialogTreeModel.h"
 
-SetupDialogTreeModel::SetupDialogTreeModel(MeasurementSetup *setup, QObject *parent)
+SetupDialogTreeModel::SetupDialogTreeModel(QObject *parent)
   : QAbstractItemModel(parent),
     _rootItem(0)
 {
-    load(setup);
 }
 
 SetupDialogTreeModel::~SetupDialogTreeModel()
@@ -21,7 +20,7 @@ QVariant SetupDialogTreeModel::data(const QModelIndex &index, int role) const
     if (item) {
 
         if (role==Qt::DisplayRole) {
-            return item->dataDisplayRole();
+            return item->dataDisplayRole(index);
         }
 
     }
@@ -31,8 +30,17 @@ QVariant SetupDialogTreeModel::data(const QModelIndex &index, int role) const
 
 QVariant SetupDialogTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+    (void) orientation;
+
     if (role==Qt::DisplayRole) {
-        return "header";
+        switch (section) {
+            case column_device: return "Device";
+            case column_driver: return "Driver";
+            case column_bitrate: return "Bitrate";
+            case column_filename: return "Filename";
+            case column_path: return "Path";
+            default: return "";
+        }
     } else {
         return QVariant();
     }
@@ -71,13 +79,17 @@ int SetupDialogTreeModel::rowCount(const QModelIndex &parent) const
 int SetupDialogTreeModel::columnCount(const QModelIndex &parent) const
 {
     (void) parent;
-    return 1;
+    return column_count;
 }
 
 void SetupDialogTreeModel::addCanDb(const QModelIndex &parent, pCanDb db)
 {
     SetupDialogTreeItem *parentItem = static_cast<SetupDialogTreeItem*>(parent.internalPointer());
+    if (!parentItem) { return; }
+
     SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb, parentItem);
+    if (!item) { return; }
+
     item->candb = db;
 
     if (parentItem->network) {
@@ -91,9 +103,30 @@ void SetupDialogTreeModel::addCanDb(const QModelIndex &parent, pCanDb db)
 void SetupDialogTreeModel::deleteCanDb(const QModelIndex &index)
 {
     SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem*>(index.internalPointer());
+    if (!item) { return; }
+
     SetupDialogTreeItem *parentItem = item->getParentItem();
     if (parentItem && parentItem->network && parentItem->network->_canDbs.contains(item->candb)) {
         parentItem->network->_canDbs.removeAll(item->candb);
+        beginRemoveRows(index.parent(), item->row(), item->row());
+        item->getParentItem()->removeChild(item);
+        endRemoveRows();
+    }
+}
+
+void SetupDialogTreeModel::addInterface(const QModelIndex &parent, pCanInterface interface)
+{
+
+}
+
+void SetupDialogTreeModel::deleteInterface(const QModelIndex &index)
+{
+    SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem*>(index.internalPointer());
+    if (!item) { return; }
+
+    SetupDialogTreeItem *parentItem = item->getParentItem();
+    if (parentItem && parentItem->network && parentItem->network->_canInterfaces.contains(item->intf)) {
+        parentItem->network->_canInterfaces.removeAll(item->intf);
         beginRemoveRows(index.parent(), item->row(), item->row());
         item->getParentItem()->removeChild(item);
         endRemoveRows();
@@ -107,8 +140,6 @@ SetupDialogTreeItem *SetupDialogTreeModel::itemOrRoot(const QModelIndex &index) 
 
 void SetupDialogTreeModel::load(MeasurementSetup *setup)
 {
-    _setup = setup;
-
     _rootItem = new SetupDialogTreeItem(SetupDialogTreeItem::type_root, 0);
     _rootItem->setup = setup;
 

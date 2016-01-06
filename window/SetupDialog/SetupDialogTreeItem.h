@@ -39,7 +39,7 @@ public:
     SetupDialogTreeItem *child(int row) const;
     int row() const;
 
-    QVariant dataDisplayRole() const;
+    QVariant dataDisplayRole(const QModelIndex &index) const;
     item_type getType();
 
 private:
@@ -47,7 +47,8 @@ private:
     SetupDialogTreeItem *_parent;
     QList<SetupDialogTreeItem*> _children;
 
-
+    QVariant dataInterface(const QModelIndex &index) const;
+    QVariant dataCanDb(const QModelIndex &index) const;
 };
 
 #endif // SETUPDIALOGTREEITEM_H

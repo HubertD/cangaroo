@@ -31,13 +31,16 @@ public slots:
     void edNetworkNameChanged();
 
     void addInterface();
-    void addCanDb();
-    void deleteCanDb();
+    void executeAddCanDb();
+    void executeDeleteCanDb();
 
 private slots:
     void on_btAddInterface_clicked();
-
     void on_btRemoveInterface_clicked();
+
+    void on_btAddDatabase_clicked();
+    void on_btRemoveDatabase_clicked();
+    void updateButtons();
 
 private:
     Ui::SetupDialog *ui;
@@ -47,12 +50,14 @@ private:
     QAction *_actionAddInterface;
     QAction *_actionAddCanDb;
 
-    SetupDialogTreeModel *tree_model;
+    SetupDialogTreeModel *model;
     MeasurementNetwork *_currentNetwork;
     QModelIndex getSelectedIndex();
     SetupDialogTreeItem *getSelectedItem();
 
     void showInterfacesPage(SetupDialogTreeItem *item);
+    void addCanDb(const QModelIndex &parent);
+
 };
 
 #endif // SETUPDIALOG_H

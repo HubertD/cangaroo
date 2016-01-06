@@ -11,8 +11,19 @@ class SetupDialogTreeModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    explicit SetupDialogTreeModel(MeasurementSetup *setup, QObject *parent=0);
+    enum {
+        column_device,
+        column_driver,
+        column_bitrate,
+        column_filename,
+        column_path,
+        column_count
+    };
+
+public:
+    explicit SetupDialogTreeModel(QObject *parent=0);
     virtual ~SetupDialogTreeModel();
+    void load(MeasurementSetup *setup);
 
     QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
@@ -24,12 +35,12 @@ public:
     void addCanDb(const QModelIndex &parent, pCanDb db);
     void deleteCanDb(const QModelIndex &index);
 
+    void addInterface(const QModelIndex &parent, pCanInterface interface);
+    void deleteInterface(const QModelIndex &index);
+
 private:
     SetupDialogTreeItem *_rootItem;
-    MeasurementSetup *_setup;
-
     SetupDialogTreeItem *itemOrRoot(const QModelIndex &index) const;
-    void load(MeasurementSetup *setup);
 };
 
 #endif // SETUPDIALOGTREEMODEL_H

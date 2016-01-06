@@ -1,4 +1,7 @@
 #include "SetupDialogTreeItem.h"
+#include <QModelIndex>
+#include <drivers/CanInterfaceProvider.h>
+#include "SetupDialogTreeModel.h"
 
 SetupDialogTreeItem::SetupDialogTreeItem(item_type type, SetupDialogTreeItem *parent)
   : _type(type), _parent(parent)
@@ -45,17 +48,45 @@ int SetupDialogTreeItem::row() const
     }
 }
 
-QVariant SetupDialogTreeItem::dataDisplayRole() const
+QVariant SetupDialogTreeItem::dataInterface(const QModelIndex &index) const
+{
+    switch (index.column()) {
+        case SetupDialogTreeModel::column_device:
+            return intf->getName();
+        case SetupDialogTreeModel::column_driver:
+            return intf->getProvider()->getName();
+        case SetupDialogTreeModel::column_bitrate:
+            return intf->getBitrate();
+        default:
+            return QVariant();
+    }
+}
+
+QVariant SetupDialogTreeItem::dataCanDb(const QModelIndex &index) const
+{
+    switch (index.column()) {
+        case SetupDialogTreeModel::column_device:
+            return candb->getBaseFilename();
+        case SetupDialogTreeModel::column_filename:
+            return candb->getFilename();
+        case SetupDialogTreeModel::column_path:
+            return candb->getFilename();
+        default:
+            return QVariant();
+    }
+}
+
+QVariant SetupDialogTreeItem::dataDisplayRole(const QModelIndex &index) const
 {
     switch (_type) {
         case type_root: return "Setup";
         case type_network: return network->name();
         case type_interface_root: return "Interfaces";
-        case type_interface: return intf->getName();
+        case type_interface: return dataInterface(index);
         case type_candb_root: return "Can Databases";
-        case type_candb: return candb->getBaseFilename();
+        case type_candb: return dataCanDb(index);
     }
-
+candb->getBaseFilename();
     return QVariant();
 }
 
