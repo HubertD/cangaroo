@@ -13,6 +13,9 @@ public:
     void cloneFrom(MeasurementNetwork &origin);
 
     void addCanInterface(pCanInterface intf);
+    void removeCanInterface(pCanInterface intf);
+    void removeCanInterface(CanInterface *intf);
+
     void addCanDb(pCanDb candb);
     QList<pCanInterface> _canInterfaces;
     QList<pCanDb> _canDbs;
@@ -22,6 +25,8 @@ public:
 
 private:
     QString _name;
+
+    pCanInterface getSharedInterfaceForPointer(CanInterface *p);
 };
 
 #endif // MEASUREMENTNETWORK_H

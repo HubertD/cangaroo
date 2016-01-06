@@ -34,6 +34,11 @@ public slots:
     void addCanDb();
     void deleteCanDb();
 
+private slots:
+    void on_btAddInterface_clicked();
+
+    void on_btRemoveInterface_clicked();
+
 private:
     Ui::SetupDialog *ui;
 
@@ -46,6 +51,8 @@ private:
     MeasurementNetwork *_currentNetwork;
     QModelIndex getSelectedIndex();
     SetupDialogTreeItem *getSelectedItem();
+
+    void showInterfacesPage(SetupDialogTreeItem *item);
 };
 
 #endif // SETUPDIALOG_H

@@ -11,6 +11,21 @@ void MeasurementNetwork::cloneFrom(MeasurementNetwork &origin)
     _canDbs = origin._canDbs;
 }
 
+void MeasurementNetwork::removeCanInterface(pCanInterface intf)
+{
+    _canInterfaces.removeAll(intf);
+}
+
+void MeasurementNetwork::removeCanInterface(CanInterface *intf)
+{
+    foreach (pCanInterface pci, _canInterfaces) {
+        if (pci.data() == intf) {
+            removeCanInterface(pci);
+            break;
+        }
+    }
+}
+
 void MeasurementNetwork::addCanInterface(QSharedPointer<CanInterface> intf)
 {
     _canInterfaces.append(intf);
