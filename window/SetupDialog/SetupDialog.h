@@ -28,19 +28,21 @@ public slots:
     void treeViewSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
     void treeViewContextMenu(const QPoint& pos);
 
+private slots:
     void edNetworkNameChanged();
 
-    void addInterface();
-    void executeAddCanDb();
-    void executeDeleteCanDb();
-
-private slots:
     void on_btAddInterface_clicked();
     void on_btRemoveInterface_clicked();
 
     void on_btAddDatabase_clicked();
     void on_btRemoveDatabase_clicked();
     void updateButtons();
+
+    void executeAddCanDb();
+    void executeDeleteCanDb();
+
+    void executeAddInterface();
+    void executeDeleteInterface();
 
 private:
     Ui::SetupDialog *ui;
@@ -57,6 +59,7 @@ private:
 
     void showInterfacesPage(SetupDialogTreeItem *item);
     void addCanDb(const QModelIndex &parent);
+    void addInterface(const QModelIndex &parent);
 
 };
 

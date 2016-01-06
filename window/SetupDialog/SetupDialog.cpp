@@ -23,40 +23,16 @@ SetupDialog::SetupDialog(QWidget *parent) :
     QIcon icon(":/assets/icon.png");
     setWindowIcon(icon);
 
-    _actionDeleteInterface = new QAction("Delete", this);
-    _actionDeleteCanDb = new QAction("Delete", this);
     _actionAddInterface = new QAction("Add...", this);
+    _actionDeleteInterface = new QAction("Delete", this);
     _actionAddCanDb = new QAction("Add...", this);
+    _actionDeleteCanDb = new QAction("Delete", this);
 
     model = new SetupDialogTreeModel(this);
 
     ui->treeView->setModel(model);
     ui->interfacesTreeView->setModel(model);
     ui->candbsTreeView->setModel(model);
-
-
-    connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(treeViewContextMenu(QPoint)));
-    connect(_actionAddCanDb, SIGNAL(triggered()), this, SLOT(executeAddCanDb()));
-    connect(_actionDeleteCanDb, SIGNAL(triggered()), this, SLOT(executeDeleteCanDb()));
-    connect(ui->edNetworkName, SIGNAL(textChanged(QString)), this, SLOT(edNetworkNameChanged()));
-    connect(ui->treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(treeViewSelectionChanged(QItemSelection,QItemSelection)));
-    connect(ui->candbsTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
-    connect(ui->interfacesTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
-}
-
-SetupDialog::~SetupDialog()
-{
-    delete ui;
-    delete model;
-}
-
-MeasurementSetup *SetupDialog::showSetupDialog(MeasurementSetup &setup)
-{
-    MeasurementSetup *mySetup = new MeasurementSetup(0);
-    mySetup->cloneFrom(setup);
-
-    model->load(mySetup);
-    ui->treeView->expandAll();
 
     for (int i=0; i<model->columnCount(); i++) {
         ui->treeView->setColumnHidden(i, true);
@@ -72,6 +48,34 @@ MeasurementSetup *SetupDialog::showSetupDialog(MeasurementSetup &setup)
 
     ui->candbsTreeView->setColumnHidden(SetupDialogTreeModel::column_filename, false);
     ui->candbsTreeView->setColumnHidden(SetupDialogTreeModel::column_path, false);
+
+
+    connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(treeViewContextMenu(QPoint)));
+    connect(ui->edNetworkName, SIGNAL(textChanged(QString)), this, SLOT(edNetworkNameChanged()));
+    connect(ui->treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(treeViewSelectionChanged(QItemSelection,QItemSelection)));
+    connect(ui->candbsTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
+    connect(ui->interfacesTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
+
+    connect(_actionAddCanDb, SIGNAL(triggered()), this, SLOT(executeAddCanDb()));
+    connect(_actionDeleteCanDb, SIGNAL(triggered()), this, SLOT(executeDeleteCanDb()));
+
+    connect(_actionAddInterface, SIGNAL(triggered()), this, SLOT(executeAddInterface()));
+    connect(_actionDeleteInterface, SIGNAL(triggered()), this, SLOT(executeDeleteInterface()));
+}
+
+SetupDialog::~SetupDialog()
+{
+    delete ui;
+    delete model;
+}
+
+MeasurementSetup *SetupDialog::showSetupDialog(MeasurementSetup &setup)
+{
+    MeasurementSetup *mySetup = new MeasurementSetup(0);
+    mySetup->cloneFrom(setup);
+
+    model->load(mySetup);
+    ui->treeView->expandAll();
 
     updateButtons();
 
@@ -110,6 +114,18 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
 
         }
     }
+}
+
+QModelIndex SetupDialog::getSelectedIndex()
+{
+    return ui->treeView->selectionModel()->currentIndex();
+}
+
+SetupDialogTreeItem *SetupDialog::getSelectedItem()
+{
+    const QModelIndex index = getSelectedIndex();
+    SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem *>(index.internalPointer());
+    return item;
 }
 
 void SetupDialog::treeViewContextMenu(const QPoint &pos)
@@ -151,9 +167,38 @@ void SetupDialog::edNetworkNameChanged()
     }
 }
 
-void SetupDialog::addInterface()
+void SetupDialog::addInterface(const QModelIndex &parent)
 {
+    // TODO implement me?
+}
 
+void SetupDialog::executeAddInterface()
+{
+    addInterface(ui->treeView->selectionModel()->currentIndex());
+}
+
+void SetupDialog::on_btAddInterface_clicked()
+{
+    addInterface(ui->treeView->selectionModel()->currentIndex());
+}
+
+void SetupDialog::executeDeleteInterface()
+{
+    model->deleteInterface(ui->treeView->selectionModel()->currentIndex());
+}
+
+void SetupDialog::on_btRemoveInterface_clicked()
+{
+    model->deleteInterface(ui->interfacesTreeView->selectionModel()->currentIndex());
+}
+
+
+
+void SetupDialog::showInterfacesPage(SetupDialogTreeItem *item)
+{
+    ui->stackedWidget->setCurrentWidget(ui->interfacesPage);
+    _currentNetwork = item->network;
+    ui->interfacesTreeView->setRootIndex(getSelectedIndex());
 }
 
 void SetupDialog::addCanDb(const QModelIndex &parent)
@@ -169,31 +214,6 @@ void SetupDialog::addCanDb(const QModelIndex &parent)
     }
 }
 
-void SetupDialog::executeDeleteCanDb()
-{
-    SetupDialogTreeModel *model = static_cast<SetupDialogTreeModel *>(ui->treeView->model());
-    model->deleteCanDb(getSelectedIndex());
-}
-
-QModelIndex SetupDialog::getSelectedIndex()
-{
-    return ui->treeView->selectionModel()->currentIndex();
-}
-
-SetupDialogTreeItem *SetupDialog::getSelectedItem()
-{
-    const QModelIndex index = getSelectedIndex();
-    SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem *>(index.internalPointer());
-    return item;
-}
-
-void SetupDialog::showInterfacesPage(SetupDialogTreeItem *item)
-{
-    ui->stackedWidget->setCurrentWidget(ui->interfacesPage);
-    _currentNetwork = item->network;
-    ui->interfacesTreeView->setRootIndex(getSelectedIndex());
-}
-
 void SetupDialog::executeAddCanDb()
 {
     addCanDb(ui->treeView->selectionModel()->currentIndex());
@@ -204,15 +224,10 @@ void SetupDialog::on_btAddDatabase_clicked()
     addCanDb(ui->treeView->selectionModel()->currentIndex());
 }
 
-void SetupDialog::on_btAddInterface_clicked()
-{
-}
-
-
-void SetupDialog::on_btRemoveInterface_clicked()
+void SetupDialog::executeDeleteCanDb()
 {
     SetupDialogTreeModel *model = static_cast<SetupDialogTreeModel *>(ui->treeView->model());
-    model->deleteInterface(ui->interfacesTreeView->selectionModel()->currentIndex());
+    model->deleteCanDb(getSelectedIndex());
 }
 
 void SetupDialog::on_btRemoveDatabase_clicked()
