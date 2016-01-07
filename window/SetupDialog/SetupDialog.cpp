@@ -14,9 +14,12 @@
 #include "SetupDialogTreeModel.h"
 #include "SetupDialogTreeItem.h"
 
-SetupDialog::SetupDialog(QWidget *parent) :
+#include "SelectCanInterfacesDialog.h"
+
+SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SetupDialog),
+    _backend(&backend),
     _currentNetwork(0)
 {
     ui->setupUi(this);
@@ -169,7 +172,14 @@ void SetupDialog::edNetworkNameChanged()
 
 void SetupDialog::addInterface(const QModelIndex &parent)
 {
-    // TODO implement me?
+    SelectCanInterfacesDialog dlg(0);
+    CanInterfaceList list;
+    if (dlg.selectInterfaces(*_backend, list, _currentNetwork->_canInterfaces)) {
+        foreach (pCanInterface intf, list) {
+            model->addInterface(ui->treeView->selectionModel()->currentIndex(), intf);
+        }
+    }
+
 }
 
 void SetupDialog::executeAddInterface()

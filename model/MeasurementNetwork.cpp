@@ -26,7 +26,7 @@ void MeasurementNetwork::removeCanInterface(CanInterface *intf)
     }
 }
 
-void MeasurementNetwork::addCanInterface(QSharedPointer<CanInterface> intf)
+void MeasurementNetwork::addCanInterface(pCanInterface intf)
 {
     _canInterfaces.append(intf);
 }

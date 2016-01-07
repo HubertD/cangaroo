@@ -112,7 +112,7 @@ void MainWindow::setActiveSubWindow(QWidget *window) {
 
 bool MainWindow::showSetupDialog()
 {
-    SetupDialog dlg(0);
+    SetupDialog dlg(backend, 0);
     MeasurementSetup *new_setup = dlg.showSetupDialog(*backend.getSetup());
     if (new_setup) {
         backend.setSetup(new_setup);

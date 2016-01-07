@@ -116,7 +116,19 @@ void SetupDialogTreeModel::deleteCanDb(const QModelIndex &index)
 
 void SetupDialogTreeModel::addInterface(const QModelIndex &parent, pCanInterface interface)
 {
+    SetupDialogTreeItem *parentItem = static_cast<SetupDialogTreeItem*>(parent.internalPointer());
+    if (!parentItem) { return; }
+    if (parentItem && parentItem->network) {
+        beginInsertRows(parent, parentItem->getChildCount(), parentItem->getChildCount());
 
+        SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface, parentItem);
+        item->intf = interface;
+        parentItem->appendChild(item);
+
+        parentItem->network->addCanInterface(interface);
+
+        endInsertRows();
+    }
 }
 
 void SetupDialogTreeModel::deleteInterface(const QModelIndex &index)

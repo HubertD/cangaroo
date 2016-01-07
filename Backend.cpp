@@ -118,3 +118,12 @@ CanTrace *Backend::getTrace()
     return _trace;
 }
 
+CanInterfaceList Backend::getInterfaceList()
+{
+    CanInterfaceList result;
+    foreach (pCanInterface intf, _socketcan->getInterfaceList()) {
+        result.append(intf);
+    }
+    return result;
+}
+

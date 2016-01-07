@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QAction>
 
+class Backend;
 class MeasurementSetup;
 class MeasurementNetwork;
 class QItemSelection;
@@ -19,7 +20,7 @@ class SetupDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SetupDialog(QWidget *parent = 0);
+    explicit SetupDialog(Backend &backend, QWidget *parent = 0);
     ~SetupDialog();
 
     MeasurementSetup *showSetupDialog(MeasurementSetup &setup);
@@ -46,6 +47,7 @@ private slots:
 
 private:
     Ui::SetupDialog *ui;
+    Backend *_backend;
 
     QAction *_actionDeleteInterface;
     QAction *_actionDeleteCanDb;

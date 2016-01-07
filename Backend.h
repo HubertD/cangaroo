@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QList>
+#include <drivers/CanInterfaceProvider.h>
 
 class MeasurementSetup;
 class MeasurementNetwork;
@@ -28,6 +29,8 @@ public:
     void saveCanDump(QString filename);
 
     CanTrace *getTrace();
+
+    CanInterfaceList getInterfaceList();
 
 signals:
     void beginMeasurement();
