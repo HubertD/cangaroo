@@ -96,7 +96,10 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
     (void) deselected;
 
     _currentNetwork = 0;
-    SetupDialogTreeItem *item = getSelectedItem();
+
+    QModelIndex idx = selected.first().topLeft();
+    SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem *>(idx.internalPointer());
+
     if (item) {
         switch (item->getType()) {
             case SetupDialogTreeItem::type_network:
@@ -236,13 +239,11 @@ void SetupDialog::on_btAddDatabase_clicked()
 
 void SetupDialog::executeDeleteCanDb()
 {
-    SetupDialogTreeModel *model = static_cast<SetupDialogTreeModel *>(ui->treeView->model());
     model->deleteCanDb(getSelectedIndex());
 }
 
 void SetupDialog::on_btRemoveDatabase_clicked()
 {
-    SetupDialogTreeModel *model = static_cast<SetupDialogTreeModel *>(ui->treeView->model());
     model->deleteCanDb(ui->candbsTreeView->selectionModel()->currentIndex());
 }
 
@@ -250,14 +251,17 @@ void SetupDialog::updateButtons()
 {
     ui->btRemoveDatabase->setEnabled(ui->candbsTreeView->selectionModel()->hasSelection());
     ui->btRemoveInterface->setEnabled(ui->interfacesTreeView->selectionModel()->hasSelection());
+    ui->btRemoveNetwork->setEnabled(ui->treeView->selectionModel()->hasSelection() && (getSelectedItem()->getType()==SetupDialogTreeItem::type_network));
 }
 
 void SetupDialog::on_btAddNetwork_clicked()
 {
-
+    QModelIndex idx = model->indexOfItem(model->addNetwork());
+    ui->treeView->expand(idx);
+    ui->treeView->selectionModel()->select(idx, QItemSelectionModel::ClearAndSelect);
 }
 
 void SetupDialog::on_btRemoveNetwork_clicked()
 {
-
+    model->deleteNetwork(getSelectedIndex());
 }

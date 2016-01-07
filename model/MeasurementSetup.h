@@ -17,14 +17,16 @@ class MeasurementSetup : public QObject
 public:
     explicit MeasurementSetup(QObject *parent);
     virtual ~MeasurementSetup();
-    MeasurementNetwork *createNetwork();
 
     CanDbMessage *findDbMessage(const CanMessage &msg);
     QString getInterfaceName(const CanInterface &interface);
 
     int countNetworks() const;
     MeasurementNetwork *getNetwork(int index) const;
+    MeasurementNetwork *getNetworkByName(QString name) const;
     QList<MeasurementNetwork*> getNetworks();
+    MeasurementNetwork *createNetwork();
+    void removeNetwork(MeasurementNetwork *network);
 
     void cloneFrom(MeasurementSetup &origin);
 

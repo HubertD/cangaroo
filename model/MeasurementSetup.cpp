@@ -37,6 +37,11 @@ MeasurementNetwork *MeasurementSetup::createNetwork()
     return network;
 }
 
+void MeasurementSetup::removeNetwork(MeasurementNetwork *network)
+{
+    _networks.removeAll(network);
+}
+
 
 CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage &msg)
 {
@@ -66,6 +71,16 @@ int MeasurementSetup::countNetworks() const
 MeasurementNetwork *MeasurementSetup::getNetwork(int index) const
 {
     return _networks.value(index);
+}
+
+MeasurementNetwork *MeasurementSetup::getNetworkByName(QString name) const
+{
+    foreach (MeasurementNetwork *network, _networks) {
+        if (network->name() == name) {
+            return network;
+        }
+    }
+    return 0;
 }
 
 QList<MeasurementNetwork *> MeasurementSetup::getNetworks()

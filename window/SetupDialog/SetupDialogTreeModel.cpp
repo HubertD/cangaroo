@@ -82,17 +82,53 @@ int SetupDialogTreeModel::columnCount(const QModelIndex &parent) const
     return column_count;
 }
 
-void SetupDialogTreeModel::addCanDb(const QModelIndex &parent, pCanDb db)
+QModelIndex SetupDialogTreeModel::indexOfItem(const SetupDialogTreeItem *item) const
+{
+    return createIndex(item->row(), 0, (void*)item);
+}
+
+SetupDialogTreeItem *SetupDialogTreeModel::addNetwork()
+{
+    QString s;
+    int i=0;
+    while (true) {
+        s = QString("Network %1").arg(++i);
+        if (_rootItem->setup->getNetworkByName(s)==0) {
+            break;
+        }
+    }
+
+    beginInsertRows(QModelIndex(), _rootItem->getChildCount(), _rootItem->getChildCount());
+    MeasurementNetwork *network = _rootItem->setup->createNetwork();
+    network->setName(s);
+    SetupDialogTreeItem *item = loadNetwork(*network);
+    endInsertRows();
+
+    return item;
+}
+
+void SetupDialogTreeModel::deleteNetwork(const QModelIndex &index)
+{
+    SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem*>(index.internalPointer());
+    beginRemoveRows(index.parent(), index.row(), index.row());
+    _rootItem->removeChild(item);
+    _rootItem->setup->removeNetwork(item->network);
+    endRemoveRows();
+}
+
+SetupDialogTreeItem *SetupDialogTreeModel::addCanDb(const QModelIndex &parent, pCanDb db)
 {
     SetupDialogTreeItem *parentItem = static_cast<SetupDialogTreeItem*>(parent.internalPointer());
-    if (!parentItem) { return; }
+    if (!parentItem) { return 0; }
 
+    SetupDialogTreeItem *item = 0;
     if (parentItem->network) {
         beginInsertRows(parent, rowCount(parent), rowCount(parent));
         parentItem->network->addCanDb(db);
-        loadCanDb(*parentItem, db);
+        item = loadCanDb(*parentItem, db);
         endInsertRows();
     }
+    return item;
 }
 
 void SetupDialogTreeModel::deleteCanDb(const QModelIndex &index)
@@ -109,16 +145,19 @@ void SetupDialogTreeModel::deleteCanDb(const QModelIndex &index)
     }
 }
 
-void SetupDialogTreeModel::addInterface(const QModelIndex &parent, pCanInterface interface)
+SetupDialogTreeItem *SetupDialogTreeModel::addInterface(const QModelIndex &parent, pCanInterface interface)
 {
     SetupDialogTreeItem *parentItem = static_cast<SetupDialogTreeItem*>(parent.internalPointer());
-    if (!parentItem) { return; }
+    if (!parentItem) { return 0; }
+
+    SetupDialogTreeItem *item = 0;
     if (parentItem && parentItem->network) {
         beginInsertRows(parent, parentItem->getChildCount(), parentItem->getChildCount());
-        loadCanInterface(*parentItem, interface);
+        item = loadCanInterface(*parentItem, interface);
         parentItem->network->addCanInterface(interface);
         endInsertRows();
     }
+    return item;
 }
 
 void SetupDialogTreeModel::deleteInterface(const QModelIndex &index)
@@ -140,21 +179,23 @@ SetupDialogTreeItem *SetupDialogTreeModel::itemOrRoot(const QModelIndex &index) 
     return index.isValid() ? static_cast<SetupDialogTreeItem*>(index.internalPointer()) : _rootItem;
 }
 
-void SetupDialogTreeModel::loadCanInterface(SetupDialogTreeItem &parent, pCanInterface &intf)
+SetupDialogTreeItem *SetupDialogTreeModel::loadCanInterface(SetupDialogTreeItem &parent, pCanInterface &intf)
 {
     SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface, &parent);
     item->intf = intf;
     parent.appendChild(item);
+    return item;
 }
 
-void SetupDialogTreeModel::loadCanDb(SetupDialogTreeItem &parent, pCanDb &db)
+SetupDialogTreeItem *SetupDialogTreeModel::loadCanDb(SetupDialogTreeItem &parent, pCanDb &db)
 {
     SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb, &parent);
     item->candb = db;
     parent.appendChild(item);
+    return item;
 }
 
-void SetupDialogTreeModel::loadNetwork(MeasurementNetwork &network)
+SetupDialogTreeItem *SetupDialogTreeModel::loadNetwork(MeasurementNetwork &network)
 {
     SetupDialogTreeItem *item_network = new SetupDialogTreeItem(SetupDialogTreeItem::type_network, _rootItem);
     item_network->network = &network;
@@ -176,6 +217,7 @@ void SetupDialogTreeModel::loadNetwork(MeasurementNetwork &network)
     }
 
     _rootItem->appendChild(item_network);
+    return item_network;
 }
 
 void SetupDialogTreeModel::load(MeasurementSetup *setup)
