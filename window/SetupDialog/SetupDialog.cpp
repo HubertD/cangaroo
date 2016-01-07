@@ -176,7 +176,7 @@ void SetupDialog::addInterface(const QModelIndex &parent)
     CanInterfaceList list;
     if (dlg.selectInterfaces(*_backend, list, _currentNetwork->_canInterfaces)) {
         foreach (pCanInterface intf, list) {
-            model->addInterface(ui->treeView->selectionModel()->currentIndex(), intf);
+            model->addInterface(parent, intf);
         }
     }
 
@@ -250,4 +250,14 @@ void SetupDialog::updateButtons()
 {
     ui->btRemoveDatabase->setEnabled(ui->candbsTreeView->selectionModel()->hasSelection());
     ui->btRemoveInterface->setEnabled(ui->interfacesTreeView->selectionModel()->hasSelection());
+}
+
+void SetupDialog::on_btAddNetwork_clicked()
+{
+
+}
+
+void SetupDialog::on_btRemoveNetwork_clicked()
+{
+
 }

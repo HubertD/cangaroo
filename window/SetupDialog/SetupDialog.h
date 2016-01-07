@@ -45,6 +45,10 @@ private slots:
     void executeAddInterface();
     void executeDeleteInterface();
 
+    void on_btAddNetwork_clicked();
+
+    void on_btRemoveNetwork_clicked();
+
 private:
     Ui::SetupDialog *ui;
     Backend *_backend;
