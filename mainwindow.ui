@@ -52,6 +52,7 @@
      </property>
      <addaction name="action_Trace_View"/>
      <addaction name="actionLog_View"/>
+     <addaction name="actionGraph_View"/>
     </widget>
     <addaction name="menu_New"/>
    </widget>
@@ -125,6 +126,11 @@
   <action name="actionSave_Trace_to_file">
    <property name="text">
     <string>Save Trace to file...</string>
+   </property>
+  </action>
+  <action name="actionGraph_View">
+   <property name="text">
+    <string>Graph View</string>
    </property>
   </action>
  </widget>

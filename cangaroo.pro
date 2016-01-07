@@ -27,8 +27,8 @@ RESOURCES = cangaroo.qrc
 
 include($$PWD/model/model.pri)
 include($$PWD/driver/driver.pri)
-include($$PWD/views/views.pri)
 include($$PWD/parser/dbc/dbc.pri)
 include($$PWD/window/TraceWindow/TraceWindow.pri)
 include($$PWD/window/SetupDialog/SetupDialog.pri)
 include($$PWD/window/LogWindow/LogWindow.pri)
+include($$PWD/window/GraphWindow/GraphWindow.pri)

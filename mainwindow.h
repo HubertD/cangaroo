@@ -36,7 +36,7 @@ protected:
 public slots:
     QMdiSubWindow *createTraceWindow();
     QMdiSubWindow *createLogWindow();
-    QMdiSubWindow *createGraphView();
+    QMdiSubWindow *createGraphWindow();
     void setActiveSubWindow(QWidget *window);
     bool showSetupDialog();
     void showAboutDialog();
@@ -52,7 +52,6 @@ private:
     Backend backend;
     Logger *_logger;
 
-    TraceWindow *activeMdiChild();
     QSignalMapper *windowMapper;
 
     QMdiSubWindow *createSubWindow(QWidget *window);

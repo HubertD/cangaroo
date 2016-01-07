@@ -13,7 +13,7 @@
 #include <window/TraceWindow/TraceWindow.h>
 #include <window/SetupDialog/SetupDialog.h>
 #include <window/LogWindow/LogWindow.h>
-#include <views/GraphView.h>
+#include <window/GraphWindow/GraphWindow.h>
 
 MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +32,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
 
     connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createTraceWindow()));
     connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(createLogWindow()));
+    connect(ui->actionGraph_View, SIGNAL(triggered()), this, SLOT(createGraphWindow()));
     connect(ui->actionSetup, SIGNAL(triggered()), this, SLOT(showSetupDialog()));
 
     connect(ui->actionStart_Measurement, SIGNAL(triggered()), this, SLOT(startMeasurement()));
@@ -99,9 +100,9 @@ QMdiSubWindow *MainWindow::createLogWindow()
     return createSubWindow(new LogWindow(ui->mdiArea, _logger));
 }
 
-QMdiSubWindow *MainWindow::createGraphView()
+QMdiSubWindow *MainWindow::createGraphWindow()
 {
-    //return createSubWindow(new GraphView(ui->mdiArea, _setup));
+    return createSubWindow(new GraphWindow(ui->mdiArea, backend));
 }
 
 void MainWindow::setActiveSubWindow(QWidget *window) {
