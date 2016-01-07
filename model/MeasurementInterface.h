@@ -13,6 +13,12 @@ public:
     pCanInterface canInterface() const;
     void setCanInterface(const pCanInterface &canif);
 
+    void cloneFrom(MeasurementInterface *origin);
+
+    QString getDriverName();
+    QString getName();
+    QList<int> getAvailableBitrates();
+
 private:
     pCanInterface _canif;
     int _bitrate;

@@ -54,9 +54,9 @@ QVariant SetupDialogTreeItem::dataInterface(const QModelIndex &index) const
         case SetupDialogTreeModel::column_device:
             return intf->getName();
         case SetupDialogTreeModel::column_driver:
-            return intf->getProvider()->getName();
+            return intf->getDriverName();
         case SetupDialogTreeModel::column_bitrate:
-            return intf->getBitrate();
+            return intf->bitrate();
         default:
             return QVariant();
     }

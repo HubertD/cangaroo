@@ -5,6 +5,7 @@
 #include <model/CanTrace.h>
 #include <model/MeasurementSetup.h>
 #include <model/MeasurementNetwork.h>
+#include <model/MeasurementInterface.h>
 #include <drivers/CanListener.h>
 #include <drivers/CanInterface.h>
 #include <drivers/CanInterfaceProvider.h>
@@ -34,7 +35,9 @@ bool Backend::startMeasurement()
     int i=0;
     foreach (MeasurementNetwork *network, _setup->getNetworks()) {
         i++;
-        foreach (pCanInterface intf, network->_canInterfaces) {
+        foreach (MeasurementInterface *mi, network->interfaces()) {
+
+            pCanInterface intf = mi->canInterface();
             intf->setId(i);
             intf->open();
 
@@ -89,7 +92,10 @@ MeasurementSetup *Backend::createDefaultSetup()
     foreach (pCanInterface intf, _socketcan->getInterfaceList()) {
         MeasurementNetwork *network = defaultSetup->createNetwork();
         network->setName(QString().sprintf("Network %d", i++));
-        network->addCanInterface(intf);
+
+        MeasurementInterface *mi = new MeasurementInterface();
+        mi->setCanInterface(intf);
+        network->addInterface(mi);
     }
 
     return defaultSetup;

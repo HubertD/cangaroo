@@ -115,7 +115,7 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
     }
 
     if (item->intf) {
-        ui->laInterfaceDriver->setText(item->intf->getProvider()->getName());
+        ui->laInterfaceDriver->setText(item->intf->getDriverName());
         ui->laInterfaceName->setText(item->intf->getName());
         ui->cbInterfaceBitrate->clear();
 
@@ -216,7 +216,7 @@ void SetupDialog::addInterface(const QModelIndex &parent)
 {
     SelectCanInterfacesDialog dlg(0);
     CanInterfaceList list;
-    if (dlg.selectInterfaces(*_backend, list, _currentNetwork->_canInterfaces)) {
+    if (dlg.selectInterfaces(*_backend, list, _currentNetwork->getReferencedCanInterfaces())) {
         foreach (pCanInterface intf, list) {
             model->addInterface(parent, intf);
         }

@@ -1,4 +1,5 @@
 #include "MeasurementNetwork.h"
+#include "MeasurementInterface.h"
 
 MeasurementNetwork::MeasurementNetwork()
 {
@@ -7,28 +8,44 @@ MeasurementNetwork::MeasurementNetwork()
 void MeasurementNetwork::cloneFrom(MeasurementNetwork &origin)
 {
     _name = origin._name;
-    _canInterfaces = origin._canInterfaces;
+    foreach (MeasurementInterface *omi, origin._interfaces) {
+        MeasurementInterface *mi = new MeasurementInterface();
+        mi->cloneFrom(omi);
+        _interfaces.append(mi);
+    }
     _canDbs = origin._canDbs;
 }
 
-void MeasurementNetwork::removeCanInterface(pCanInterface intf)
+void MeasurementNetwork::addInterface(MeasurementInterface *intf)
 {
-    _canInterfaces.removeAll(intf);
+    _interfaces.append(intf);
 }
 
-void MeasurementNetwork::removeCanInterface(CanInterface *intf)
+void MeasurementNetwork::removeInterface(MeasurementInterface *intf)
 {
-    foreach (pCanInterface pci, _canInterfaces) {
-        if (pci.data() == intf) {
-            removeCanInterface(pci);
-            break;
-        }
+    _interfaces.removeAll(intf);
+}
+
+QList<MeasurementInterface *> MeasurementNetwork::interfaces()
+{
+    return _interfaces;
+}
+
+MeasurementInterface *MeasurementNetwork::addCanInterface(pCanInterface canif)
+{
+    MeasurementInterface *mi = new MeasurementInterface();
+    mi->setCanInterface(canif);
+    addInterface(mi);
+    return mi;
+}
+
+CanInterfaceList MeasurementNetwork::getReferencedCanInterfaces()
+{
+    CanInterfaceList list;
+    foreach (MeasurementInterface *mi, _interfaces) {
+        list << mi->canInterface();
     }
-}
-
-void MeasurementNetwork::addCanInterface(pCanInterface intf)
-{
-    _canInterfaces.append(intf);
+    return list;
 }
 
 void MeasurementNetwork::addCanDb(QSharedPointer<CanDb> candb)

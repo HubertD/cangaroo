@@ -6,8 +6,8 @@
 
 #include <model/MeasurementSetup.h>
 #include <model/MeasurementNetwork.h>
+#include <model/MeasurementInterface.h>
 #include <model/CanDb.h>
-#include <drivers/CanInterface.h>
 
 class SetupDialogTreeItem
 {
@@ -28,7 +28,7 @@ public:
 
     MeasurementSetup *setup;
     MeasurementNetwork *network;
-    pCanInterface intf;
+    MeasurementInterface *intf;
     pCanDb candb;
 
     SetupDialogTreeItem *getParentItem() const;

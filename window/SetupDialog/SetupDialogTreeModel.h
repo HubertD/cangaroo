@@ -41,7 +41,7 @@ public:
     SetupDialogTreeItem *addCanDb(const QModelIndex &parent, pCanDb db);
     void deleteCanDb(const QModelIndex &index);
 
-    SetupDialogTreeItem *addInterface(const QModelIndex &parent, pCanInterface interface);
+    SetupDialogTreeItem *addInterface(const QModelIndex &parent, pCanInterface &interface);
     void deleteInterface(const QModelIndex &index);
 
 private:
@@ -49,7 +49,7 @@ private:
     SetupDialogTreeItem *itemOrRoot(const QModelIndex &index) const;
 
     SetupDialogTreeItem *loadNetwork(MeasurementNetwork &network);
-    SetupDialogTreeItem *loadCanInterface(SetupDialogTreeItem &parent, pCanInterface &intf);
+    SetupDialogTreeItem *loadMeasurementInterface(SetupDialogTreeItem &parent, MeasurementInterface *intf);
     SetupDialogTreeItem *loadCanDb(SetupDialogTreeItem &parent, pCanDb &db);
 };
 

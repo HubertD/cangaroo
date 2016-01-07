@@ -4,7 +4,11 @@
 #include <QString>
 #include <QList>
 #include <drivers/CanInterface.h>
+#include <drivers/CanInterfaceProvider.h>
 #include <model/CanDb.h>
+
+
+class MeasurementInterface;
 
 class MeasurementNetwork
 {
@@ -12,12 +16,14 @@ public:
     MeasurementNetwork();
     void cloneFrom(MeasurementNetwork &origin);
 
-    void addCanInterface(pCanInterface intf);
-    void removeCanInterface(pCanInterface intf);
-    void removeCanInterface(CanInterface *intf);
+    void addInterface(MeasurementInterface *intf);
+    void removeInterface(MeasurementInterface *intf);
+    QList<MeasurementInterface*> interfaces();
+
+    MeasurementInterface *addCanInterface(pCanInterface canif);
+    CanInterfaceList getReferencedCanInterfaces();
 
     void addCanDb(pCanDb candb);
-    QList<pCanInterface> _canInterfaces;
     QList<pCanDb> _canDbs;
 
     QString name() const;
@@ -25,8 +31,7 @@ public:
 
 private:
     QString _name;
-
-    pCanInterface getSharedInterfaceForPointer(CanInterface *p);
+    QList<MeasurementInterface*> _interfaces;
 };
 
 #endif // MEASUREMENTNETWORK_H
