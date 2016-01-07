@@ -7,7 +7,7 @@
 
 class Logger;
 class TraceWindow;
-class LogView;
+class LogWindow;
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -34,8 +34,8 @@ protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
-    QMdiSubWindow *createTraceView();
-    QMdiSubWindow *createLogView();
+    QMdiSubWindow *createTraceWindow();
+    QMdiSubWindow *createLogWindow();
     QMdiSubWindow *createGraphView();
     void setActiveSubWindow(QWidget *window);
     bool showSetupDialog();

@@ -12,7 +12,7 @@
 #include <model/MeasurementSetup.h>
 #include <window/TraceWindow/TraceWindow.h>
 #include <window/SetupDialog/SetupDialog.h>
-#include <views/LogView.h>
+#include <window/LogWindow/LogWindow.h>
 #include <views/GraphView.h>
 
 MainWindow::MainWindow(Logger *logger, QWidget *parent) :
@@ -30,8 +30,8 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
-    connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createTraceView()));
-    connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(createLogView()));
+    connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createTraceWindow()));
+    connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(createLogWindow()));
     connect(ui->actionSetup, SIGNAL(triggered()), this, SLOT(showSetupDialog()));
 
     connect(ui->actionStart_Measurement, SIGNAL(triggered()), this, SLOT(startMeasurement()));
@@ -49,10 +49,10 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
 
     backend.setSetup(backend.createDefaultSetup());
 
-    QMdiSubWindow *logView = createLogView();
-    logView->setGeometry(0, 500, 1000, 200);
+    QMdiSubWindow *logWindow = createLogWindow();
+    logWindow->setGeometry(0, 500, 1000, 200);
 
-    QMdiSubWindow *traceViewWindow = createTraceView();
+    QMdiSubWindow *traceViewWindow = createTraceWindow();
     traceViewWindow->setGeometry(0, 0, 1000, 500);
 
 
@@ -90,13 +90,13 @@ QMdiSubWindow *MainWindow::createSubWindow(QWidget *window)
     return retval;
 }
 
-QMdiSubWindow *MainWindow::createTraceView() {
+QMdiSubWindow *MainWindow::createTraceWindow() {
     return createSubWindow(new TraceWindow(ui->mdiArea, backend));
 }
 
-QMdiSubWindow *MainWindow::createLogView()
+QMdiSubWindow *MainWindow::createLogWindow()
 {
-    return createSubWindow(new LogView(ui->mdiArea, _logger));
+    return createSubWindow(new LogWindow(ui->mdiArea, _logger));
 }
 
 QMdiSubWindow *MainWindow::createGraphView()
