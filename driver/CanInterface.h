@@ -12,14 +12,14 @@
 #include <QSharedPointer>
 #include <stdint.h>
 
-class CanInterfaceProvider;
+class CanDriver;
 class CanMessage;
 
 class CanInterface {
 public:
-	CanInterface(CanInterfaceProvider *provider);
+    CanInterface(CanDriver *driver);
 	virtual ~CanInterface();
-	virtual CanInterfaceProvider *getProvider();
+    virtual CanDriver *getDriver();
     virtual QString getName() const = 0;
 
 	virtual int getBitrate() = 0;
@@ -37,7 +37,7 @@ public:
 
 private:
     uint16_t _id;
-	CanInterfaceProvider *_provider;
+    CanDriver *_driver;
 };
 
 typedef QSharedPointer<CanInterface> pCanInterface;

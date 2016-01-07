@@ -30,7 +30,7 @@ bool SelectCanInterfacesDialog::selectInterfaces(Backend &backend, CanInterfaceL
     foreach (pCanInterface intf, allInterfaces) {
         QTreeWidgetItem *treeItem = new QTreeWidgetItem(ui->treeWidget);
         treeItem->setText(0, intf->getName());
-        treeItem->setText(1, intf->getProvider()->getName());
+        treeItem->setText(1, intf->getDriver()->getName());
         treeItem->setText(2, "");
     }
 

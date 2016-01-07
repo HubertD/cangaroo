@@ -3,8 +3,8 @@
 
 #include <QString>
 #include <QList>
-#include <drivers/CanInterface.h>
-#include <drivers/CanInterfaceProvider.h>
+#include <driver/CanDriver.h>
+#include <driver/CanInterface.h>
 #include <model/CanDb.h>
 
 

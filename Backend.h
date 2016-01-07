@@ -3,13 +3,14 @@
 
 #include <QObject>
 #include <QList>
-#include <drivers/CanInterfaceProvider.h>
+#include <driver/CanDriver.h>
 
 class MeasurementSetup;
 class MeasurementNetwork;
 class CanTrace;
 class CanListener;
-class SocketCanInterfaceProvider;
+class SocketCanDriver;
+
 
 class Backend : public QObject
 {
@@ -43,7 +44,7 @@ private:
     MeasurementSetup *_setup;
     CanTrace *_trace;
     QList<CanListener*> _listeners;
-    SocketCanInterfaceProvider *_socketcan;
+    SocketCanDriver *_socketcan;
 };
 
 #endif // BACKEND_H

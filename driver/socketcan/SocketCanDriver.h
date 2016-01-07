@@ -1,23 +1,22 @@
 /*
- * SocketCanInterfaceProvider.h
+ * SocketCanDriver.h
  *
  *  Created on: 19.12.2015
  *      Author: hd
  */
 
-#ifndef SOCKETCAN_SOCKETCANINTERFACEPROVIDER_H_
-#define SOCKETCAN_SOCKETCANINTERFACEPROVIDER_H_
-
-#include "../CanInterfaceProvider.h"
+#ifndef SOCKETCAN_SOCKETCANDRIVER_H_
+#define SOCKETCAN_SOCKETCANDRIVER_H_
 
 #include <sys/types.h>
 #include <linux/netlink.h>
 #include <QString>
+#include <driver/CanDriver.h>
 
-class SocketCanInterfaceProvider: public CanInterfaceProvider {
+class SocketCanDriver: public CanDriver {
 public:
-	SocketCanInterfaceProvider();
-	virtual ~SocketCanInterfaceProvider();
+    SocketCanDriver();
+    virtual ~SocketCanDriver();
 
     virtual QString getName();
 	virtual CanInterfaceList getInterfaceList();
@@ -30,4 +29,4 @@ private:
     void createOrUpdateInterface(int index, QString name);
 };
 
-#endif /* SOCKETCAN_SOCKETCANINTERFACEPROVIDER_H_ */
+#endif /* SOCKETCAN_SOCKETCANDRIVER_H_ */

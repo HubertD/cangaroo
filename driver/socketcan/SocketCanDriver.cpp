@@ -1,11 +1,11 @@
 /*
- * SocketCanInterfaceProvider.cpp
+ * SocketCanDriver.cpp
  *
  *  Created on: 19.12.2015
  *      Author: hd
  */
 
-#include "SocketCanInterfaceProvider.h"
+#include "SocketCanDriver.h"
 #include "SocketCanInterface.h"
 
 #include <sys/types.h>          /* See NOTES */
@@ -16,19 +16,19 @@
 #include <unistd.h>
 #include <string.h>
 
-SocketCanInterfaceProvider::SocketCanInterfaceProvider()
-  : CanInterfaceProvider()
+SocketCanDriver::SocketCanDriver()
+  : CanDriver()
 {
 }
 
-SocketCanInterfaceProvider::~SocketCanInterfaceProvider() {
+SocketCanDriver::~SocketCanDriver() {
 }
 
-CanInterfaceList SocketCanInterfaceProvider::getInterfaceList() {
+CanInterfaceList SocketCanDriver::getInterfaceList() {
 	return _interfaces;
 }
 
-void SocketCanInterfaceProvider::update() {
+void SocketCanDriver::update() {
 	int fd;
 	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
 
@@ -126,7 +126,7 @@ void SocketCanInterfaceProvider::update() {
 	return;
 }
 
-void SocketCanInterfaceProvider::addNetlinkInterface(struct nlmsghdr* h) {
+void SocketCanDriver::addNetlinkInterface(struct nlmsghdr* h) {
 	struct rtattr *attribute;
 	int len;
 
@@ -146,11 +146,11 @@ void SocketCanInterfaceProvider::addNetlinkInterface(struct nlmsghdr* h) {
 	}
 }
 
-QString SocketCanInterfaceProvider::getName() {
+QString SocketCanDriver::getName() {
 	return "SocketCAN";
 }
 
-void SocketCanInterfaceProvider::createOrUpdateInterface(int index, QString name) {
+void SocketCanDriver::createOrUpdateInterface(int index, QString name) {
 
     foreach (pCanInterface intf, _interfaces) {
         QSharedPointer<SocketCanInterface> scif = qSharedPointerCast<SocketCanInterface>(intf);

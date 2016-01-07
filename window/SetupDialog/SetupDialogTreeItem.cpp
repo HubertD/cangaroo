@@ -1,10 +1,10 @@
 #include "SetupDialogTreeItem.h"
 #include <QModelIndex>
-#include <drivers/CanInterfaceProvider.h>
+#include <driver/CanDriver.h>
 #include "SetupDialogTreeModel.h"
 
 SetupDialogTreeItem::SetupDialogTreeItem(item_type type, SetupDialogTreeItem *parent)
-  : _type(type), _parent(parent), setup(0), network(0), intf(0), candb(0)
+  : setup(0), network(0), intf(0), candb(0), _type(type), _parent(parent)
 {
 
 }

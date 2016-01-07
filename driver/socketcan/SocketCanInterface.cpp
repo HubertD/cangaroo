@@ -22,8 +22,8 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
-SocketCanInterface::SocketCanInterface(SocketCanInterfaceProvider *provider, int index, QString name)
-  : CanInterface((CanInterfaceProvider *)provider),
+SocketCanInterface::SocketCanInterface(SocketCanDriver *driver, int index, QString name)
+  : CanInterface((CanDriver *)driver),
 	_idx(index),
 	_fd(0),
 	_name(name)

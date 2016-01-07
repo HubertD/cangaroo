@@ -1,6 +1,6 @@
 #include "MeasurementInterface.h"
-#include <drivers/CanInterface.h>
-#include <drivers/CanInterfaceProvider.h>
+#include <driver/CanDriver.h>
+#include <driver/CanInterface.h>
 
 MeasurementInterface::MeasurementInterface()
   : _bitrate(500000)
@@ -37,7 +37,7 @@ void MeasurementInterface::cloneFrom(MeasurementInterface *origin)
 QString MeasurementInterface::getDriverName()
 {
     if (_canif) {
-        return _canif->getProvider()->getName();
+        return _canif->getDriver()->getName();
     } else {
         return "";
     }

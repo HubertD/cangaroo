@@ -10,7 +10,7 @@
 
 #include "BaseTraceViewModel.h"
 #include <model/CanMessage.h>
-#include <drivers/CanInterface.h>
+#include <driver/CanInterface.h>
 
 #include "AggregatedTraceViewItem.h"
 

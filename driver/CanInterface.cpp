@@ -7,16 +7,16 @@
 
 #include "CanInterface.h"
 
-CanInterface::CanInterface(CanInterfaceProvider *provider)
-  : _id(-1), _provider(provider)
+CanInterface::CanInterface(CanDriver *driver)
+  : _id(-1), _driver(driver)
 {
 }
 
 CanInterface::~CanInterface() {
 }
 
-CanInterfaceProvider* CanInterface::getProvider() {
-    return _provider;
+CanDriver* CanInterface::getDriver() {
+    return _driver;
 }
 
 QList<int> CanInterface::getAvailableBitrates()

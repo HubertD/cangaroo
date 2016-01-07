@@ -30,6 +30,7 @@ private:
     LinearTraceViewModel *_linearTraceViewModel;
     AggregatedTraceViewModel *_aggregatedTraceViewModel;
     QSortFilterProxyModel *_aggregatedProxyModel;
+    QSortFilterProxyModel *_linearProxyModel;
 };
 
 #endif // TRACEWINDOW_H

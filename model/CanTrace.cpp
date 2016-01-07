@@ -4,7 +4,7 @@
 #include <QTextStream>
 
 #include <model/CanMessage.h>
-#include <drivers/CanInterface.h>
+#include <driver/CanInterface.h>
 #include <model/MeasurementSetup.h>
 
 CanTrace::CanTrace(QObject *parent, MeasurementSetup *setup, int flushInterval)

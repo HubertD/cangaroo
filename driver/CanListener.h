@@ -2,7 +2,7 @@
 #define CANLISTENER_H
 
 #include <QObject>
-#include <drivers/CanInterface.h>
+#include <driver/CanInterface.h>
 
 class QThread;
 class CanMessage;

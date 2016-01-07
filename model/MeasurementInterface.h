@@ -1,7 +1,7 @@
 #ifndef MEASUREMENTINTERFACE_H
 #define MEASUREMENTINTERFACE_H
 
-#include <drivers/CanInterface.h>
+#include <driver/CanInterface.h>
 
 class MeasurementInterface
 {

@@ -10,11 +10,11 @@
 
 #include "../CanInterface.h"
 
-class SocketCanInterfaceProvider;
+class SocketCanDriver;
 
 class SocketCanInterface: public CanInterface {
 public:
-    SocketCanInterface(SocketCanInterfaceProvider *provider, int index, QString name);
+    SocketCanInterface(SocketCanDriver *driver, int index, QString name);
 	virtual ~SocketCanInterface();
 
     virtual QString getName() const;

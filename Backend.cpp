@@ -6,10 +6,10 @@
 #include <model/MeasurementSetup.h>
 #include <model/MeasurementNetwork.h>
 #include <model/MeasurementInterface.h>
-#include <drivers/CanListener.h>
-#include <drivers/CanInterface.h>
-#include <drivers/CanInterfaceProvider.h>
-#include <drivers/socketcan/SocketCanInterfaceProvider.h>
+#include <driver/CanDriver.h>
+#include <driver/CanInterface.h>
+#include <driver/CanListener.h>
+#include <driver/socketcan/SocketCanDriver.h>
 
 Backend::Backend(QObject *parent)
   : QObject(parent),
@@ -17,7 +17,7 @@ Backend::Backend(QObject *parent)
 {
     qRegisterMetaType<CanMessage>("CanMessage");
 
-    _socketcan = new SocketCanInterfaceProvider();
+    _socketcan = new SocketCanDriver();
     _setup = createDefaultSetup();
     _trace = new CanTrace(this, _setup, 100);
 }

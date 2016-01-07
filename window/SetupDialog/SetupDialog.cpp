@@ -8,8 +8,8 @@
 
 #include <parser/dbc/DbcParser.h>
 #include <model/MeasurementSetup.h>
-#include <drivers/CanInterface.h>
-#include <drivers/CanInterfaceProvider.h>
+#include <driver/CanInterface.h>
+#include <driver/CanDriver.h>
 
 #include "SetupDialogTreeModel.h"
 #include "SetupDialogTreeItem.h"

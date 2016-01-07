@@ -26,7 +26,7 @@ FORMS    += mainwindow.ui
 RESOURCES = cangaroo.qrc
 
 include($$PWD/model/model.pri)
-include($$PWD/drivers/drivers.pri)
+include($$PWD/driver/driver.pri)
 include($$PWD/views/views.pri)
 include($$PWD/parser/dbc/dbc.pri)
 include($$PWD/window/TraceWindow/TraceWindow.pri)
