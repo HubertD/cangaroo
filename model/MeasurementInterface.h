@@ -1,0 +1,21 @@
+#ifndef MEASUREMENTINTERFACE_H
+#define MEASUREMENTINTERFACE_H
+
+#include <drivers/CanInterface.h>
+
+class MeasurementInterface
+{
+public:
+    MeasurementInterface();
+    int bitrate() const;
+    void setBitrate(int bitrate);
+
+    pCanInterface canInterface() const;
+    void setCanInterface(const pCanInterface &canif);
+
+private:
+    pCanInterface _canif;
+    int _bitrate;
+};
+
+#endif // MEASUREMENTINTERFACE_H

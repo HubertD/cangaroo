@@ -4,7 +4,7 @@
 #include "SetupDialogTreeModel.h"
 
 SetupDialogTreeItem::SetupDialogTreeItem(item_type type, SetupDialogTreeItem *parent)
-  : _type(type), _parent(parent)
+  : _type(type), _parent(parent), setup(0), network(0), intf(0), candb(0)
 {
 
 }

@@ -24,6 +24,7 @@ public:
 
 	virtual int getBitrate() = 0;
 	virtual void setBitrate(int bitrate) = 0;
+    virtual QList<int> getAvailableBitrates();
 
 	virtual void open();
 	virtual void close();

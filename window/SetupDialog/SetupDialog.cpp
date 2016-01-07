@@ -107,23 +107,48 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
     QModelIndex idx = selected.first().topLeft();
     SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem *>(idx.internalPointer());
 
+
+    _currentNetwork = item->network;
+
+    if (item->network) {
+        ui->edNetworkName->setText(item->network->name());
+    }
+
+    if (item->intf) {
+        ui->laInterfaceDriver->setText(item->intf->getProvider()->getName());
+        ui->laInterfaceName->setText(item->intf->getName());
+        ui->cbInterfaceBitrate->clear();
+
+        foreach (int br, item->intf->getAvailableBitrates()) {
+            ui->cbInterfaceBitrate->addItem(QString::number(br));
+        }
+    }
+
     if (item) {
         switch (item->getType()) {
+
             case SetupDialogTreeItem::type_network:
                 ui->stackedWidget->setCurrentWidget(ui->networkPage);
-                _currentNetwork = item->network;
-                ui->edNetworkName->setText(item->network->name());
                 break;
+
             case SetupDialogTreeItem::type_interface_root:
-                showInterfacesPage(item);
+                ui->stackedWidget->setCurrentWidget(ui->interfacesPage);
+                ui->interfacesTreeView->setRootIndex(getSelectedIndex());
                 break;
+
+            case SetupDialogTreeItem::type_interface:
+                showInterfacePage(item);
+                break;
+
             case SetupDialogTreeItem::type_candb_root:
                 ui->stackedWidget->setCurrentWidget(ui->candbsPage);
                 ui->candbsTreeView->setRootIndex(getSelectedIndex());
                 break;
+
             default:
                 ui->stackedWidget->setCurrentWidget(ui->emptyPage);
                 break;
+
 
         }
     }
@@ -219,13 +244,9 @@ void SetupDialog::on_btRemoveInterface_clicked()
     model->deleteInterface(ui->interfacesTreeView->selectionModel()->currentIndex());
 }
 
-
-
-void SetupDialog::showInterfacesPage(SetupDialogTreeItem *item)
+void SetupDialog::showInterfacePage(SetupDialogTreeItem *item)
 {
-    ui->stackedWidget->setCurrentWidget(ui->interfacesPage);
-    _currentNetwork = item->network;
-    ui->interfacesTreeView->setRootIndex(getSelectedIndex());
+    ui->stackedWidget->setCurrentWidget(ui->socketCanInterfacePage);
 }
 
 void SetupDialog::addCanDb(const QModelIndex &parent)

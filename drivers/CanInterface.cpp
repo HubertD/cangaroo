@@ -16,7 +16,14 @@ CanInterface::~CanInterface() {
 }
 
 CanInterfaceProvider* CanInterface::getProvider() {
-	return _provider;
+    return _provider;
+}
+
+QList<int> CanInterface::getAvailableBitrates()
+{
+    QList<int> retval;
+    retval << 88300 << 100000 << 125000 << 250000 << 500000 << 1000000;
+    return retval;
 }
 
 void CanInterface::open() {

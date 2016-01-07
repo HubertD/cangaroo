@@ -6,7 +6,8 @@ SOURCES += \
     $$PWD/CanDbNode.cpp \
     $$PWD/CanDbSignal.cpp \
     $$PWD/MeasurementSetup.cpp \
-    $$PWD/MeasurementNetwork.cpp
+    $$PWD/MeasurementNetwork.cpp \
+    $$PWD/MeasurementInterface.cpp
 
 HEADERS  += \
     $$PWD/CanMessage.h \
@@ -16,4 +17,5 @@ HEADERS  += \
     $$PWD/CanDbNode.h \
     $$PWD/CanDbSignal.h \
     $$PWD/MeasurementSetup.h \
-    $$PWD/MeasurementNetwork.h
+    $$PWD/MeasurementNetwork.h \
+    $$PWD/MeasurementInterface.h
