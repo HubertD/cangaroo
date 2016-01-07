@@ -43,6 +43,11 @@ bool Backend::startMeasurement()
 
             qDebug() << "listening on interface" << intf->getName();
 
+            if (intf->getBitrate() != mi->bitrate()) {
+                qInfo() << "setting bitrate on" << intf->getName() << " from " << intf->getBitrate() << " to " << mi->bitrate();
+                intf->setBitrate(mi->bitrate());
+            }
+
             CanListener *listener = new CanListener(0, intf);
             connect(listener, SIGNAL(messageReceived(CanMessage)), _trace, SLOT(enqueueMessage(CanMessage)));
             listener->startThread();
@@ -95,6 +100,7 @@ MeasurementSetup *Backend::createDefaultSetup()
 
         MeasurementInterface *mi = new MeasurementInterface();
         mi->setCanInterface(intf);
+        mi->setBitrate(500000);
         network->addInterface(mi);
     }
 
