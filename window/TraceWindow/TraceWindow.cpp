@@ -12,6 +12,9 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
 
     _linearTraceViewModel = new LinearTraceViewModel(backend);
     _aggregatedTraceViewModel = new AggregatedTraceViewModel(backend);
+    _aggregatedProxyModel = new QSortFilterProxyModel(this);
+    _aggregatedProxyModel->setSourceModel(_aggregatedTraceViewModel);
+    _aggregatedProxyModel->setDynamicSortFilter(true);
 
     ui->tree->setModel(_linearTraceViewModel);
     ui->tree->setUniformRowHeights(true);
@@ -38,8 +41,12 @@ TraceWindow::~TraceWindow()
 void TraceWindow::onCbTraceTypeChanged(int i)
 {
     if (i==Qt::Checked) {
-        ui->tree->setModel(_aggregatedTraceViewModel);
+        ui->tree->setModel(_aggregatedProxyModel);
+        ui->tree->setSortingEnabled(true);
+
+
     } else {
+        ui->tree->setSortingEnabled(false);
         ui->tree->setModel(_linearTraceViewModel);
     }
 }

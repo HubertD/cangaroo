@@ -2,6 +2,7 @@
 #define TRACEWINDOW_H
 
 #include <QWidget>
+#include <QSortFilterProxyModel>
 
 namespace Ui {
 class TraceWindow;
@@ -28,6 +29,7 @@ private:
     Backend *_backend;
     LinearTraceViewModel *_linearTraceViewModel;
     AggregatedTraceViewModel *_aggregatedTraceViewModel;
+    QSortFilterProxyModel *_aggregatedProxyModel;
 };
 
 #endif // TRACEWINDOW_H
