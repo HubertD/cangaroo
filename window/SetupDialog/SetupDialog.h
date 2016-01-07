@@ -7,6 +7,7 @@
 class Backend;
 class MeasurementSetup;
 class MeasurementNetwork;
+class MeasurementInterface;
 class QItemSelection;
 class SetupDialogTreeItem;
 class SetupDialogTreeModel;
@@ -31,6 +32,7 @@ public slots:
 
 private slots:
     void edNetworkNameChanged();
+    void cbInterfaceBitrateChanged(QString value);
 
     void on_btAddInterface_clicked();
     void on_btRemoveInterface_clicked();
@@ -60,6 +62,8 @@ private:
 
     SetupDialogTreeModel *model;
     MeasurementNetwork *_currentNetwork;
+    MeasurementInterface *_currentInterface;
+
     QModelIndex getSelectedIndex();
     SetupDialogTreeItem *getSelectedItem();
 

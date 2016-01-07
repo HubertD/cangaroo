@@ -60,6 +60,9 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     connect(ui->candbsTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
     connect(ui->interfacesTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
 
+
+    connect(ui->cbInterfaceBitrate, SIGNAL(currentIndexChanged(QString)), this, SLOT(cbInterfaceBitrateChanged(QString)));
+
     connect(_actionAddCanDb, SIGNAL(triggered()), this, SLOT(executeAddCanDb()));
     connect(_actionDeleteCanDb, SIGNAL(triggered()), this, SLOT(executeDeleteCanDb()));
 
@@ -109,6 +112,7 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
 
 
     _currentNetwork = item->network;
+    _currentInterface = item->intf;
 
     if (item->network) {
         ui->edNetworkName->setText(item->network->name());
@@ -117,11 +121,13 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
     if (item->intf) {
         ui->laInterfaceDriver->setText(item->intf->getDriverName());
         ui->laInterfaceName->setText(item->intf->getName());
+        int bitrate = item->intf->bitrate();
         ui->cbInterfaceBitrate->clear();
-
         foreach (int br, item->intf->getAvailableBitrates()) {
             ui->cbInterfaceBitrate->addItem(QString::number(br));
         }
+
+        ui->cbInterfaceBitrate->setCurrentText(QString::number(bitrate));
     }
 
     if (item) {
@@ -209,6 +215,13 @@ void SetupDialog::edNetworkNameChanged()
     if (_currentNetwork) {
         _currentNetwork->setName(ui->edNetworkName->text());
         model->dataChanged(getSelectedIndex(), getSelectedIndex());
+    }
+}
+
+void SetupDialog::cbInterfaceBitrateChanged(QString value)
+{
+    if (_currentInterface) {
+        _currentInterface->setBitrate(value.toInt());
     }
 }
 
