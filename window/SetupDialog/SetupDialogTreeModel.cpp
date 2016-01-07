@@ -87,15 +87,10 @@ void SetupDialogTreeModel::addCanDb(const QModelIndex &parent, pCanDb db)
     SetupDialogTreeItem *parentItem = static_cast<SetupDialogTreeItem*>(parent.internalPointer());
     if (!parentItem) { return; }
 
-    SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb, parentItem);
-    if (!item) { return; }
-
-    item->candb = db;
-
     if (parentItem->network) {
-        parentItem->network->addCanDb(db);
         beginInsertRows(parent, rowCount(parent), rowCount(parent));
-        parentItem->appendChild(item);
+        parentItem->network->addCanDb(db);
+        loadCanDb(*parentItem, db);
         endInsertRows();
     }
 }
@@ -120,13 +115,8 @@ void SetupDialogTreeModel::addInterface(const QModelIndex &parent, pCanInterface
     if (!parentItem) { return; }
     if (parentItem && parentItem->network) {
         beginInsertRows(parent, parentItem->getChildCount(), parentItem->getChildCount());
-
-        SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface, parentItem);
-        item->intf = interface;
-        parentItem->appendChild(item);
-
+        loadCanInterface(*parentItem, interface);
         parentItem->network->addCanInterface(interface);
-
         endInsertRows();
     }
 }
@@ -150,36 +140,51 @@ SetupDialogTreeItem *SetupDialogTreeModel::itemOrRoot(const QModelIndex &index) 
     return index.isValid() ? static_cast<SetupDialogTreeItem*>(index.internalPointer()) : _rootItem;
 }
 
+void SetupDialogTreeModel::loadCanInterface(SetupDialogTreeItem &parent, pCanInterface &intf)
+{
+    SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface, &parent);
+    item->intf = intf;
+    parent.appendChild(item);
+}
+
+void SetupDialogTreeModel::loadCanDb(SetupDialogTreeItem &parent, pCanDb &db)
+{
+    SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb, &parent);
+    item->candb = db;
+    parent.appendChild(item);
+}
+
+void SetupDialogTreeModel::loadNetwork(MeasurementNetwork &network)
+{
+    SetupDialogTreeItem *item_network = new SetupDialogTreeItem(SetupDialogTreeItem::type_network, _rootItem);
+    item_network->network = &network;
+
+    SetupDialogTreeItem *item_intf_root = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface_root, item_network);
+    item_intf_root->network = &network;
+    item_network->appendChild(item_intf_root);
+
+    SetupDialogTreeItem *item_candb_root = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb_root, item_network);
+    item_candb_root->network = &network;
+    item_network->appendChild(item_candb_root);
+
+    foreach (pCanInterface intf, network._canInterfaces) {
+        loadCanInterface(*item_intf_root, intf);
+    }
+
+    foreach (pCanDb candb, network._canDbs) {
+        loadCanDb(*item_candb_root, candb);
+    }
+
+    _rootItem->appendChild(item_network);
+}
+
 void SetupDialogTreeModel::load(MeasurementSetup *setup)
 {
     _rootItem = new SetupDialogTreeItem(SetupDialogTreeItem::type_root, 0);
     _rootItem->setup = setup;
 
     foreach (MeasurementNetwork *network, setup->getNetworks()) {
-        SetupDialogTreeItem *item_network = new SetupDialogTreeItem(SetupDialogTreeItem::type_network, _rootItem);
-        item_network->network = network;
-
-        SetupDialogTreeItem *item_intf_root = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface_root, item_network);
-        item_intf_root->network = network;
-        item_network->appendChild(item_intf_root);
-
-        foreach (pCanInterface intf, network->_canInterfaces) {
-            SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface, item_intf_root);
-            item->intf = intf;
-            item_intf_root->appendChild(item);
-        }
-
-        SetupDialogTreeItem *item_candb_root = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb_root, item_network);
-        item_candb_root->network = network;
-        item_network->appendChild(item_candb_root);
-
-        foreach (pCanDb candb, network->_canDbs) {
-            SetupDialogTreeItem *item = new SetupDialogTreeItem(SetupDialogTreeItem::type_candb, item_candb_root);
-            item->candb = candb;
-            item_candb_root->appendChild(item);
-        }
-
-        _rootItem->appendChild(item_network);
+        loadNetwork(*network);
     }
 
 }

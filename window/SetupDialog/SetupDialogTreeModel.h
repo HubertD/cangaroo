@@ -41,6 +41,10 @@ public:
 private:
     SetupDialogTreeItem *_rootItem;
     SetupDialogTreeItem *itemOrRoot(const QModelIndex &index) const;
+
+    void loadNetwork(MeasurementNetwork &network);
+    void loadCanInterface(SetupDialogTreeItem &parent, pCanInterface &intf);
+    void loadCanDb(SetupDialogTreeItem &parent, pCanDb &db);
 };
 
 #endif // SETUPDIALOGTREEMODEL_H
