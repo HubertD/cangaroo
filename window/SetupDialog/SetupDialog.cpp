@@ -55,6 +55,7 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
 
     connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(treeViewContextMenu(QPoint)));
     connect(ui->edNetworkName, SIGNAL(textChanged(QString)), this, SLOT(edNetworkNameChanged()));
+
     connect(ui->treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(treeViewSelectionChanged(QItemSelection,QItemSelection)));
     connect(ui->candbsTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
     connect(ui->interfacesTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
@@ -97,6 +98,12 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
 
     _currentNetwork = 0;
 
+    if (selected.isEmpty()) {
+        ui->stackedWidget->setCurrentWidget(ui->emptyPage);
+        updateButtons();
+        return;
+    }
+
     QModelIndex idx = selected.first().topLeft();
     SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem *>(idx.internalPointer());
 
@@ -120,11 +127,18 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
 
         }
     }
+
+    updateButtons();
 }
 
 QModelIndex SetupDialog::getSelectedIndex()
 {
-    return ui->treeView->selectionModel()->currentIndex();
+    QModelIndexList list = ui->treeView->selectionModel()->selectedRows();
+    if (list.isEmpty()) {
+        return QModelIndex();
+    } else {
+        return list.first();
+    }
 }
 
 SetupDialogTreeItem *SetupDialog::getSelectedItem()
@@ -251,7 +265,9 @@ void SetupDialog::updateButtons()
 {
     ui->btRemoveDatabase->setEnabled(ui->candbsTreeView->selectionModel()->hasSelection());
     ui->btRemoveInterface->setEnabled(ui->interfacesTreeView->selectionModel()->hasSelection());
-    ui->btRemoveNetwork->setEnabled(ui->treeView->selectionModel()->hasSelection() && (getSelectedItem()->getType()==SetupDialogTreeItem::type_network));
+
+    SetupDialogTreeItem *item = getSelectedItem();
+    ui->btRemoveNetwork->setEnabled(ui->treeView->selectionModel()->hasSelection() && item && (item->getType()==SetupDialogTreeItem::type_network));
 }
 
 void SetupDialog::on_btAddNetwork_clicked()
