@@ -35,16 +35,21 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
+   <widget class="QMenu" name="menuWorkspace">
     <property name="title">
-     <string>&amp;File</string>
+     <string>W&amp;orkspace</string>
     </property>
+    <addaction name="action_New"/>
+    <addaction name="separator"/>
+    <addaction name="action_Open"/>
+    <addaction name="action_Save"/>
+    <addaction name="actionSave_as"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
    <widget class="QMenu" name="menuWindow">
     <property name="title">
-     <string>Window</string>
+     <string>&amp;Window</string>
     </property>
     <widget class="QMenu" name="menu_New">
      <property name="title">
@@ -58,23 +63,31 @@
    </widget>
    <widget class="QMenu" name="menuMeasurement">
     <property name="title">
-     <string>Measurement</string>
+     <string>&amp;Measurement</string>
     </property>
     <addaction name="actionStart_Measurement"/>
     <addaction name="actionStop_Measurement"/>
     <addaction name="separator"/>
     <addaction name="actionSetup"/>
     <addaction name="separator"/>
-    <addaction name="actionSave_Trace_to_file"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionAbout"/>
    </widget>
-   <addaction name="menuFile"/>
+   <widget class="QMenu" name="menu_Trace">
+    <property name="title">
+     <string>&amp;Trace</string>
+    </property>
+    <addaction name="action_Clear"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Trace_to_file"/>
+   </widget>
+   <addaction name="menuWorkspace"/>
    <addaction name="menuMeasurement"/>
+   <addaction name="menu_Trace"/>
    <addaction name="menuWindow"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -88,10 +101,16 @@
    <property name="text">
     <string>&amp;Trace View</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+T</string>
+   </property>
   </action>
   <action name="actionLog_View">
    <property name="text">
-    <string>Log View</string>
+    <string>&amp;Log View</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+L</string>
    </property>
   </action>
   <action name="actionSetup">
@@ -120,17 +139,42 @@
   </action>
   <action name="actionAbout">
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="actionSave_Trace_to_file">
    <property name="text">
-    <string>Save Trace to file...</string>
+    <string>&amp;Save Trace to file...</string>
    </property>
   </action>
   <action name="actionGraph_View">
    <property name="text">
-    <string>Graph View</string>
+    <string>&amp;Graph View</string>
+   </property>
+  </action>
+  <action name="action_New">
+   <property name="text">
+    <string>&amp;New...</string>
+   </property>
+  </action>
+  <action name="action_Save">
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+  </action>
+  <action name="actionSave_as">
+   <property name="text">
+    <string>Save &amp;as...</string>
+   </property>
+  </action>
+  <action name="action_Open">
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+  </action>
+  <action name="action_Clear">
+   <property name="text">
+    <string>&amp;Clear</string>
    </property>
   </action>
  </widget>
