@@ -4,6 +4,9 @@
 #
 #-------------------------------------------------
 
+# This project requires at least v5.x to compile
+lessThan(QT_MAJOR_VERSION, 5): error("requires Qt 5")
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
