@@ -46,7 +46,7 @@ bool Backend::startMeasurement()
             qDebug() << "listening on interface" << intf->getName();
 
             if (intf->getBitrate() != mi->bitrate()) {
-                qInfo() << "setting bitrate on" << intf->getName() << " from " << intf->getBitrate() << " to " << mi->bitrate();
+                qDebug() << "setting bitrate on" << intf->getName() << " from " << intf->getBitrate() << " to " << mi->bitrate();
                 intf->setBitrate(mi->bitrate());
             }
 
