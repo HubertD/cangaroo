@@ -19,12 +19,9 @@ public:
     virtual ~SocketCanDriver();
 
     virtual QString getName();
-	virtual CanInterfaceList getInterfaceList();
 	virtual void update();
 
 private:
-	CanInterfaceList _interfaces;
-
 	void addNetlinkInterface(struct nlmsghdr *h);
     void createOrUpdateInterface(int index, QString name);
 };

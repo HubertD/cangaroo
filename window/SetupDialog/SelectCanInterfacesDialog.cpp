@@ -15,22 +15,22 @@ SelectCanInterfacesDialog::~SelectCanInterfacesDialog()
     delete ui;
 }
 
-bool SelectCanInterfacesDialog::selectInterfaces(Backend &backend, CanInterfaceList &selectedInterfaces, const CanInterfaceList &excludeInterfaces)
+bool SelectCanInterfacesDialog::selectInterfaces(Backend &backend, CanInterfaceIdList &selectedInterfaces, const CanInterfaceIdList &excludeInterfaces)
 {
     ui->treeWidget->clear();
 
-    CanInterfaceList allInterfaces;
-    foreach (pCanInterface intf, backend.getInterfaceList()) {
+    CanInterfaceIdList allInterfaces;
+    foreach (CanInterfaceId intf, backend.getInterfaceList()) {
         if (!excludeInterfaces.contains(intf)) {
             allInterfaces.append(intf);
         }
     }
 
 
-    foreach (pCanInterface intf, allInterfaces) {
+    foreach (CanInterfaceId intf, allInterfaces) {
         QTreeWidgetItem *treeItem = new QTreeWidgetItem(ui->treeWidget);
-        treeItem->setText(0, intf->getName());
-        treeItem->setText(1, intf->getDriver()->getName());
+        treeItem->setText(0, backend.getInterfaceName(intf));
+        treeItem->setText(1, backend.getDriverName(intf));
         treeItem->setText(2, "");
     }
 

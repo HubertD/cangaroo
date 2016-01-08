@@ -14,16 +14,28 @@
 
 class CanInterface;
 
-typedef QList<pCanInterface> CanInterfaceList;
+typedef uint16_t CanInterfaceId;
+typedef QList<uint16_t> CanInterfaceIdList;
 
 class CanDriver {
 public:
     CanDriver();
     virtual ~CanDriver();
 
+    void setId(int id);
+    int id();
+
     virtual QString getName() = 0;
-	virtual CanInterfaceList getInterfaceList() = 0;
 	virtual void update() = 0;
+
+    CanInterfaceIdList getInterfaceIds() const;
+    QList<CanInterface*> getInterfaces() const;
+    CanInterface *getInterfaceById(CanInterfaceId id);
+    CanInterfaceId addInterface(CanInterface *intf);
+
+private:
+    int _id;
+    QList<CanInterface*> _interfaces;
 };
 
 #endif /* BASE_CANDRIVER_H_ */

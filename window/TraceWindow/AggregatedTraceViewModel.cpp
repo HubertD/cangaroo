@@ -109,7 +109,7 @@ void AggregatedTraceViewModel::afterClear()
 
 AggregatedTraceViewModel::unique_key_t AggregatedTraceViewModel::makeUniqueKey(const CanMessage &msg)
 {
-    return ((uint64_t)msg.getInterface()->getId() << 32) | msg.getRawId();
+    return ((uint64_t)msg.getInterfaceId() << 32) | msg.getRawId();
 }
 
 double AggregatedTraceViewModel::getTimeDiff(const timeval t1, const timeval t2) const

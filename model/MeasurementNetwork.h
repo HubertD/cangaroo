@@ -20,8 +20,8 @@ public:
     void removeInterface(MeasurementInterface *intf);
     QList<MeasurementInterface*> interfaces();
 
-    MeasurementInterface *addCanInterface(pCanInterface canif);
-    CanInterfaceList getReferencedCanInterfaces();
+    MeasurementInterface *addCanInterface(CanInterfaceId canif);
+    CanInterfaceIdList getReferencedCanInterfaces();
 
     void addCanDb(pCanDb candb);
     QList<pCanDb> _canDbs;

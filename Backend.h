@@ -36,8 +36,11 @@ public:
 
     CanDbMessage *findDbMessage(const CanMessage &msg);
 
-    CanInterfaceList getInterfaceList();
-    QString getInterfaceName(const CanInterface &interface);
+    CanInterfaceIdList getInterfaceList();
+    CanDriver *getDriverById(CanInterfaceId id);
+    CanInterface *getInterfaceById(CanInterfaceId id);
+    QString getInterfaceName(CanInterfaceId id);
+    QString getDriverName(CanInterfaceId id);
 
 signals:
     void beginMeasurement();

@@ -3,8 +3,8 @@
 #include <driver/CanDriver.h>
 #include "SetupDialogTreeModel.h"
 
-SetupDialogTreeItem::SetupDialogTreeItem(item_type type, SetupDialogTreeItem *parent)
-  : setup(0), network(0), intf(0), candb(0), _type(type), _parent(parent)
+SetupDialogTreeItem::SetupDialogTreeItem(item_type type, Backend *backend, SetupDialogTreeItem *parent)
+  : setup(0), network(0), intf(0), candb(0), _backend(backend), _type(type), _parent(parent)
 {
 
 }
@@ -52,9 +52,9 @@ QVariant SetupDialogTreeItem::dataInterface(const QModelIndex &index) const
 {
     switch (index.column()) {
         case SetupDialogTreeModel::column_device:
-            return intf->getName();
+            return _backend->getInterfaceName(intf->canInterface());
         case SetupDialogTreeModel::column_driver:
-            return intf->getDriverName();
+            return _backend->getDriverName(intf->canInterface());
         case SetupDialogTreeModel::column_bitrate:
             return intf->bitrate();
         default:

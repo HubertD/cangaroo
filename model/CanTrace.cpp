@@ -3,11 +3,13 @@
 #include <QFile>
 #include <QTextStream>
 
+#include <Backend.h>
 #include <model/CanMessage.h>
 #include <driver/CanInterface.h>
 
-CanTrace::CanTrace(QObject *parent, int flushInterval)
+CanTrace::CanTrace(Backend &backend, QObject *parent, int flushInterval)
   : QObject(parent),
+    _backend(backend),
     _mutex(QMutex::Recursive)
 {
     clear();
@@ -85,7 +87,7 @@ void CanTrace::saveCanDump(QString filename)
             CanMessage *msg = &_data[i];
             QString line;
             line.append(QString().sprintf("(%.6f) ", msg->getFloatTimestamp()));
-            line.append(msg->getInterface()->getName());
+            line.append(_backend.getInterfaceName(msg->getInterfaceId()));
             if (msg->isExtended()) {
                 line.append(QString().sprintf(" %08X#", msg->getId()));
             } else {

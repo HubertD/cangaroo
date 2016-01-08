@@ -102,12 +102,12 @@ void CanMessage::setErrorFrame(const bool isErrorFrame) {
     }
 }
 
-CanInterface *CanMessage::getInterface() const
+CanInterfaceId CanMessage::getInterfaceId() const
 {
     return _interface;
 }
 
-void CanMessage::setInterface(CanInterface *interface)
+void CanMessage::setInterfaceId(CanInterfaceId interface)
 {
     _interface = interface;
 }

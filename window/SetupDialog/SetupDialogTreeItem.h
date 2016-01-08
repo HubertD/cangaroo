@@ -4,6 +4,7 @@
 #include <QList>
 #include <QVariant>
 
+#include <Backend.h>
 #include <model/MeasurementSetup.h>
 #include <model/MeasurementNetwork.h>
 #include <model/MeasurementInterface.h>
@@ -23,7 +24,7 @@ public:
     } item_type;
 
 public:
-    SetupDialogTreeItem(item_type type, SetupDialogTreeItem *parent=0);
+    SetupDialogTreeItem(item_type type, Backend *backend, SetupDialogTreeItem *parent=0);
     virtual ~SetupDialogTreeItem();
 
     MeasurementSetup *setup;
@@ -43,6 +44,7 @@ public:
     item_type getType();
 
 private:
+    Backend *_backend;
     item_type _type;
     SetupDialogTreeItem *_parent;
     QList<SetupDialogTreeItem*> _children;

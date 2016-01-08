@@ -3,6 +3,7 @@
 
 #include "SetupDialogTreeItem.h"
 
+#include <Backend.h>
 #include <QAbstractItemModel>
 #include <model/MeasurementSetup.h>
 
@@ -21,7 +22,7 @@ public:
     };
 
 public:
-    explicit SetupDialogTreeModel(QObject *parent=0);
+    explicit SetupDialogTreeModel(Backend *backend, QObject *parent=0);
     virtual ~SetupDialogTreeModel();
 
     QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
@@ -41,10 +42,11 @@ public:
     SetupDialogTreeItem *addCanDb(const QModelIndex &parent, pCanDb db);
     void deleteCanDb(const QModelIndex &index);
 
-    SetupDialogTreeItem *addInterface(const QModelIndex &parent, pCanInterface &interface);
+    SetupDialogTreeItem *addInterface(const QModelIndex &parent, CanInterfaceId &interface);
     void deleteInterface(const QModelIndex &index);
 
 private:
+    Backend *_backend;
     SetupDialogTreeItem *_rootItem;
     SetupDialogTreeItem *itemOrRoot(const QModelIndex &index) const;
 

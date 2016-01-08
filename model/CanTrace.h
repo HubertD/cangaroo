@@ -11,13 +11,14 @@
 class CanInterface;
 class CanDbMessage;
 class MeasurementSetup;
+class Backend;
 
 class CanTrace : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit CanTrace(QObject *parent, int flushInterval);
+    explicit CanTrace(Backend &backend, QObject *parent, int flushInterval);
 
     unsigned long size();
     void clear();
@@ -43,12 +44,15 @@ private:
         pool_chunk_size = 1024
     };
 
+    Backend &_backend;
+
     QVector<CanMessage> _data;
     int _dataRowsUsed;
     int _newRows;
 
     QMutex _mutex;
     QTimer _flushTimer;
+
 
 };
 

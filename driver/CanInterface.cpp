@@ -7,6 +7,8 @@
 
 #include "CanInterface.h"
 
+#include <QList>
+
 CanInterface::CanInterface(CanDriver *driver)
   : _id(-1), _driver(driver)
 {
@@ -32,12 +34,12 @@ void CanInterface::open() {
 void CanInterface::close() {
 }
 
-uint16_t CanInterface::getId()
+uint8_t CanInterface::getId()
 {
     return _id;
 }
 
-void CanInterface::setId(uint16_t id)
+void CanInterface::setId(uint8_t id)
 {
     _id = id;
 }

@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QTreeWidget>
 
+#include <Backend.h>
 #include <parser/dbc/DbcParser.h>
 #include <model/MeasurementSetup.h>
 #include <driver/CanInterface.h>
@@ -31,7 +32,7 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     _actionAddCanDb = new QAction("Add...", this);
     _actionDeleteCanDb = new QAction("Delete", this);
 
-    model = new SetupDialogTreeModel(this);
+    model = new SetupDialogTreeModel(_backend, this);
 
     ui->treeView->setModel(model);
     ui->interfacesTreeView->setModel(model);
@@ -119,12 +120,15 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
     }
 
     if (item->intf) {
-        ui->laInterfaceDriver->setText(item->intf->getDriverName());
-        ui->laInterfaceName->setText(item->intf->getName());
+        ui->laInterfaceDriver->setText(_backend->getDriverName(item->intf->canInterface()));
+        ui->laInterfaceName->setText(_backend->getInterfaceName(item->intf->canInterface()));
         int bitrate = item->intf->bitrate();
         ui->cbInterfaceBitrate->clear();
-        foreach (int br, item->intf->getAvailableBitrates()) {
-            ui->cbInterfaceBitrate->addItem(QString::number(br));
+        CanInterface *intf = _backend->getInterfaceById(item->intf->canInterface());
+        if (intf) {
+            foreach (int br, intf->getAvailableBitrates()) {
+                ui->cbInterfaceBitrate->addItem(QString::number(br));
+            }
         }
 
         ui->cbInterfaceBitrate->setCurrentText(QString::number(bitrate));
@@ -228,9 +232,9 @@ void SetupDialog::cbInterfaceBitrateChanged(QString value)
 void SetupDialog::addInterface(const QModelIndex &parent)
 {
     SelectCanInterfacesDialog dlg(0);
-    CanInterfaceList list;
+    CanInterfaceIdList list;
     if (dlg.selectInterfaces(*_backend, list, _currentNetwork->getReferencedCanInterfaces())) {
-        foreach (pCanInterface intf, list) {
+        foreach (CanInterfaceId intf, list) {
             model->addInterface(parent, intf);
         }
     }
@@ -259,6 +263,7 @@ void SetupDialog::on_btRemoveInterface_clicked()
 
 void SetupDialog::showInterfacePage(SetupDialogTreeItem *item)
 {
+    (void) item;
     ui->stackedWidget->setCurrentWidget(ui->socketCanInterfacePage);
 }
 

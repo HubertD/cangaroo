@@ -6,7 +6,7 @@
 #include "model/CanMessage.h"
 #include "CanInterface.h"
 
-CanListener::CanListener(QObject *parent, pCanInterface intf)
+CanListener::CanListener(QObject *parent, CanInterface *intf)
   : QObject(parent),
     _intf(intf),
     _shouldBeRunning(true)
@@ -19,7 +19,12 @@ CanListener::~CanListener()
     delete _thread;
 }
 
-pCanInterface CanListener::getInterface()
+CanInterfaceId CanListener::getInterfaceId()
+{
+    return _intf->getId();
+}
+
+CanInterface *CanListener::getInterface()
 {
     return _intf;
 }

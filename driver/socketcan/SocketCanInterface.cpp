@@ -132,7 +132,7 @@ bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
         msg.setExtended((frame.can_id & CAN_EFF_FLAG)!=0);
         msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
         msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);
-        msg.setInterface(this);
+        msg.setInterfaceId(getId());
 
         uint8_t len = frame.can_dlc;
         if (len>8) { len = 8; }

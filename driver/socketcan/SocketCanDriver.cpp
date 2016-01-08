@@ -24,10 +24,6 @@ SocketCanDriver::SocketCanDriver()
 SocketCanDriver::~SocketCanDriver() {
 }
 
-CanInterfaceList SocketCanDriver::getInterfaceList() {
-	return _interfaces;
-}
-
 void SocketCanDriver::update() {
 	int fd;
 	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
@@ -152,14 +148,15 @@ QString SocketCanDriver::getName() {
 
 void SocketCanDriver::createOrUpdateInterface(int index, QString name) {
 
-    foreach (pCanInterface intf, _interfaces) {
-        QSharedPointer<SocketCanInterface> scif = qSharedPointerCast<SocketCanInterface>(intf);
+    foreach (CanInterface *intf, getInterfaces()) {
+        SocketCanInterface *scif = dynamic_cast<SocketCanInterface*>(intf);
 		if (scif->getIfIndex() == index) {
 			scif->setName(name);
 			return;
 		}
 	}
 
+
     SocketCanInterface *scif = new SocketCanInterface(this, index, name);
-    _interfaces.push_back(pCanInterface(scif));
+    addInterface(scif);
 }

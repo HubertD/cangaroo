@@ -90,7 +90,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
             return (intervalD==0) ? "" : QString().sprintf("%.04f", intervalD);
 
         case column_channel:
-            return backend()->getInterfaceName(*msg->getInterface());
+            return backend()->getInterfaceName(msg->getInterfaceId());
 
         case column_direction:
             return "rx";

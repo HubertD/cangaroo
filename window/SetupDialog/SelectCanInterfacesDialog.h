@@ -20,7 +20,7 @@ public:
     explicit SelectCanInterfacesDialog(QWidget *parent = 0);
     ~SelectCanInterfacesDialog();
 
-    bool selectInterfaces(Backend &backend, CanInterfaceList &selectedInterfaces, const CanInterfaceList &excludeInterfaces);
+    bool selectInterfaces(Backend &backend, CanInterfaceIdList &selectedInterfaces, const CanInterfaceIdList &excludeInterfaces);
 
 private:
     Ui::SelectCanInterfacesDialog *ui;

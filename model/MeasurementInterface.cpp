@@ -18,12 +18,12 @@ void MeasurementInterface::setBitrate(int bitrate)
     _bitrate = bitrate;
 }
 
-pCanInterface MeasurementInterface::canInterface() const
+CanInterfaceId MeasurementInterface::canInterface() const
 {
     return _canif;
 }
 
-void MeasurementInterface::setCanInterface(const pCanInterface &canif)
+void MeasurementInterface::setCanInterface(CanInterfaceId canif)
 {
     _canif = canif;
 }
@@ -34,29 +34,3 @@ void MeasurementInterface::cloneFrom(MeasurementInterface *origin)
     _bitrate = origin->_bitrate;
 }
 
-QString MeasurementInterface::getDriverName()
-{
-    if (_canif) {
-        return _canif->getDriver()->getName();
-    } else {
-        return "";
-    }
-}
-
-QString MeasurementInterface::getName()
-{
-    if (_canif) {
-        return _canif->getName();
-    } else {
-        return "";
-    }
-}
-
-QList<int> MeasurementInterface::getAvailableBitrates()
-{
-    if (_canif) {
-        return _canif->getAvailableBitrates();
-    } else {
-        return QList<int>();
-    }
-}

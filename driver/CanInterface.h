@@ -9,7 +9,6 @@
 #define BASE_CANINTERFACE_H_
 
 #include <QString>
-#include <QSharedPointer>
 #include <stdint.h>
 
 class CanDriver;
@@ -32,14 +31,12 @@ public:
     virtual void sendMessage(const CanMessage &msg) = 0;
     virtual bool readMessage(CanMessage &msg, unsigned int timeout_ms) = 0;
 
-    uint16_t getId();
-    void setId(uint16_t id);
+    uint8_t getId();
+    void setId(uint8_t id);
 
 private:
-    uint16_t _id;
+    uint8_t _id;
     CanDriver *_driver;
 };
-
-typedef QSharedPointer<CanInterface> pCanInterface;
 
 #endif /* BASE_CANINTERFACE_H_ */

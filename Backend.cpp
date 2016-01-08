@@ -17,7 +17,7 @@ Backend::Backend(QObject *parent)
     qRegisterMetaType<CanMessage>("CanMessage");
 
     _setup = createDefaultSetup();
-    _trace = new CanTrace(this, 100);
+    _trace = new CanTrace(*this, this, 100);
 }
 
 Backend::~Backend()
@@ -28,6 +28,7 @@ Backend::~Backend()
 
 void Backend::addCanDriver(CanDriver *driver)
 {
+    driver->setId(_drivers.size());
     _drivers.append(driver);
 }
 
@@ -39,8 +40,7 @@ bool Backend::startMeasurement()
         i++;
         foreach (MeasurementInterface *mi, network->interfaces()) {
 
-            pCanInterface intf = mi->canInterface();
-            intf->setId(i);
+            CanInterface *intf = getInterfaceById(mi->canInterface());
             intf->open();
 
             qDebug() << "listening on interface" << intf->getName();
@@ -70,7 +70,7 @@ bool Backend::stopMeasurement()
 
     foreach (CanListener *listener, _listeners) {
         listener->waitFinish();
-        qDebug() << "closing interface" << listener->getInterface()->getName();
+        qDebug() << "closing interface" << getInterfaceName(listener->getInterfaceId());
         listener->getInterface()->close();
     }
 
@@ -98,7 +98,7 @@ MeasurementSetup *Backend::createDefaultSetup()
 
     foreach (CanDriver *driver, _drivers) {
         driver->update();
-        foreach (pCanInterface intf, driver->getInterfaceList()) {
+        foreach (CanInterfaceId intf, driver->getInterfaceIds()) {
             MeasurementNetwork *network = defaultSetup->createNetwork();
             network->setName(QString().sprintf("Network %d", i++));
 
@@ -144,18 +144,45 @@ CanDbMessage *Backend::findDbMessage(const CanMessage &msg)
     return _setup->findDbMessage(msg);
 }
 
-CanInterfaceList Backend::getInterfaceList()
+CanInterfaceIdList Backend::getInterfaceList()
 {
-    CanInterfaceList result;
+    CanInterfaceIdList result;
     foreach (CanDriver *driver, _drivers) {
-        foreach (pCanInterface intf, driver->getInterfaceList()) {
-            result.append(intf);
+        foreach (CanInterfaceId id, driver->getInterfaceIds()) {
+            result.append(id);
         }
     }
     return result;
 }
 
-QString Backend::getInterfaceName(const CanInterface &interface)
+CanDriver *Backend::getDriverById(CanInterfaceId id)
 {
-    return _setup->getInterfaceName(interface);
+    CanDriver *driver = _drivers.value((id>>8) & 0xFF);
+    if (!driver) {
+        qWarning() << "unable to get driver for interface id" << id << ", this should never happen.";
+    }
+    return driver;
+}
+
+CanInterface *Backend::getInterfaceById(CanInterfaceId id)
+{
+    CanDriver *driver = getDriverById(id);
+    return driver ? driver->getInterfaceById(id) : 0;
+}
+
+QString Backend::getInterfaceName(CanInterfaceId id)
+{
+    CanInterface *intf = getInterfaceById(id);
+    if (intf) {
+        return intf->getName();
+    } else {
+        qWarning() << "trying to get name from unknown interface id" << id << ", this should never happen.";
+        return "";
+    }
+}
+
+QString Backend::getDriverName(CanInterfaceId id)
+{
+    CanDriver *driver = getDriverById(id);
+    return driver ? driver->getName() : "";
 }

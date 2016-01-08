@@ -31,7 +31,7 @@ QList<MeasurementInterface *> MeasurementNetwork::interfaces()
     return _interfaces;
 }
 
-MeasurementInterface *MeasurementNetwork::addCanInterface(pCanInterface canif)
+MeasurementInterface *MeasurementNetwork::addCanInterface(CanInterfaceId canif)
 {
     MeasurementInterface *mi = new MeasurementInterface();
     mi->setCanInterface(canif);
@@ -39,9 +39,9 @@ MeasurementInterface *MeasurementNetwork::addCanInterface(pCanInterface canif)
     return mi;
 }
 
-CanInterfaceList MeasurementNetwork::getReferencedCanInterfaces()
+CanInterfaceIdList MeasurementNetwork::getReferencedCanInterfaces()
 {
-    CanInterfaceList list;
+    CanInterfaceIdList list;
     foreach (MeasurementInterface *mi, _interfaces) {
         list << mi->canInterface();
     }

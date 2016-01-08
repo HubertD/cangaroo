@@ -29,11 +29,10 @@ public:
     virtual void sendMessage(const CanMessage &msg);
     virtual bool readMessage(CanMessage &msg, unsigned int timeout_ms);
 
-	int getIfIndex();
-
+    int getIfIndex();
 
 private:
-	int _idx;
+    int _idx;
 	int _fd;
     QString _name;
 };

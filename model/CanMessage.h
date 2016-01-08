@@ -11,8 +11,7 @@
 #include <sys/time.h>
 
 #include <QString>
-
-class CanInterface;
+#include <driver/CanDriver.h>
 
 class CanMessage {
 public:
@@ -36,8 +35,8 @@ public:
 	bool isErrorFrame() const;
 	void setErrorFrame(const bool isErrorFrame);
 
-    CanInterface *getInterface() const;
-    void setInterface(CanInterface *interface);
+    CanInterfaceId getInterfaceId() const;
+    void setInterfaceId(CanInterfaceId interface);
 
 	uint8_t getLength() const;
 	void setLength(const uint8_t dlc);
@@ -68,13 +67,13 @@ public:
 private:
 	uint32_t _raw_id;
     uint8_t _dlc;
-	union {
+    CanInterfaceId _interface;
+    union {
 		uint8_t _u8[8];
 		uint16_t _u16[4];
 		uint32_t _u32[2];
 		uint64_t _u64;
 	};
-    CanInterface *_interface;
     struct timeval _timestamp;
 
 };
