@@ -80,7 +80,7 @@
     <property name="title">
      <string>&amp;Trace</string>
     </property>
-    <addaction name="action_Clear"/>
+    <addaction name="action_TraceClear"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Trace_to_file"/>
    </widget>
@@ -189,7 +189,7 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="action_Clear">
+  <action name="action_TraceClear">
    <property name="text">
     <string>&amp;Clear</string>
    </property>

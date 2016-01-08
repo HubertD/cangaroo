@@ -8,6 +8,8 @@ LinearTraceViewModel::LinearTraceViewModel(Backend &backend)
 {
     connect(backend.getTrace(), SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
     connect(backend.getTrace(), SIGNAL(afterAppend(int)), this, SLOT(afterAppend(int)));
+    connect(backend.getTrace(), SIGNAL(beforeClear()), this, SLOT(beforeClear()));
+    connect(backend.getTrace(), SIGNAL(afterClear()), this, SLOT(afterClear()));
 }
 
 QModelIndex LinearTraceViewModel::index(int row, int column, const QModelIndex &parent) const
@@ -69,6 +71,16 @@ void LinearTraceViewModel::afterAppend(int num_messages)
 {
     (void) num_messages;
     endInsertRows();
+}
+
+void LinearTraceViewModel::beforeClear()
+{
+    beginResetModel();
+}
+
+void LinearTraceViewModel::afterClear()
+{
+    endResetModel();
 }
 
 QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const

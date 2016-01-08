@@ -46,6 +46,9 @@ public slots:
 
     void updateMeasurementActions();
 
+private slots:
+    void on_action_TraceClear_triggered();
+
 private:
     Ui::MainWindow *ui;
 

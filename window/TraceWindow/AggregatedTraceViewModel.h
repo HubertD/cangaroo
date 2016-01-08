@@ -32,10 +32,6 @@ public:
     virtual QModelIndex parent(const QModelIndex &child) const;
     virtual int rowCount(const QModelIndex &parent) const;
 
-public slots:
-    void messageReceived(const CanMessage &msg);
-    void onUpdateTimer();
-
 private:
     CanIdMap _map;
     AggregatedTraceViewItem *_rootItem;
@@ -54,6 +50,11 @@ protected:
 private slots:
     void createItem(const CanMessage &msg);
     void updateItem(const CanMessage &msg);
+    void onUpdateTimer();
+
+    void messageReceived(const CanMessage &msg);
+    void beforeClear();
+    void afterClear();
 };
 
 #endif // AGGREGATEDTRACEVIEWMODEL_H

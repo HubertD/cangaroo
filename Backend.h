@@ -30,6 +30,7 @@ public:
     void saveCanDump(QString filename);
 
     CanTrace *getTrace();
+    void clearTrace();
 
     CanInterfaceList getInterfaceList();
 

@@ -130,6 +130,11 @@ CanTrace *Backend::getTrace()
     return _trace;
 }
 
+void Backend::clearTrace()
+{
+    _trace->clear();
+}
+
 CanInterfaceList Backend::getInterfaceList()
 {
     CanInterfaceList result;

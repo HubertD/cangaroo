@@ -21,9 +21,11 @@ public:
     virtual int columnCount(const QModelIndex &parent) const;
     virtual bool hasChildren(const QModelIndex &parent) const;
 
-public slots:
+private slots:
     void beforeAppend(int num_messages);
     void afterAppend(int num_messages);
+    void beforeClear();
+    void afterClear();
 
 private:
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;

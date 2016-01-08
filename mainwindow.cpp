@@ -148,3 +148,8 @@ void MainWindow::saveTraceToFile()
     }
 }
 
+
+void MainWindow::on_action_TraceClear_triggered()
+{
+    backend.clearTrace();
+}

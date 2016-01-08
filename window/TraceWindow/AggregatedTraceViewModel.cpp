@@ -13,6 +13,8 @@ AggregatedTraceViewModel::AggregatedTraceViewModel(Backend &backend)
     _updateTimer = new QTimer(this);
     connect(_updateTimer, SIGNAL(timeout()), this, SLOT(onUpdateTimer()));
     connect(backend.getTrace(), SIGNAL(messageEnqueued(CanMessage)), this, SLOT(messageReceived(CanMessage)));
+    connect(backend.getTrace(), SIGNAL(beforeClear()), this, SLOT(beforeClear()));
+    connect(backend.getTrace(), SIGNAL(afterClear()), this, SLOT(afterClear()));
 
     _updateTimer->setSingleShot(true);
 }
@@ -90,6 +92,19 @@ void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
     if (!_updateTimer->isActive()) {
         _updateTimer->start(100);
     }
+}
+
+void AggregatedTraceViewModel::beforeClear()
+{
+    beginResetModel();
+    delete _rootItem;
+    _map.clear();
+    _rootItem = new AggregatedTraceViewItem(0);
+}
+
+void AggregatedTraceViewModel::afterClear()
+{
+    endResetModel();
 }
 
 AggregatedTraceViewModel::unique_key_t AggregatedTraceViewModel::makeUniqueKey(const CanMessage &msg)
