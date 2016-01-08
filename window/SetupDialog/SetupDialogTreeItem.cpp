@@ -66,11 +66,11 @@ QVariant SetupDialogTreeItem::dataCanDb(const QModelIndex &index) const
 {
     switch (index.column()) {
         case SetupDialogTreeModel::column_device:
-            return candb->getBaseFilename();
+            return candb->getFileName();
         case SetupDialogTreeModel::column_filename:
-            return candb->getFilename();
+            return candb->getFileName();
         case SetupDialogTreeModel::column_path:
-            return candb->getFilename();
+            return candb->getDirectory();
         default:
             return QVariant();
     }
@@ -86,7 +86,7 @@ QVariant SetupDialogTreeItem::dataDisplayRole(const QModelIndex &index) const
         case type_candb_root: return "Can Databases";
         case type_candb: return dataCanDb(index);
     }
-candb->getBaseFilename();
+candb->getFileName();
     return QVariant();
 }
 

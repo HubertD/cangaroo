@@ -21,9 +21,10 @@ class CanDb
     public:
         CanDb();
 
-        void setFilename(QString filename) { _filename = filename; }
-        QString getFilename() { return _filename; }
-        QString getBaseFilename();
+        void setPath(QString path) { _path = path; }
+        QString getPath() { return _path; }
+        QString getFileName();
+        QString getDirectory();
 
         void setVersion(QString version) { _version = version; }
         QString getVersion() { return _version; }
@@ -37,7 +38,7 @@ class CanDb
         void setComment(const QString &comment);
 
 private:
-        QString _filename;
+        QString _path;
         QString _version;
         QString _comment;
         CanDbNodeMap _nodes;

@@ -6,10 +6,16 @@ CanDb::CanDb()
 
 }
 
-QString CanDb::getBaseFilename()
+QString CanDb::getFileName()
 {
-    QFileInfo fi(getFilename());
-    return fi.baseName();
+    QFileInfo fi(getPath());
+    return fi.fileName();
+}
+
+QString CanDb::getDirectory()
+{
+    QFileInfo fi(getPath());
+    return fi.absolutePath();
 }
 
 CanDbNode *CanDb::getOrCreateNode(QString node_name)

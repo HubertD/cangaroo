@@ -23,7 +23,7 @@ bool DbcParser::parseFile(QFile *file, CanDb &candb)
         return false;
     }
 
-    candb.setFilename(file->fileName());
+    candb.setPath(file->fileName());
     return parse(candb, tokens);
 }
 
