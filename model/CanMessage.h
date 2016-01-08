@@ -19,6 +19,7 @@ public:
 	CanMessage();
 	CanMessage(uint32_t can_id);
     CanMessage(const CanMessage &msg);
+    void cloneFrom(const CanMessage &msg);
 
 	uint32_t getRawId() const;
 	void setRawId(const uint32_t raw_id);

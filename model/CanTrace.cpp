@@ -10,9 +10,11 @@
 CanTrace::CanTrace(QObject *parent, MeasurementSetup *setup, int flushInterval)
   : QObject(parent),
     _setup(setup),
+    _poolUsageCounter(0),
     _dataMutex(QMutex::Recursive),
     _queueMutex(QMutex::Recursive)
 {
+    _pool.resize(pool_chunk_size);
     _flushTimer.setSingleShot(true);
     _flushTimer.setInterval(flushInterval);
     connect(&_flushTimer, SIGNAL(timeout()), this, SLOT(flushQueue()));
@@ -28,9 +30,12 @@ void CanTrace::clear()
 {
     QMutexLocker dataLocker(&_dataMutex);
     QMutexLocker queueLocker(&_queueMutex);
+    QMutexLocker poolLocker(&_poolMutex);
     emit beforeClear();
     _data.clear();
     _queue.clear();
+    _pool.resize(pool_chunk_size);
+    _poolUsageCounter = 0;
     emit afterClear();
 }
 
@@ -85,8 +90,11 @@ void CanTrace::saveCanDump(QString filename)
 
 void CanTrace::enqueueMessage(const CanMessage &msg, bool more_to_follow)
 {
+    CanMessage *mymsg = getMessageObjectFromPool();
+    mymsg->cloneFrom(msg);
+
     _queueMutex.lock();
-    _queue.push_back(new CanMessage(msg));
+    _queue.push_back(mymsg);
     _queueMutex.unlock();
 
     if (!more_to_follow) {
@@ -114,4 +122,13 @@ void CanTrace::flushQueue()
         emit afterAppend(num_msg);
     }
 
+}
+
+CanMessage *CanTrace::getMessageObjectFromPool()
+{
+    QMutexLocker locker(&_poolMutex);
+    if (_poolUsageCounter>=_pool.size()) {
+        _pool.resize(_pool.size() + pool_chunk_size);
+    }
+    return &_pool[_poolUsageCounter++];
 }

@@ -28,8 +28,17 @@ CanMessage::CanMessage(uint32_t can_id)
 }
 
 CanMessage::CanMessage(const CanMessage &msg)
-  : _raw_id(msg._raw_id), _dlc(msg._dlc), _u64(msg._u64), _interface(msg._interface), _timestamp(msg._timestamp)
 {
+    cloneFrom(msg);
+}
+
+void CanMessage::cloneFrom(const CanMessage &msg)
+{
+    _raw_id = msg._raw_id;
+    _dlc = msg._dlc;
+    _u64 = msg._u64;
+    _interface = msg._interface;
+    _timestamp = msg._timestamp;
 }
 
 

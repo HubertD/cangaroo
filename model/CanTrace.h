@@ -6,8 +6,9 @@
 #include <QTimer>
 #include <QVector>
 
+#include "CanMessage.h"
+
 class CanInterface;
-class CanMessage;
 class CanDbMessage;
 class MeasurementSetup;
 
@@ -40,13 +41,22 @@ public slots:
     void flushQueue();
 
 private:
+    enum {
+        pool_chunk_size = 1024
+    };
+
     MeasurementSetup *_setup;
     QVector<CanMessage*> _data;
     QVector<CanMessage*> _queue;
+    QVector<CanMessage> _pool;
+    int _poolUsageCounter;
 
     QMutex _dataMutex;
     QMutex _queueMutex;
+    QMutex _poolMutex;
     QTimer _flushTimer;
+
+    CanMessage *getMessageObjectFromPool();
 
 };
 
