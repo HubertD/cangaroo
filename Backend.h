@@ -9,7 +9,6 @@ class MeasurementSetup;
 class MeasurementNetwork;
 class CanTrace;
 class CanListener;
-class SocketCanDriver;
 
 
 class Backend : public QObject
@@ -18,6 +17,8 @@ class Backend : public QObject
 public:
     explicit Backend(QObject *parent = 0);
     virtual ~Backend();
+
+    void addCanDriver(CanDriver *driver);
 
     bool startMeasurement();
     bool stopMeasurement();
@@ -42,10 +43,10 @@ public slots:
 
 private:
     bool _measurementRunning;
+    QList<CanDriver*> _drivers;
     MeasurementSetup *_setup;
     CanTrace *_trace;
     QList<CanListener*> _listeners;
-    SocketCanDriver *_socketcan;
 };
 
 #endif // BACKEND_H

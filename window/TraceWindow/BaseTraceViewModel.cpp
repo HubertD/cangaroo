@@ -88,7 +88,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
             return _trace->getInterfaceName(*msg->getInterface());
 
         case column_direction:
-            return (msg->getId() % 7)==0 ? "tx" : "rx";
+            return "rx";
 
         case column_canid:
             return msg->getIdString();

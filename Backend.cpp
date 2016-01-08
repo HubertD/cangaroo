@@ -9,7 +9,6 @@
 #include <driver/CanDriver.h>
 #include <driver/CanInterface.h>
 #include <driver/CanListener.h>
-#include <driver/socketcan/SocketCanDriver.h>
 
 Backend::Backend(QObject *parent)
   : QObject(parent),
@@ -17,7 +16,6 @@ Backend::Backend(QObject *parent)
 {
     qRegisterMetaType<CanMessage>("CanMessage");
 
-    _socketcan = new SocketCanDriver();
     _setup = createDefaultSetup();
     _trace = new CanTrace(this, _setup, 100);
 }
@@ -26,7 +24,11 @@ Backend::~Backend()
 {
     delete _trace;
     delete _setup;
-    delete _socketcan;
+}
+
+void Backend::addCanDriver(CanDriver *driver)
+{
+    _drivers.append(driver);
 }
 
 bool Backend::startMeasurement()
@@ -90,18 +92,21 @@ bool Backend::isMeasurementRunning()
 
 MeasurementSetup *Backend::createDefaultSetup()
 {
-    _socketcan->update();
 
     MeasurementSetup *defaultSetup = new MeasurementSetup(this);
     int i = 1;
-    foreach (pCanInterface intf, _socketcan->getInterfaceList()) {
-        MeasurementNetwork *network = defaultSetup->createNetwork();
-        network->setName(QString().sprintf("Network %d", i++));
 
-        MeasurementInterface *mi = new MeasurementInterface();
-        mi->setCanInterface(intf);
-        mi->setBitrate(500000);
-        network->addInterface(mi);
+    foreach (CanDriver *driver, _drivers) {
+        driver->update();
+        foreach (pCanInterface intf, driver->getInterfaceList()) {
+            MeasurementNetwork *network = defaultSetup->createNetwork();
+            network->setName(QString().sprintf("Network %d", i++));
+
+            MeasurementInterface *mi = new MeasurementInterface();
+            mi->setCanInterface(intf);
+            mi->setBitrate(500000);
+            network->addInterface(mi);
+        }
     }
 
     return defaultSetup;
@@ -138,8 +143,10 @@ void Backend::clearTrace()
 CanInterfaceList Backend::getInterfaceList()
 {
     CanInterfaceList result;
-    foreach (pCanInterface intf, _socketcan->getInterfaceList()) {
-        result.append(intf);
+    foreach (CanDriver *driver, _drivers) {
+        foreach (pCanInterface intf, driver->getInterfaceList()) {
+            result.append(intf);
+        }
     }
     return result;
 }

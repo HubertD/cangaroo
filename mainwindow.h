@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QList>
 #include <Backend.h>
+#include <driver/socketcan/SocketCanDriver.h>
 
 class Logger;
 class TraceWindow;
@@ -54,6 +55,7 @@ private:
 
     Backend backend;
     Logger *_logger;
+    SocketCanDriver _socketcan;
 
     QSignalMapper *windowMapper;
 

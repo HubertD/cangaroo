@@ -48,6 +48,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
+    backend.addCanDriver(&_socketcan);
     backend.setSetup(backend.createDefaultSetup());
 
     QMdiSubWindow *logWindow = createLogWindow();
@@ -55,7 +56,6 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
 
     QMdiSubWindow *traceViewWindow = createTraceWindow();
     traceViewWindow->setGeometry(0, 0, 1000, 500);
-
 
     /*QMdiSubWindow *graphViewWindow = createGraphView();
     graphViewWindow->setGeometry(0, 500, 1000, 200);
