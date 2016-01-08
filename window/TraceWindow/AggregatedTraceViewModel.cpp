@@ -59,20 +59,20 @@ void AggregatedTraceViewModel::updateItem(const CanMessage &msg)
 void AggregatedTraceViewModel::onUpdateTimer()
 {
 
-    if (_pendingMessageUpdates.length()) {
-        foreach (CanMessage msg, _pendingMessageUpdates) {
-            updateItem(msg);
-        }
-        _pendingMessageUpdates.clear();
-    }
-
-    if (_pendingMessageInserts.length()) {
-        beginInsertRows(QModelIndex(), _rootItem->childCount(), _rootItem->childCount()+_pendingMessageInserts.length()-1);
+    if (!_pendingMessageInserts.isEmpty()) {
+        beginInsertRows(QModelIndex(), _rootItem->childCount(), _rootItem->childCount()+_pendingMessageInserts.size()-1);
         foreach (CanMessage msg, _pendingMessageInserts) {
             createItem(msg);
         }
         endInsertRows();
         _pendingMessageInserts.clear();
+    }
+
+    if (!_pendingMessageUpdates.isEmpty()) {
+        foreach (CanMessage msg, _pendingMessageUpdates) {
+            updateItem(msg);
+        }
+        _pendingMessageUpdates.clear();
     }
 
     if (_rootItem->childCount()>0) {
@@ -83,10 +83,11 @@ void AggregatedTraceViewModel::onUpdateTimer()
 
 void AggregatedTraceViewModel::messageReceived(const CanMessage &msg)
 {
-    if (_map.contains(makeUniqueKey(msg))) {
+    unique_key_t key = makeUniqueKey(msg);
+    if (_map.contains(key) || _pendingMessageInserts.contains(key)) {
         _pendingMessageUpdates.append(msg);
     } else {
-        _pendingMessageInserts.append(msg);
+        _pendingMessageInserts[key] = msg;
     }
 
     if (!_updateTimer->isActive()) {
@@ -107,7 +108,7 @@ void AggregatedTraceViewModel::afterClear()
     endResetModel();
 }
 
-AggregatedTraceViewModel::unique_key_t AggregatedTraceViewModel::makeUniqueKey(const CanMessage &msg)
+AggregatedTraceViewModel::unique_key_t AggregatedTraceViewModel::makeUniqueKey(const CanMessage &msg) const
 {
     return ((uint64_t)msg.getInterfaceId() << 32) | msg.getRawId();
 }

@@ -37,9 +37,9 @@ private:
     AggregatedTraceViewItem *_rootItem;
     QTimer *_updateTimer;
     QList<CanMessage> _pendingMessageUpdates;
-    QList<CanMessage> _pendingMessageInserts;
+    QMap<unique_key_t, CanMessage> _pendingMessageInserts;
 
-    unique_key_t makeUniqueKey(const CanMessage &msg);
+    unique_key_t makeUniqueKey(const CanMessage &msg) const;
     void createItem(const CanMessage &msg, AggregatedTraceViewItem *item, unique_key_t key);
     double getTimeDiff(const timeval t1, const timeval t2) const;
     
