@@ -23,7 +23,7 @@ public:
 
 private slots:
     void beforeAppend(int num_messages);
-    void afterAppend(int num_messages);
+    void afterAppend();
     void beforeClear();
     void afterClear();
 

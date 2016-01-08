@@ -5,16 +5,12 @@
 
 #include <model/CanMessage.h>
 #include <driver/CanInterface.h>
-#include <model/MeasurementSetup.h>
 
-CanTrace::CanTrace(QObject *parent, MeasurementSetup *setup, int flushInterval)
+CanTrace::CanTrace(QObject *parent, int flushInterval)
   : QObject(parent),
-    _setup(setup),
-    _poolUsageCounter(0),
-    _dataMutex(QMutex::Recursive),
-    _queueMutex(QMutex::Recursive)
+    _mutex(QMutex::Recursive)
 {
-    _pool.resize(pool_chunk_size);
+    clear();
     _flushTimer.setSingleShot(true);
     _flushTimer.setInterval(flushInterval);
     connect(&_flushTimer, SIGNAL(timeout()), this, SLOT(flushQueue()));
@@ -22,55 +18,71 @@ CanTrace::CanTrace(QObject *parent, MeasurementSetup *setup, int flushInterval)
 
 unsigned long CanTrace::size()
 {
-    QMutexLocker dataLocker(&_dataMutex);
-    return _data.size();
+    QMutexLocker locker(&_mutex);
+    return _dataRowsUsed;
 }
 
 void CanTrace::clear()
 {
-    QMutexLocker dataLocker(&_dataMutex);
-    QMutexLocker queueLocker(&_queueMutex);
-    QMutexLocker poolLocker(&_poolMutex);
+    QMutexLocker locker(&_mutex);
     emit beforeClear();
-    _data.clear();
-    _queue.clear();
-    _pool.resize(pool_chunk_size);
-    _poolUsageCounter = 0;
+    _data.resize(pool_chunk_size);
+    _dataRowsUsed = 0;
+    _newRows = 0;
     emit afterClear();
-}
-
-void CanTrace::setSetup(MeasurementSetup *setup)
-{
-    _setup = setup;
 }
 
 const CanMessage *CanTrace::getMessage(unsigned long idx)
 {
-    QMutexLocker dataLocker(&_dataMutex);
-    if (idx >= _data.size()) {
+    QMutexLocker locker(&_mutex);
+    if (idx >= size()) {
         return 0;
     } else {
-        return _data[idx];
+        return &_data[idx];
     }
 }
 
-CanDbMessage *CanTrace::findDbMessage(const CanMessage &msg)
+void CanTrace::enqueueMessage(const CanMessage &msg, bool more_to_follow)
 {
-    return _setup->findDbMessage(msg);
+    QMutexLocker locker(&_mutex);
+
+    int idx = size() + _newRows;
+    if (idx>=_data.size()) {
+        _data.resize(_data.size() + pool_chunk_size);
+    }
+
+    _data[idx].cloneFrom(msg);
+    _newRows++;
+
+    if (!more_to_follow) {
+        if (!_flushTimer.isActive()) {
+            _flushTimer.start();
+        }
+    }
+
+    emit messageEnqueued(_data[idx]);
 }
 
-QString CanTrace::getInterfaceName(const CanInterface &interface)
+void CanTrace::flushQueue()
 {
-    return _setup->getInterfaceName(interface);
+    QMutexLocker locker(&_mutex);
+    if (_newRows) {
+        emit beforeAppend(_newRows);
+        _dataRowsUsed += _newRows;
+        _newRows = 0;
+        emit afterAppend();
+    }
+
 }
 
 void CanTrace::saveCanDump(QString filename)
 {
     QFile file(filename);
     if (file.open(QIODevice::ReadWrite)) {
+        QMutexLocker locker(&_mutex);
         QTextStream stream(&file);
-        foreach (CanMessage *msg, _data) {
-
+        for (unsigned int i=0; i<size(); i++) {
+            CanMessage *msg = &_data[i];
             QString line;
             line.append(QString().sprintf("(%.6f) ", msg->getFloatTimestamp()));
             line.append(msg->getInterface()->getName());
@@ -86,49 +98,4 @@ void CanTrace::saveCanDump(QString filename)
         }
         file.close();
     }
-}
-
-void CanTrace::enqueueMessage(const CanMessage &msg, bool more_to_follow)
-{
-    CanMessage *mymsg = getMessageObjectFromPool();
-    mymsg->cloneFrom(msg);
-
-    _queueMutex.lock();
-    _queue.push_back(mymsg);
-    _queueMutex.unlock();
-
-    if (!more_to_follow) {
-        if (!_flushTimer.isActive()) {
-            _flushTimer.start();
-        }
-    }
-
-    emit messageEnqueued(msg);
-}
-
-void CanTrace::flushQueue()
-{
-    QMutexLocker queueLocker(&_queueMutex);
-
-    unsigned long num_msg = _queue.size();
-    if (num_msg) {
-        emit beforeAppend(num_msg);
-        _dataMutex.lock();
-        foreach (CanMessage *msg, _queue) {
-            _data.push_back(msg);
-        }
-        _dataMutex.unlock();
-        _queue.clear();
-        emit afterAppend(num_msg);
-    }
-
-}
-
-CanMessage *CanTrace::getMessageObjectFromPool()
-{
-    QMutexLocker locker(&_poolMutex);
-    if (_poolUsageCounter>=_pool.size()) {
-        _pool.resize(_pool.size() + pool_chunk_size);
-    }
-    return &_pool[_poolUsageCounter++];
 }

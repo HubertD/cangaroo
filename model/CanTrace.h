@@ -15,29 +15,27 @@ class MeasurementSetup;
 class CanTrace : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit CanTrace(QObject *parent, MeasurementSetup *setup, int flushInterval);
+    explicit CanTrace(QObject *parent, int flushInterval);
 
     unsigned long size();
     void clear();
-
-    void setSetup(MeasurementSetup *setup);
-
     const CanMessage *getMessage(unsigned long idx);
-    CanDbMessage *findDbMessage(const CanMessage &msg);
-    QString getInterfaceName(const CanInterface &interface);
 
     void saveCanDump(QString filename);
 
 signals:
     void messageEnqueued(const CanMessage &msg);
     void beforeAppend(int num_messages);
-    void afterAppend(int num_messages);
+    void afterAppend();
     void beforeClear();
     void afterClear();
 
 public slots:
     void enqueueMessage(const CanMessage &msg, bool more_to_follow=false);
+
+private slots:
     void flushQueue();
 
 private:
@@ -45,18 +43,12 @@ private:
         pool_chunk_size = 1024
     };
 
-    MeasurementSetup *_setup;
-    QVector<CanMessage*> _data;
-    QVector<CanMessage*> _queue;
-    QVector<CanMessage> _pool;
-    int _poolUsageCounter;
+    QVector<CanMessage> _data;
+    int _dataRowsUsed;
+    int _newRows;
 
-    QMutex _dataMutex;
-    QMutex _queueMutex;
-    QMutex _poolMutex;
+    QMutex _mutex;
     QTimer _flushTimer;
-
-    CanMessage *getMessageObjectFromPool();
 
 };
 

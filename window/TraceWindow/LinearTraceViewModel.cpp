@@ -7,7 +7,7 @@ LinearTraceViewModel::LinearTraceViewModel(Backend &backend)
   : BaseTraceViewModel(backend)
 {
     connect(backend.getTrace(), SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
-    connect(backend.getTrace(), SIGNAL(afterAppend(int)), this, SLOT(afterAppend(int)));
+    connect(backend.getTrace(), SIGNAL(afterAppend()), this, SLOT(afterAppend()));
     connect(backend.getTrace(), SIGNAL(beforeClear()), this, SLOT(beforeClear()));
     connect(backend.getTrace(), SIGNAL(afterClear()), this, SLOT(afterClear()));
 }
@@ -40,7 +40,7 @@ int LinearTraceViewModel::rowCount(const QModelIndex &parent) const
         } else { // a message
             const CanMessage *msg = trace()->getMessage(id-1);
             if (msg) {
-                CanDbMessage *dbmsg = trace()->findDbMessage(*msg);
+                CanDbMessage *dbmsg = backend()->findDbMessage(*msg);
                 return (dbmsg!=0) ? dbmsg->getSignals().length() : 0;
             } else {
                 return 0;
@@ -67,9 +67,8 @@ void LinearTraceViewModel::beforeAppend(int num_messages)
     beginInsertRows(QModelIndex(), trace()->size(), trace()->size()+num_messages-1);
 }
 
-void LinearTraceViewModel::afterAppend(int num_messages)
+void LinearTraceViewModel::afterAppend()
 {
-    (void) num_messages;
     endInsertRows();
 }
 

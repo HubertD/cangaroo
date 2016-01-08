@@ -17,7 +17,7 @@ Backend::Backend(QObject *parent)
     qRegisterMetaType<CanMessage>("CanMessage");
 
     _setup = createDefaultSetup();
-    _trace = new CanTrace(this, _setup, 100);
+    _trace = new CanTrace(this, 100);
 }
 
 Backend::~Backend()
@@ -121,7 +121,6 @@ void Backend::setSetup(MeasurementSetup *setup)
 {
     MeasurementSetup *old_setup = _setup;
     _setup = setup;
-    _trace->setSetup(_setup);
     delete old_setup;
 }
 
@@ -140,6 +139,11 @@ void Backend::clearTrace()
     _trace->clear();
 }
 
+CanDbMessage *Backend::findDbMessage(const CanMessage &msg)
+{
+    return _setup->findDbMessage(msg);
+}
+
 CanInterfaceList Backend::getInterfaceList()
 {
     CanInterfaceList result;
@@ -151,3 +155,7 @@ CanInterfaceList Backend::getInterfaceList()
     return result;
 }
 
+QString Backend::getInterfaceName(const CanInterface &interface)
+{
+    return _setup->getInterfaceName(interface);
+}

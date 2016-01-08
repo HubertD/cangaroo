@@ -9,6 +9,7 @@ class MeasurementSetup;
 class MeasurementNetwork;
 class CanTrace;
 class CanListener;
+class CanDbMessage;
 
 
 class Backend : public QObject
@@ -33,7 +34,10 @@ public:
     CanTrace *getTrace();
     void clearTrace();
 
+    CanDbMessage *findDbMessage(const CanMessage &msg);
+
     CanInterfaceList getInterfaceList();
+    QString getInterfaceName(const CanInterface &interface);
 
 signals:
     void beginMeasurement();

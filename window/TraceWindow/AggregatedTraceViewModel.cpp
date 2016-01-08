@@ -24,7 +24,7 @@ void AggregatedTraceViewModel::createItem(const CanMessage &msg)
     AggregatedTraceViewItem *item = new AggregatedTraceViewItem(_rootItem);
     item->_lastmsg = msg;
 
-    CanDbMessage *dbmsg = _trace->findDbMessage(msg);
+    CanDbMessage *dbmsg = backend()->findDbMessage(msg);
     if (dbmsg) {
         for (int i=0; i<dbmsg->getSignals().length(); i++) {
             item->appendChild(new AggregatedTraceViewItem(item));
