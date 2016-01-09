@@ -9,6 +9,7 @@
 #include <driver/CanDriver.h>
 #include <driver/CanInterface.h>
 #include <driver/CanListener.h>
+#include <parser/dbc/DbcParser.h>
 
 Backend::Backend(QObject *parent)
   : QObject(parent),
@@ -185,4 +186,37 @@ QString Backend::getDriverName(CanInterfaceId id)
 {
     CanDriver *driver = getDriverById(id);
     return driver ? driver->getName() : "";
+}
+
+CanDriver *Backend::getDriverByName(QString driverName)
+{
+    foreach (CanDriver *driver, _drivers) {
+        if (driver->getName()==driverName) {
+            return driver;
+        }
+    }
+    return 0;
+}
+
+CanInterface *Backend::getInterfaceByDriverAndName(QString driverName, QString deviceName)
+{
+    CanDriver *driver = getDriverByName(driverName);
+    if (driver) {
+        return driver->getInterfaceByName(deviceName);
+    } else {
+        return 0;
+    }
+
+}
+
+pCanDb Backend::loadDbc(QString filename)
+{
+    DbcParser parser;
+
+    QFile *dbc = new QFile(filename);
+    pCanDb candb(new CanDb());
+    parser.parseFile(dbc, *candb);
+    delete dbc;
+
+    return candb;
 }

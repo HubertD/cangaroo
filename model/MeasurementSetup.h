@@ -19,6 +19,7 @@ class MeasurementSetup : public QObject
 public:
     explicit MeasurementSetup(QObject *parent);
     virtual ~MeasurementSetup();
+    void clear();
 
     CanDbMessage *findDbMessage(const CanMessage &msg);
     QString getInterfaceName(const CanInterface &interface);
@@ -32,6 +33,7 @@ public:
 
     void cloneFrom(MeasurementSetup &origin);
     bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
+    bool loadXML(Backend &backend, QDomElement &el);
 
 private:
     QList<MeasurementNetwork*> _networks;

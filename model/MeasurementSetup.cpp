@@ -17,11 +17,15 @@ MeasurementSetup::~MeasurementSetup()
     qDeleteAll(_networks);
 }
 
-void MeasurementSetup::cloneFrom(MeasurementSetup &origin)
+void MeasurementSetup::clear()
 {
     qDeleteAll(_networks);
     _networks.clear();
+}
 
+void MeasurementSetup::cloneFrom(MeasurementSetup &origin)
+{
+    clear();
     foreach (MeasurementNetwork *network, origin._networks) {
         MeasurementNetwork *network_copy = new MeasurementNetwork();
         network_copy->cloneFrom(*network);
@@ -38,6 +42,21 @@ bool MeasurementSetup::saveXML(Backend &backend, QDomDocument &xml, QDomElement 
         }
         root.appendChild(networkNode);
     }
+    return true;
+}
+
+bool MeasurementSetup::loadXML(Backend &backend, QDomElement &el)
+{
+    clear();
+
+    QDomNodeList networks = el.elementsByTagName("network");
+    for (int i=0; i<networks.length(); i++) {
+        MeasurementNetwork *network = createNetwork();
+        if (!network->loadXML(backend, networks.item(i).toElement())) {
+            return false;
+        }
+    }
+
     return true;
 }
 

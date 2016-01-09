@@ -51,3 +51,13 @@ CanInterfaceId CanDriver::addInterface(CanInterface *intf)
     _interfaces.push_back(intf);
     return intf->getId();
 }
+
+CanInterface *CanDriver::getInterfaceByName(QString ifName)
+{
+    foreach (CanInterface *intf, _interfaces) {
+        if (intf->getName() == ifName) {
+            return intf;
+        }
+    }
+    return 0;
+}

@@ -7,7 +7,6 @@
 #include <QTreeWidget>
 
 #include <Backend.h>
-#include <parser/dbc/DbcParser.h>
 #include <model/MeasurementSetup.h>
 #include <driver/CanInterface.h>
 #include <driver/CanDriver.h>
@@ -271,11 +270,7 @@ void SetupDialog::addCanDb(const QModelIndex &parent)
 {
     QString filename = QFileDialog::getOpenFileName(this, "Load CAN Database", "", "Vector DBC Files (*.dbc)");
     if (!filename.isNull()) {
-        DbcParser parser;
-        QFile *dbc = new QFile(filename);
-        pCanDb candb(new CanDb());
-        parser.parseFile(dbc, *candb);
-        delete dbc;
+        pCanDb candb = _backend->loadDbc(filename);
         model->addCanDb(parent, candb);
     }
 }

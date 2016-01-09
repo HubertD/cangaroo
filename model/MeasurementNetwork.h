@@ -32,6 +32,7 @@ public:
     void setName(const QString &name);
 
     bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
+    bool loadXML(Backend &backend, QDomElement el);
 
 private:
     QString _name;

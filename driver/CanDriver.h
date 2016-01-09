@@ -33,6 +33,8 @@ public:
     CanInterface *getInterfaceById(CanInterfaceId id);
     CanInterfaceId addInterface(CanInterface *intf);
 
+    CanInterface *getInterfaceByName(QString ifName);
+
 private:
     int _id;
     QList<CanInterface*> _interfaces;

@@ -120,7 +120,14 @@ bool MainWindow::loadWorkspaceWindow(QDomElement el)
 
 bool MainWindow::loadWorkspaceSetup(QDomElement el)
 {
-    return true;
+    MeasurementSetup *setup = new MeasurementSetup(&backend);
+    if (setup->loadXML(backend, el)) {
+        backend.setSetup(setup);
+        return true;
+    } else {
+        delete setup;
+        return false;
+    }
 }
 
 void MainWindow::loadWorkspace(QString filename)
@@ -140,6 +147,8 @@ void MainWindow::loadWorkspace(QString filename)
     }
     file.close();
 
+    ui->mdiArea->closeAllSubWindows();
+
     QDomElement windowsRoot = doc.firstChild().firstChildElement("windows");
     QDomNodeList windows = windowsRoot.elementsByTagName("window");
     for (int i=0; i<windows.length(); i++) {
@@ -149,7 +158,7 @@ void MainWindow::loadWorkspace(QString filename)
         }
     }
 
-    QDomElement setupRoot = doc.firstChildElement("setup");
+    QDomElement setupRoot = doc.firstChild().firstChildElement("setup");
     if (loadWorkspaceSetup(setupRoot)) {
         _workspaceFileName = filename;
     } else {

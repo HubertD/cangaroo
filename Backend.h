@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QList>
 #include <driver/CanDriver.h>
+#include <model/CanDb.h>
 
 class MeasurementSetup;
 class MeasurementNetwork;
@@ -41,6 +42,11 @@ public:
     CanInterface *getInterfaceById(CanInterfaceId id);
     QString getInterfaceName(CanInterfaceId id);
     QString getDriverName(CanInterfaceId id);
+
+    CanDriver *getDriverByName(QString driverName);
+    CanInterface *getInterfaceByDriverAndName(QString driverName, QString deviceName);
+
+    pCanDb loadDbc(QString filename);
 
 signals:
     void beginMeasurement();

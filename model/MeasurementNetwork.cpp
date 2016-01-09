@@ -1,6 +1,10 @@
 #include "MeasurementNetwork.h"
 #include "MeasurementInterface.h"
+
+#include <QDebug>
+
 #include <Backend.h>
+
 
 MeasurementNetwork::MeasurementNetwork()
 {
@@ -88,6 +92,41 @@ bool MeasurementNetwork::saveXML(Backend &backend, QDomDocument &xml, QDomElemen
     }
     root.appendChild(candbsNode);
 
+
+    return true;
+}
+
+bool MeasurementNetwork::loadXML(Backend &backend, QDomElement el)
+{
+    setName(el.attribute("name", "unnamed network"));
+
+    QDomNodeList ifList = el.firstChildElement("interfaces").elementsByTagName("interface");
+    for (int i=0; i<ifList.length(); i++) {
+        QDomElement elIntf = ifList.item(i).toElement();
+        QString driverName = elIntf.attribute("driver");
+        QString deviceName = elIntf.attribute("name");
+        int bitrate = elIntf.attribute("bitrate", "100000").toInt();
+
+        CanInterface *intf = backend.getInterfaceByDriverAndName(driverName, deviceName);
+        if (intf) {
+            MeasurementInterface *mi = addCanInterface(intf->getId());
+            mi->setBitrate(bitrate);
+        } else {
+            qCritical() << "could not find can interface" << driverName << deviceName << "which is referenced to in the workspace config file.";
+        }
+    }
+
+
+    QDomNodeList dbList = el.firstChildElement("databases").elementsByTagName("database");
+    for (int i=0; i<dbList.length(); i++) {
+        QDomElement elDb = dbList.item(i).toElement();
+        QString filename = elDb.attribute("filename", QString());
+        if (!filename.isEmpty()) {
+            addCanDb(backend.loadDbc(filename));
+        } else {
+            qCritical() << "could not load candb";
+        }
+    }
 
     return true;
 }
