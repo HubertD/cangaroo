@@ -29,6 +29,7 @@ public:
 
     void setMode(mode_t mode);
     virtual bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
+    virtual bool loadXML(Backend &backend, QDomElement &el);
 
 public slots:
     void onCbTraceTypeChanged(int i);

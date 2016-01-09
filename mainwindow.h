@@ -6,6 +6,7 @@
 #include <Backend.h>
 #include <driver/socketcan/SocketCanDriver.h>
 
+class QDomElement;
 class Logger;
 class TraceWindow;
 class LogWindow;
@@ -52,7 +53,9 @@ private slots:
 
     void on_action_WorkspaceOpen_triggered();
 
-    void on_actionSave_as_triggered();
+    void on_action_WorkspaceSaveAs_triggered();
+
+    void on_action_WorkspaceSave_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -66,6 +69,8 @@ private:
 
     QMdiSubWindow *createSubWindow(QWidget *window);
 
+    bool loadWorkspaceWindow(QDomElement el);
+    bool loadWorkspaceSetup(QDomElement el);
     void loadWorkspace(QString filename);
     void saveWorkspace(QString filename);
 

@@ -1,6 +1,7 @@
 #include "TraceWindow.h"
 #include "ui_TraceWindow.h"
 
+#include <QDebug>
 #include <QDomDocument>
 #include <QSortFilterProxyModel>
 #include "LinearTraceViewModel.h"
@@ -51,11 +52,11 @@ void TraceWindow::setMode(TraceWindow::mode_t mode)
     _mode = mode;
 
     if (_mode==mode_linear) {
-        ui->tree->setModel(_linearTraceViewModel);
         ui->tree->setSortingEnabled(false);
+        ui->tree->setModel(_linearTraceViewModel);
     } else {
-        ui->tree->setModel(_aggregatedProxyModel);
         ui->tree->setSortingEnabled(true);
+        ui->tree->setModel(_aggregatedProxyModel);
     }
 
 }
@@ -76,6 +77,24 @@ bool TraceWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root
     QDomElement elAggregated = xml.createElement("AggregatedTraceView");
     elAggregated.setAttribute("SortColumn", _aggregatedProxyModel->sortColumn());
     root.appendChild(elAggregated);
+
+    return true;
+}
+
+bool TraceWindow::loadXML(Backend &backend, QDomElement &el)
+{
+    if (!MdiWindow::loadXML(backend, el)) {
+        return false;
+    }
+
+    setMode((el.attribute("mode", "linear") == "linear") ? mode_linear : mode_aggregated);
+
+    QDomElement elLinear = el.firstChildElement("LinearTraceView");
+    ui->cbAutoScroll->setChecked(elLinear.attribute("autoscroll", "0").toInt() != 0);
+
+    QDomElement elAggregated = el.firstChildElement("AggregatedTraceView");
+    int sortColumn = elAggregated.attribute("SortColumn", "-1").toInt();
+    ui->tree->sortByColumn(sortColumn);
 
     return true;
 }

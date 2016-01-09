@@ -91,10 +91,70 @@ QMdiSubWindow *MainWindow::createSubWindow(QWidget *window)
     return retval;
 }
 
+bool MainWindow::loadWorkspaceWindow(QDomElement el)
+{
+    MdiWindow *window;
+    QString type = el.attribute("type");
+    if (type=="LogWindow") {
+        window = new LogWindow(ui->mdiArea, *_logger);
+    } else if (type=="TraceWindow") {
+        window = new TraceWindow(ui->mdiArea, backend);
+    } else if (type=="GraphWindow") {
+        window = new GraphWindow(ui->mdiArea, backend);
+    } else {
+        qCritical() << "cannot construct window of unknown type" << type;
+        window = new MdiWindow(ui->mdiArea);
+    }
+
+    window->loadXML(backend, el);
+    QMdiSubWindow *mdi = createSubWindow(window);
+    mdi->setGeometry(
+        el.attribute("left", "0").toInt(),
+        el.attribute("top", "0").toInt(),
+        el.attribute("width", "100").toInt(),
+        el.attribute("height", "100").toInt()
+    );
+
+    return true;
+}
+
+bool MainWindow::loadWorkspaceSetup(QDomElement el)
+{
+    return true;
+}
+
 void MainWindow::loadWorkspace(QString filename)
 {
-    _workspaceFileName = filename;
-    // TODO implement me
+
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qCritical() << "Cannot open workspace settings file:" << filename;
+        return;
+    }
+
+    QDomDocument doc;
+    if (!doc.setContent(&file)) {
+        file.close();
+        qCritical() << "Cannot load settings from" << filename;
+        return;
+    }
+    file.close();
+
+    QDomElement windowsRoot = doc.firstChild().firstChildElement("windows");
+    QDomNodeList windows = windowsRoot.elementsByTagName("window");
+    for (int i=0; i<windows.length(); i++) {
+        if (!loadWorkspaceWindow(windows.item(i).toElement())) {
+            qDebug() << "Could not read window " << i << "settings from" << filename;
+            continue;
+        }
+    }
+
+    QDomElement setupRoot = doc.firstChildElement("setup");
+    if (loadWorkspaceSetup(setupRoot)) {
+        _workspaceFileName = filename;
+    } else {
+        qCritical() << "Unable to read measurement setup from workspace config file" << filename;
+    }
 }
 
 void MainWindow::saveWorkspace(QString filename)
@@ -138,6 +198,8 @@ void MainWindow::saveWorkspace(QString filename)
     } else {
         qCritical() << "Cannot open workspace file for writing:" << filename;
     }
+
+    qDebug() << "saved workspace settings to " << filename;
 }
 
 QMdiSubWindow *MainWindow::createTraceWindow() {
@@ -211,7 +273,16 @@ void MainWindow::on_action_WorkspaceOpen_triggered()
     }
 }
 
-void MainWindow::on_actionSave_as_triggered()
+void MainWindow::on_action_WorkspaceSave_triggered()
+{
+    if (_workspaceFileName.isEmpty()) {
+        on_action_WorkspaceSaveAs_triggered();
+    } else {
+        saveWorkspace(_workspaceFileName);
+    }
+}
+
+void MainWindow::on_action_WorkspaceSaveAs_triggered()
 {
     QString filename = QFileDialog::getSaveFileName(this, "Save workspace configuration", "", "Workspace config files (*.cangaroo)");
     if (!filename.isNull()) {

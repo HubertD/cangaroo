@@ -26,6 +26,11 @@ bool LogWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
     return true;
 }
 
+bool LogWindow::loadXML(Backend &backend, QDomElement &el)
+{
+    return MdiWindow::loadXML(backend, el);
+}
+
 void LogWindow::onLogMessage(QtMsgType type, const QString &msg)
 {
     (void) type;

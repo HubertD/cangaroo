@@ -21,6 +21,7 @@ public:
     ~LogWindow();
 
     virtual bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
+    virtual bool loadXML(Backend &backend, QDomElement &el);
 
 public slots:
     void onLogMessage(QtMsgType type, const QString &msg);

@@ -24,3 +24,9 @@ bool GraphWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root
     root.setAttribute("type", "GraphWindow");
     return true;
 }
+
+bool GraphWindow::loadXML(Backend &backend, QDomElement &el)
+{
+    if (!MdiWindow::loadXML(backend, el)) { return false; }
+    return true;
+}

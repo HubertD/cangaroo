@@ -16,3 +16,8 @@ bool MdiWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
     return true;
 }
 
+bool MdiWindow::loadXML(Backend &backend, QDomElement &el)
+{
+    setWindowTitle(el.attribute("title", ""));
+    return true;
+}

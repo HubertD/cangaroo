@@ -20,6 +20,7 @@ public:
     explicit GraphWindow(QWidget *parent, Backend &backend);
     ~GraphWindow();
     virtual bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
+    virtual bool loadXML(Backend &backend, QDomElement &el);
 
 private:
     Ui::GraphWindow *ui;
