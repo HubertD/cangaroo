@@ -99,7 +99,7 @@ void MainWindow::loadWorkspace(QString filename)
 
 void MainWindow::saveWorkspace(QString filename)
 {
-    QDomDocument doc("workspace");
+    QDomDocument doc;
     QDomElement root = doc.createElement("cangaroo-workspace");
     doc.appendChild(root);
 
@@ -108,11 +108,17 @@ void MainWindow::saveWorkspace(QString filename)
 
     foreach (QMdiSubWindow *window, ui->mdiArea->subWindowList()) {
         QDomElement wnode = doc.createElement("window");
-        wnode.setAttribute("title", window->widget()->windowTitle());
         wnode.setAttribute("left", window->geometry().left());
         wnode.setAttribute("top", window->geometry().top());
         wnode.setAttribute("width", window->geometry().width());
         wnode.setAttribute("height", window->geometry().height());
+
+        MdiWindow *mdiwin = dynamic_cast<MdiWindow*>(window->widget());
+        if (!mdiwin->saveXML(backend, doc, wnode)) {
+            qCritical() << "Cannot save window settings to file";
+            return;
+        }
+
         windowsRoot.appendChild(wnode);
     }
 
@@ -140,7 +146,7 @@ QMdiSubWindow *MainWindow::createTraceWindow() {
 
 QMdiSubWindow *MainWindow::createLogWindow()
 {
-    return createSubWindow(new LogWindow(ui->mdiArea, _logger));
+    return createSubWindow(new LogWindow(ui->mdiArea, *_logger));
 }
 
 QMdiSubWindow *MainWindow::createGraphWindow()

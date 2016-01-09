@@ -9,6 +9,9 @@ namespace Ui {
 class GraphWindow;
 }
 
+class QDomDocument;
+class QDomElement;
+
 class GraphWindow : public MdiWindow
 {
     Q_OBJECT
@@ -16,10 +19,11 @@ class GraphWindow : public MdiWindow
 public:
     explicit GraphWindow(QWidget *parent, Backend &backend);
     ~GraphWindow();
+    virtual bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
 
 private:
     Ui::GraphWindow *ui;
-    Backend *_backend;
+    Backend &_backend;
 };
 
 #endif // GRAPHWINDOW_H
