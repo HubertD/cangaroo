@@ -3,11 +3,13 @@
 
 #include <QString>
 #include <QList>
+#include <QDomDocument>
+
 #include <driver/CanDriver.h>
 #include <driver/CanInterface.h>
 #include <model/CanDb.h>
 
-
+class Backend;
 class MeasurementInterface;
 
 class MeasurementNetwork
@@ -28,6 +30,8 @@ public:
 
     QString name() const;
     void setName(const QString &name);
+
+    bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
 
 private:
     QString _name;

@@ -1,4 +1,6 @@
 #include "MeasurementInterface.h"
+
+#include <Backend.h>
 #include <driver/CanDriver.h>
 #include <driver/CanInterface.h>
 
@@ -32,5 +34,15 @@ void MeasurementInterface::cloneFrom(MeasurementInterface *origin)
 {
     _canif = origin->_canif;
     _bitrate = origin->_bitrate;
+}
+
+bool MeasurementInterface::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
+{
+    (void) xml;
+    root.setAttribute("type", "can");
+    root.setAttribute("driver", backend.getDriverName(_canif));
+    root.setAttribute("name", backend.getInterfaceName(_canif));
+    root.setAttribute("bitrate", _bitrate);
+    return true;
 }
 

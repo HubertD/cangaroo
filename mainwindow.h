@@ -50,16 +50,24 @@ public slots:
 private slots:
     void on_action_TraceClear_triggered();
 
+    void on_action_WorkspaceOpen_triggered();
+
+    void on_actionSave_as_triggered();
+
 private:
     Ui::MainWindow *ui;
 
     Backend backend;
     Logger *_logger;
     SocketCanDriver _socketcan;
+    QString _workspaceFileName;
 
     QSignalMapper *windowMapper;
 
     QMdiSubWindow *createSubWindow(QWidget *window);
+
+    void loadWorkspace(QString filename);
+    void saveWorkspace(QString filename);
 
 };
 

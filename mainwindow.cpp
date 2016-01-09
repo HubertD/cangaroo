@@ -6,9 +6,9 @@
 #include <QSignalMapper>
 #include <QCloseEvent>
 #include <QDebug>
+#include <QDomDocument>
 
 #include "Logger.h"
-
 #include <model/MeasurementSetup.h>
 #include <window/TraceWindow/TraceWindow.h>
 #include <window/SetupDialog/SetupDialog.h>
@@ -91,6 +91,49 @@ QMdiSubWindow *MainWindow::createSubWindow(QWidget *window)
     return retval;
 }
 
+void MainWindow::loadWorkspace(QString filename)
+{
+    _workspaceFileName = filename;
+    // TODO implement me
+}
+
+void MainWindow::saveWorkspace(QString filename)
+{
+    QDomDocument doc("workspace");
+    QDomElement root = doc.createElement("cangaroo-workspace");
+    doc.appendChild(root);
+
+    QDomElement windowsRoot = doc.createElement("windows");
+    root.appendChild(windowsRoot);
+
+    foreach (QMdiSubWindow *window, ui->mdiArea->subWindowList()) {
+        QDomElement wnode = doc.createElement("window");
+        wnode.setAttribute("title", window->widget()->windowTitle());
+        wnode.setAttribute("left", window->geometry().left());
+        wnode.setAttribute("top", window->geometry().top());
+        wnode.setAttribute("width", window->geometry().width());
+        wnode.setAttribute("height", window->geometry().height());
+        windowsRoot.appendChild(wnode);
+    }
+
+    QDomElement setupRoot = doc.createElement("setup");
+    if (!backend.getSetup()->saveXML(backend, doc, setupRoot)) {
+        qCritical() << "Cannot save measurement setup to file";
+        return;
+    }
+    root.appendChild(setupRoot);
+
+    QFile outFile(filename);
+    if(outFile.open(QIODevice::WriteOnly|QIODevice::Text) ) {
+        QTextStream stream( &outFile );
+        stream << doc.toString();
+        outFile.close();
+        _workspaceFileName = filename;
+    } else {
+        qCritical() << "Cannot open workspace file for writing:" << filename;
+    }
+}
+
 QMdiSubWindow *MainWindow::createTraceWindow() {
     return createSubWindow(new TraceWindow(ui->mdiArea, backend));
 }
@@ -152,4 +195,20 @@ void MainWindow::saveTraceToFile()
 void MainWindow::on_action_TraceClear_triggered()
 {
     backend.clearTrace();
+}
+
+void MainWindow::on_action_WorkspaceOpen_triggered()
+{
+    QString filename = QFileDialog::getOpenFileName(this, "Open workspace configuration", "", "Workspace config files (*.cangaroo)");
+    if (!filename.isNull()) {
+        loadWorkspace(filename);
+    }
+}
+
+void MainWindow::on_actionSave_as_triggered()
+{
+    QString filename = QFileDialog::getSaveFileName(this, "Save workspace configuration", "", "Workspace config files (*.cangaroo)");
+    if (!filename.isNull()) {
+        saveWorkspace(filename);
+    }
 }

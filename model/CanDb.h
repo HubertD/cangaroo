@@ -9,6 +9,10 @@
 #include "CanDbNode.h"
 #include "CanDbMessage.h"
 
+class QDomDocument;
+class QDomElement;
+
+class Backend;
 class CanDb;
 class CanDbMessage;
 
@@ -36,6 +40,8 @@ class CanDb
 
         QString getComment() const;
         void setComment(const QString &comment);
+
+        bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
 
 private:
         QString _path;

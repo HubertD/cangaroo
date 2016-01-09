@@ -29,6 +29,18 @@ void MeasurementSetup::cloneFrom(MeasurementSetup &origin)
     }
 }
 
+bool MeasurementSetup::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
+{
+    foreach (MeasurementNetwork *network, _networks) {
+        QDomElement networkNode = xml.createElement("network");
+        if (!network->saveXML(backend, xml, networkNode)) {
+            return false;
+        }
+        root.appendChild(networkNode);
+    }
+    return true;
+}
+
 
 MeasurementNetwork *MeasurementSetup::createNetwork()
 {

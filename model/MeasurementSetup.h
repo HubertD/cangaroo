@@ -3,7 +3,9 @@
 
 #include <QObject>
 #include <QList>
+#include <QDomDocument>
 
+class Backend;
 class MeasurementNetwork;
 class CanTrace;
 class CanMessage;
@@ -29,6 +31,7 @@ public:
     void removeNetwork(MeasurementNetwork *network);
 
     void cloneFrom(MeasurementSetup &origin);
+    bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
 
 private:
     QList<MeasurementNetwork*> _networks;

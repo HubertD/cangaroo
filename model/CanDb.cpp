@@ -1,5 +1,8 @@
 #include "CanDb.h"
 #include <QFileInfo>
+#include <QDomDocument>
+
+#include <Backend.h>
 
 CanDb::CanDb()
 {
@@ -52,5 +55,14 @@ QString CanDb::getComment() const
 void CanDb::setComment(const QString &comment)
 {
     _comment = comment;
+}
+
+bool CanDb::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
+{
+    (void) backend;
+    (void) xml;
+    root.setAttribute("type", "dbc");
+    root.setAttribute("filename", _path);
+    return true;
 }
 
