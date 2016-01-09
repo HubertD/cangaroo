@@ -1,10 +1,12 @@
 #include "TraceWindow.h"
 #include "ui_TraceWindow.h"
+
+#include <QSortFilterProxyModel>
 #include "LinearTraceViewModel.h"
 #include "AggregatedTraceViewModel.h"
 
 TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
-    QWidget(parent),
+    MdiWindow(parent),
     ui(new Ui::TraceWindow),
     _backend(&backend)
 {

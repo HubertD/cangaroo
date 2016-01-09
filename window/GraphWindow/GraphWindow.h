@@ -1,7 +1,7 @@
 #ifndef GRAPHWINDOW_H
 #define GRAPHWINDOW_H
 
-#include <QWidget>
+#include <MdiWindow.h>
 #include <model/MeasurementSetup.h>
 #include <Backend.h>
 
@@ -9,7 +9,7 @@ namespace Ui {
 class GraphWindow;
 }
 
-class GraphWindow : public QWidget
+class GraphWindow : public MdiWindow
 {
     Q_OBJECT
 

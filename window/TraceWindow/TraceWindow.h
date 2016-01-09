@@ -1,18 +1,18 @@
 #ifndef TRACEWINDOW_H
 #define TRACEWINDOW_H
 
-#include <QWidget>
-#include <QSortFilterProxyModel>
+#include <MdiWindow.h>
 
 namespace Ui {
 class TraceWindow;
 }
 
+class QSortFilterProxyModel;
 class LinearTraceViewModel;
 class AggregatedTraceViewModel;
 class Backend;
 
-class TraceWindow : public QWidget
+class TraceWindow : public MdiWindow
 {
     Q_OBJECT
 

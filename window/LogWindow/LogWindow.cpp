@@ -3,7 +3,7 @@
 #include "Logger.h"
 
 LogWindow::LogWindow(QWidget *parent, Logger *logger) :
-    QWidget(parent),
+    MdiWindow(parent),
     ui(new Ui::LogWindow)
 {
     ui->setupUi(this);

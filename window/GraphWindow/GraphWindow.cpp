@@ -2,7 +2,7 @@
 #include "ui_GraphWindow.h"
 
 GraphWindow::GraphWindow(QWidget *parent, Backend &backend) :
-    QWidget(parent),
+    MdiWindow(parent),
     ui(new Ui::GraphWindow),
     _backend(&backend)
 {
