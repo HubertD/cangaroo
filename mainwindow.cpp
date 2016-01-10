@@ -130,12 +130,11 @@ bool MainWindow::loadWorkspaceWindow(QDomElement el)
 
 bool MainWindow::loadWorkspaceSetup(QDomElement el)
 {
-    MeasurementSetup *setup = new MeasurementSetup(&backend);
-    if (setup->loadXML(backend, el)) {
+    MeasurementSetup setup(&backend);
+    if (setup.loadXML(backend, el)) {
         backend.setSetup(setup);
         return true;
     } else {
-        delete setup;
         return false;
     }
 }
@@ -204,7 +203,7 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
     }
 
     QDomElement setupRoot = doc.createElement("setup");
-    if (!backend.getSetup()->saveXML(backend, doc, setupRoot)) {
+    if (!backend.getSetup().saveXML(backend, doc, setupRoot)) {
         qCritical() << "Cannot save measurement setup to file";
         return false;
     }
@@ -235,7 +234,7 @@ void MainWindow::newWorkspace()
         ui->mdiArea->closeAllSubWindows();
         createLogWindow()->setGeometry(0, 500, 1000, 200);
         createTraceWindow()->setGeometry(0, 0, 1000, 500);
-        backend.setSetup(backend.createDefaultSetup());
+        backend.setDefaultSetup();
     }
 }
 
@@ -329,9 +328,11 @@ void MainWindow::setActiveSubWindow(QWidget *window) {
 
 bool MainWindow::showSetupDialog()
 {
+    MeasurementSetup new_setup(&backend);
+    new_setup.cloneFrom(backend.getSetup());
+
     SetupDialog dlg(backend, 0);
-    MeasurementSetup *new_setup = dlg.showSetupDialog(*backend.getSetup());
-    if (new_setup) {
+    if (dlg.showSetupDialog(new_setup)) {
         backend.setSetup(new_setup);
         setWorkspaceModified(true);
         return true;

@@ -76,22 +76,12 @@ SetupDialog::~SetupDialog()
     delete model;
 }
 
-MeasurementSetup *SetupDialog::showSetupDialog(MeasurementSetup &setup)
+bool SetupDialog::showSetupDialog(MeasurementSetup &setup)
 {
-    MeasurementSetup *mySetup = new MeasurementSetup(0);
-    mySetup->cloneFrom(setup);
-
-    model->load(mySetup);
+    model->load(setup);
     ui->treeView->expandAll();
-
     updateButtons();
-
-    if (exec()==QDialog::Accepted) {
-        return mySetup;
-    } else {
-        delete mySetup;
-        return 0;
-    }
+    return exec()==QDialog::Accepted;
 }
 
 void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)

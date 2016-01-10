@@ -24,7 +24,7 @@ public:
     explicit SetupDialog(Backend &backend, QWidget *parent = 0);
     ~SetupDialog();
 
-    MeasurementSetup *showSetupDialog(MeasurementSetup &setup);
+    bool showSetupDialog(MeasurementSetup &setup);
 
 public slots:
     void treeViewSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);

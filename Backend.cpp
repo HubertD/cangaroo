@@ -13,18 +13,18 @@
 
 Backend::Backend(QObject *parent)
   : QObject(parent),
-    _measurementRunning(false)
+    _measurementRunning(false),
+    _setup(this)
 {
     qRegisterMetaType<CanMessage>("CanMessage");
 
-    _setup = createDefaultSetup();
+    setDefaultSetup();
     _trace = new CanTrace(*this, this, 100);
 }
 
 Backend::~Backend()
 {
     delete _trace;
-    delete _setup;
 }
 
 void Backend::addCanDriver(CanDriver *driver)
@@ -37,7 +37,7 @@ bool Backend::startMeasurement()
 {
     qDebug("starting measurement");
     int i=0;
-    foreach (MeasurementNetwork *network, _setup->getNetworks()) {
+    foreach (MeasurementNetwork *network, _setup.getNetworks()) {
         i++;
         foreach (MeasurementInterface *mi, network->interfaces()) {
 
@@ -91,16 +91,15 @@ bool Backend::isMeasurementRunning()
     return _measurementRunning;
 }
 
-MeasurementSetup *Backend::createDefaultSetup()
+void Backend::loadDefaultSetup(MeasurementSetup &setup)
 {
-
-    MeasurementSetup *defaultSetup = new MeasurementSetup(this);
+    setup.clear();
     int i = 1;
 
     foreach (CanDriver *driver, _drivers) {
         driver->update();
         foreach (CanInterfaceId intf, driver->getInterfaceIds()) {
-            MeasurementNetwork *network = defaultSetup->createNetwork();
+            MeasurementNetwork *network = setup.createNetwork();
             network->setName(QString().sprintf("Network %d", i++));
 
             MeasurementInterface *mi = new MeasurementInterface();
@@ -109,20 +108,21 @@ MeasurementSetup *Backend::createDefaultSetup()
             network->addInterface(mi);
         }
     }
-
-    return defaultSetup;
 }
 
-MeasurementSetup *Backend::getSetup()
+void Backend::setDefaultSetup()
+{
+    loadDefaultSetup(_setup);
+}
+
+MeasurementSetup &Backend::getSetup()
 {
     return _setup;
 }
 
-void Backend::setSetup(MeasurementSetup *setup)
+void Backend::setSetup(MeasurementSetup &new_setup)
 {
-    MeasurementSetup *old_setup = _setup;
-    _setup = setup;
-    delete old_setup;
+    _setup.cloneFrom(new_setup);
 }
 
 void Backend::saveCanDump(QString filename)
@@ -142,7 +142,7 @@ void Backend::clearTrace()
 
 CanDbMessage *Backend::findDbMessage(const CanMessage &msg)
 {
-    return _setup->findDbMessage(msg);
+    return _setup.findDbMessage(msg);
 }
 
 CanInterfaceIdList Backend::getInterfaceList()

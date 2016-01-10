@@ -221,12 +221,12 @@ SetupDialogTreeItem *SetupDialogTreeModel::loadNetwork(MeasurementNetwork &netwo
     return item_network;
 }
 
-void SetupDialogTreeModel::load(MeasurementSetup *setup)
+void SetupDialogTreeModel::load(MeasurementSetup &setup)
 {
     _rootItem = new SetupDialogTreeItem(SetupDialogTreeItem::type_root, 0);
-    _rootItem->setup = setup;
+    _rootItem->setup = &setup;
 
-    foreach (MeasurementNetwork *network, setup->getNetworks()) {
+    foreach (MeasurementNetwork *network, setup.getNetworks()) {
         loadNetwork(*network);
     }
 

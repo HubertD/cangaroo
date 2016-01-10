@@ -34,7 +34,7 @@ public:
 
     QModelIndex indexOfItem(const SetupDialogTreeItem *item) const;
 
-    void load(MeasurementSetup *setup);
+    void load(MeasurementSetup &setup);
 
     SetupDialogTreeItem *addNetwork();
     void deleteNetwork(const QModelIndex &index);

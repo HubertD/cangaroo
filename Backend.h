@@ -5,8 +5,8 @@
 #include <QList>
 #include <driver/CanDriver.h>
 #include <model/CanDb.h>
+#include <model/MeasurementSetup.h>
 
-class MeasurementSetup;
 class MeasurementNetwork;
 class CanTrace;
 class CanListener;
@@ -26,10 +26,11 @@ public:
     bool stopMeasurement();
     bool isMeasurementRunning();
 
-    MeasurementSetup *createDefaultSetup();
 
-    MeasurementSetup *getSetup();
-    void setSetup(MeasurementSetup *setup);
+    MeasurementSetup &getSetup();
+    void loadDefaultSetup(MeasurementSetup &setup);
+    void setDefaultSetup();
+    void setSetup(MeasurementSetup &new_setup);
     void saveCanDump(QString filename);
 
     CanTrace *getTrace();
@@ -57,7 +58,7 @@ public slots:
 private:
     bool _measurementRunning;
     QList<CanDriver*> _drivers;
-    MeasurementSetup *_setup;
+    MeasurementSetup _setup;
     CanTrace *_trace;
     QList<CanListener*> _listeners;
 };
