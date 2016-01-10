@@ -1,6 +1,7 @@
 #include "Backend.h"
 
 #include <QDebug>
+#include <QDateTime>
 
 #include <model/CanTrace.h>
 #include <model/MeasurementSetup.h>
@@ -14,6 +15,7 @@
 Backend::Backend(QObject *parent)
   : QObject(parent),
     _measurementRunning(false),
+    _measurementStartTime(0),
     _setup(this)
 {
     qRegisterMetaType<CanMessage>("CanMessage");
@@ -36,6 +38,8 @@ void Backend::addCanDriver(CanDriver *driver)
 bool Backend::startMeasurement()
 {
     qDebug("starting measurement");
+    _measurementStartTime = currentTimeStamp();
+
     int i=0;
     foreach (MeasurementNetwork *network, _setup.getNetworks()) {
         i++;
@@ -86,7 +90,7 @@ bool Backend::stopMeasurement()
     return true;
 }
 
-bool Backend::isMeasurementRunning()
+bool Backend::isMeasurementRunning() const
 {
     return _measurementRunning;
 }
@@ -130,6 +134,11 @@ void Backend::saveCanDump(QString filename)
     _trace->saveCanDump(filename);
 }
 
+double Backend::currentTimeStamp() const
+{
+    return ((double)QDateTime::currentMSecsSinceEpoch()) / 1000;
+}
+
 CanTrace *Backend::getTrace()
 {
     return _trace;
@@ -140,7 +149,7 @@ void Backend::clearTrace()
     _trace->clear();
 }
 
-CanDbMessage *Backend::findDbMessage(const CanMessage &msg)
+CanDbMessage *Backend::findDbMessage(const CanMessage &msg) const
 {
     return _setup.findDbMessage(msg);
 }
@@ -219,4 +228,9 @@ pCanDb Backend::loadDbc(QString filename)
     delete dbc;
 
     return candb;
+}
+
+double Backend::getMeasurementStartTime() const
+{
+    return _measurementStartTime;
 }

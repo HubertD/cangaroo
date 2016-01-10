@@ -2,6 +2,7 @@
 #define BASETRACEVIEWMODEL_H
 
 #include <QAbstractItemModel>
+#include "TraceViewTypes.h"
 
 class Backend;
 class CanTrace;
@@ -33,15 +34,21 @@ public:
     Backend *backend() const;
     CanTrace *trace() const;
 
+    timestamp_mode_t timestampMode() const;
+    void setTimestampMode(timestamp_mode_t timestampMode);
 
 protected:
-    Backend *_backend;
-
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;
-    virtual QVariant data_DisplayRole_Message(const QModelIndex &index, int role, const CanMessage *msg, struct timeval tv) const;
+    virtual QVariant data_DisplayRole_Message(const QModelIndex &index, int role, const CanMessage &currentMsg, const CanMessage &lastMsg) const;
     virtual QVariant data_DisplayRole_Signal(const QModelIndex &index, int role, const CanMessage *msg) const;
     virtual QVariant data_TextAlignmentRole(const QModelIndex &index, int role) const;
     virtual QVariant data_TextColorRole(const QModelIndex &index, int role) const;
+
+    QVariant formatTimestamp(timestamp_mode_t mode, const CanMessage &currentMsg, const CanMessage &lastMsg) const;
+
+private:
+    Backend *_backend;
+    timestamp_mode_t _timestampMode;
 
 };
 

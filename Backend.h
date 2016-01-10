@@ -24,7 +24,9 @@ public:
 
     bool startMeasurement();
     bool stopMeasurement();
-    bool isMeasurementRunning();
+    bool isMeasurementRunning() const;
+    double getMeasurementStartTime() const;
+
 
 
     MeasurementSetup &getSetup();
@@ -33,10 +35,12 @@ public:
     void setSetup(MeasurementSetup &new_setup);
     void saveCanDump(QString filename);
 
+    double currentTimeStamp() const;
+
     CanTrace *getTrace();
     void clearTrace();
 
-    CanDbMessage *findDbMessage(const CanMessage &msg);
+    CanDbMessage *findDbMessage(const CanMessage &msg) const;
 
     CanInterfaceIdList getInterfaceList();
     CanDriver *getDriverById(CanInterfaceId id);
@@ -57,6 +61,7 @@ public slots:
 
 private:
     bool _measurementRunning;
+    double _measurementStartTime;
     QList<CanDriver*> _drivers;
     MeasurementSetup _setup;
     CanTrace *_trace;

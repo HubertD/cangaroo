@@ -28,18 +28,19 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     setAutoScroll(false);
 
     ui->tree->setUniformRowHeights(true);
-    ui->tree->setColumnWidth(0, 80);
+    ui->tree->setColumnWidth(0, 120);
     ui->tree->setColumnWidth(1, 70);
     ui->tree->setColumnWidth(2, 50);
     ui->tree->setColumnWidth(3, 90);
     ui->tree->setColumnWidth(4, 200);
     ui->tree->setColumnWidth(5, 50);
     ui->tree->setColumnWidth(6, 200);
-    ui->tree->sortByColumn(BaseTraceViewModel::column_canid);
+    ui->tree->sortByColumn(BaseTraceViewModel::column_canid, Qt::AscendingOrder);
 
     ui->cbTimestampMode->addItem("absolute", 0);
     ui->cbTimestampMode->addItem("relative", 1);
     ui->cbTimestampMode->addItem("delta", 2);
+    setTimestampMode(timestamp_mode_relative);
 
     connect(_linearTraceViewModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
 
@@ -90,6 +91,9 @@ void TraceWindow::setTimestampMode(int mode)
     } else {
         new_mode = timestamp_mode_absolute;
     }
+
+    _aggregatedTraceViewModel->setTimestampMode(new_mode);
+    _linearTraceViewModel->setTimestampMode(new_mode);
 
     if (new_mode != _timestampMode) {
         _timestampMode = new_mode;

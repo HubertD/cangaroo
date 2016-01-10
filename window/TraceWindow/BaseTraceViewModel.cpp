@@ -1,5 +1,7 @@
 #include "BaseTraceViewModel.h"
 
+#include <QDateTime>
+
 #include <Backend.h>
 #include <model/CanTrace.h>
 #include <model/CanMessage.h>
@@ -70,6 +72,43 @@ CanTrace *BaseTraceViewModel::trace() const
     return _backend->getTrace();
 }
 
+timestamp_mode_t BaseTraceViewModel::timestampMode() const
+{
+    return _timestampMode;
+}
+
+void BaseTraceViewModel::setTimestampMode(timestamp_mode_t timestampMode)
+{
+    _timestampMode = timestampMode;
+}
+
+QVariant BaseTraceViewModel::formatTimestamp(timestamp_mode_t mode, const CanMessage &currentMsg, const CanMessage &lastMsg) const
+{
+    double t_current = currentMsg.getFloatTimestamp();
+
+    if (mode==timestamp_mode_delta) {
+
+        double t_last = lastMsg.getFloatTimestamp();
+        if (t_last==0) {
+            return QVariant();
+        } else {
+            return QString().sprintf("%.04lf", t_current-t_last);
+        }
+
+    } else if (mode==timestamp_mode_absolute) {
+
+        QDateTime dt = QDateTime::fromMSecsSinceEpoch((qint64)(1000*t_current));
+        return dt.toString("hh:mm:ss.zzz");
+
+    } else if (mode==timestamp_mode_relative) {
+
+        return QString().sprintf("%.04lf", t_current - backend()->getMeasurementStartTime());
+
+    }
+
+    return QVariant();
+}
+
 QVariant BaseTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
     (void) index;
@@ -77,35 +116,33 @@ QVariant BaseTraceViewModel::data_DisplayRole(const QModelIndex &index, int role
     return QVariant();
 }
 
-QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, int role, const CanMessage *msg, timeval tv) const
+QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, int role, const CanMessage &currentMsg, const CanMessage &lastMsg) const
 {
     (void) role;
-    double intervalD;
-    CanDbMessage *dbmsg = backend()->findDbMessage(*msg);
+    CanDbMessage *dbmsg = backend()->findDbMessage(currentMsg);
 
     switch (index.column()) {
 
         case column_timestamp:
-            intervalD = (double)tv.tv_sec + ((double)tv.tv_usec/1000000);
-            return (intervalD==0) ? "" : QString().sprintf("%.04f", intervalD);
+            return formatTimestamp(_timestampMode, currentMsg, lastMsg);
 
         case column_channel:
-            return backend()->getInterfaceName(msg->getInterfaceId());
+            return backend()->getInterfaceName(currentMsg.getInterfaceId());
 
         case column_direction:
             return "rx";
 
         case column_canid:
-            return msg->getIdString();
+            return currentMsg.getIdString();
 
         case column_name:
             return (dbmsg) ? dbmsg->getName() : "";
 
         case column_dlc:
-            return msg->getLength();
+            return currentMsg.getLength();
 
         case column_data:
-            return msg->getDataHexString();
+            return currentMsg.getDataHexString();
 
         case column_comment:
             return (dbmsg) ? dbmsg->getComment() : "";

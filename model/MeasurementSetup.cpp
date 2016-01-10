@@ -74,7 +74,7 @@ void MeasurementSetup::removeNetwork(MeasurementNetwork *network)
 }
 
 
-CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage &msg)
+CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage &msg) const
 {
     CanDbMessage *result = 0;
 
@@ -89,7 +89,7 @@ CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage &msg)
     return result;
 }
 
-QString MeasurementSetup::getInterfaceName(const CanInterface &interface)
+QString MeasurementSetup::getInterfaceName(const CanInterface &interface) const
 {
     return interface.getName();
 }

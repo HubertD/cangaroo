@@ -20,8 +20,7 @@ public:
     AggregatedTraceViewItem *firstChild() const;
     AggregatedTraceViewItem *lastChild() const;
 
-    CanMessage _lastmsg;
-    struct timeval _interval;
+    CanMessage _lastmsg, _prevmsg;
 
 private:
     AggregatedTraceViewItem *_parent;

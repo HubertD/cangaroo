@@ -21,8 +21,8 @@ public:
     virtual ~MeasurementSetup();
     void clear();
 
-    CanDbMessage *findDbMessage(const CanMessage &msg);
-    QString getInterfaceName(const CanInterface &interface);
+    CanDbMessage *findDbMessage(const CanMessage &msg) const;
+    QString getInterfaceName(const CanInterface &interface) const;
 
     int countNetworks() const;
     MeasurementNetwork *getNetwork(int index) const;

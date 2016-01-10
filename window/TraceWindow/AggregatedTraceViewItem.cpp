@@ -3,8 +3,6 @@
 AggregatedTraceViewItem::AggregatedTraceViewItem(AggregatedTraceViewItem *parent)
   : _parent(parent)
 {
-    _interval.tv_sec = 0;
-    _interval.tv_usec = 0;
 }
 
 AggregatedTraceViewItem::~AggregatedTraceViewItem()

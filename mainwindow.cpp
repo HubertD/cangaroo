@@ -341,7 +341,15 @@ bool MainWindow::showSetupDialog()
 
 void MainWindow::showAboutDialog()
 {
-    QMessageBox::about(this, "About cangaroo", "cangaroo version 0.1\n(c)2015-2016 Hubert Denkmair");
+    QMessageBox::about(this,
+       "About cangaroo",
+       "cangaroo\n"
+       "open source can bus analyzer\n"
+       "\n"
+       "version 0.1\n"
+       "\n"
+       "(c)2015-2016 Hubert Denkmair"
+    );
 }
 
 void MainWindow::startMeasurement()

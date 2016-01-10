@@ -37,22 +37,10 @@ void AggregatedTraceViewModel::createItem(const CanMessage &msg)
 
 void AggregatedTraceViewModel::updateItem(const CanMessage &msg)
 {
-    struct timeval tv_last, tv_now;
-
     AggregatedTraceViewItem *item = _map.value(makeUniqueKey(msg));
     if (item) {
-        tv_last = item->_lastmsg.getTimestamp();
-        tv_now = msg.getTimestamp();
-
+        item->_prevmsg = item->_lastmsg;
         item->_lastmsg = msg;
-
-        int diff_us = tv_now.tv_usec - tv_last.tv_usec;
-        item->_interval.tv_sec = tv_now.tv_sec - tv_last.tv_sec;
-        if (diff_us<0) {
-            item->_interval.tv_sec--;
-            diff_us += 1000000;
-        }
-        item->_interval.tv_usec = diff_us;
     }
 }
 
@@ -174,7 +162,7 @@ QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, in
     if (!item) { return QVariant(); }
 
     if (item->parent() == _rootItem) { // CanMessage row
-        return data_DisplayRole_Message(index, role, &item->_lastmsg, item->_interval);
+        return data_DisplayRole_Message(index, role, item->_lastmsg, item->_prevmsg);
     } else { // CanSignal Row
         return data_DisplayRole_Signal(index, role, &item->parent()->_lastmsg);
     }

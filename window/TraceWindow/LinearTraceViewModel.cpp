@@ -85,13 +85,20 @@ void LinearTraceViewModel::afterClear()
 QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
     quintptr id = index.internalId();
-    const CanMessage *msg = trace()->getMessage((id & ~0x80000000)-1);
+    int msg_id = (id & ~0x80000000)-1;
+
+    const CanMessage *msg = trace()->getMessage(msg_id);
     if (!msg) { return QVariant(); }
 
     if (id & 0x80000000) {
         return data_DisplayRole_Signal(index, role, msg);
     } else if (id) {
-        return data_DisplayRole_Message(index, role, msg, msg->getTimestamp());
+        if (msg_id>1) {
+            const CanMessage *prev_msg = trace()->getMessage(msg_id-1);
+            return data_DisplayRole_Message(index, role, *msg, *prev_msg);
+        } else {
+            return data_DisplayRole_Message(index, role, *msg, CanMessage());
+        }
     }
 
     return QVariant();
