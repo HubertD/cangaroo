@@ -35,6 +35,7 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ui->tree->setColumnWidth(4, 200);
     ui->tree->setColumnWidth(5, 50);
     ui->tree->setColumnWidth(6, 200);
+    ui->tree->sortByColumn(BaseTraceViewModel::column_canid);
 
     connect(_linearTraceViewModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
 
