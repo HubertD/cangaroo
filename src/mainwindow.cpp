@@ -23,7 +23,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     ui->setupUi(this);
     _baseWindowTitle = windowTitle();
 
-    QIcon icon(":/assets/icon.png");
+    QIcon icon(":/assets/cangaroo.png");
     setWindowIcon(icon);
 
     QImage bgimg(":/assets/mdibg.png");

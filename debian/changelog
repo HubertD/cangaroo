@@ -1,5 +1,6 @@
-packagename (0.1.0-1) UNRELEASED; urgency=low
+cangaroo (0.1.0-1) UNRELEASED; urgency=low
 
   * Initial Release
 
-  -- Hubert Denkmair <hubert@denkmair.de>  Sun, 10 Jan 2016 21:00:00 +0200
+ -- Hubert Denkmair <hubert@denkmair.de>  Sun, 10 Jan 2016 21:00:00 +0200
+
