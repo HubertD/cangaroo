@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../../cangaroo.qrc">
-    <normaloff>:/assets/icon.png</normaloff>:/assets/icon.png</iconset>
+    <normaloff>:/assets/cangaroo.png</normaloff>:/assets/cangaroo.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

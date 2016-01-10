@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Name=cangaroo
+Exec=/usr/bin/cangaroo %f
+Comment=CAN Bus Analyzer
+Icon=cangaroo
+StartupNotify=false
+Encoding=UTF-8
+Categories=Development
+

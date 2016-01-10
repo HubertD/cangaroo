@@ -1,0 +1,4 @@
+bin/cangaroo usr/bin
+cangaroo.desktop usr/share/applications
+src/assets/cangaroo.png usr/share/pixmaps
+src/assets/cangaroo.svg usr/share/pixmaps

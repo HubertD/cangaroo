@@ -23,7 +23,7 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     _currentNetwork(0)
 {
     ui->setupUi(this);
-    QIcon icon(":/assets/icon.png");
+    QIcon icon(":/assets/cangaroo.png");
     setWindowIcon(icon);
 
     _actionAddInterface = new QAction("Add...", this);
