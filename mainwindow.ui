@@ -35,9 +35,9 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuWorkspace">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>W&amp;orkspace</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="action_WorkspaceNew"/>
     <addaction name="separator"/>
@@ -84,7 +84,7 @@
     <addaction name="separator"/>
     <addaction name="actionSave_Trace_to_file"/>
    </widget>
-   <addaction name="menuWorkspace"/>
+   <addaction name="menuFile"/>
    <addaction name="menuMeasurement"/>
    <addaction name="menu_Trace"/>
    <addaction name="menuWindow"/>
@@ -117,7 +117,7 @@
   </action>
   <action name="actionSetup">
    <property name="text">
-    <string>Setup...</string>
+    <string>&amp;Setup...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Alt+S</string>
@@ -125,7 +125,7 @@
   </action>
   <action name="actionStart_Measurement">
    <property name="text">
-    <string>Start Measurement</string>
+    <string>Star&amp;t Measurement</string>
    </property>
    <property name="shortcut">
     <string>F5</string>
@@ -133,7 +133,7 @@
   </action>
   <action name="actionStop_Measurement">
    <property name="text">
-    <string>Stop Measurement</string>
+    <string>Sto&amp;p Measurement</string>
    </property>
    <property name="shortcut">
     <string>Shift+F5</string>
@@ -159,7 +159,7 @@
   </action>
   <action name="action_WorkspaceNew">
    <property name="text">
-    <string>&amp;New...</string>
+    <string>&amp;New Workspace...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -167,7 +167,7 @@
   </action>
   <action name="action_WorkspaceSave">
    <property name="text">
-    <string>&amp;Save</string>
+    <string>&amp;Save Workspace</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -175,7 +175,7 @@
   </action>
   <action name="action_WorkspaceSaveAs">
    <property name="text">
-    <string>Save &amp;as...</string>
+    <string>Save Workspace &amp;As...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -183,7 +183,7 @@
   </action>
   <action name="action_WorkspaceOpen">
    <property name="text">
-    <string>&amp;Open...</string>
+    <string>&amp;Open Workspace...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
