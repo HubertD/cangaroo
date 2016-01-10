@@ -10,7 +10,8 @@ HEADERS  += \
     $$PWD/AggregatedTraceViewModel.h \
     $$PWD/BaseTraceViewModel.h \
     $$PWD/AggregatedTraceViewItem.h \
-    $$PWD/TraceWindow.h
+    $$PWD/TraceWindow.h \
+    $$PWD/TraceViewTypes.h
 
 FORMS    += \
     $$PWD/TraceWindow.ui

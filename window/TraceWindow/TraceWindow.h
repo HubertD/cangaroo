@@ -2,6 +2,7 @@
 #define TRACEWINDOW_H
 
 #include <MdiWindow.h>
+#include "TraceViewTypes.h"
 
 namespace Ui {
 class TraceWindow;
@@ -29,6 +30,8 @@ public:
 
     void setMode(mode_t mode);
     void setAutoScroll(bool doAutoScroll);
+    void setTimestampMode(int mode);
+
     virtual bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
     virtual bool loadXML(Backend &backend, QDomElement &el);
 
@@ -37,14 +40,16 @@ public slots:
 
 private slots:
     void on_cbAggregated_stateChanged(int i);
-
     void on_cbAutoScroll_stateChanged(int i);
+
+    void on_cbTimestampMode_currentIndexChanged(int index);
 
 private:
     Ui::TraceWindow *ui;
     Backend *_backend;
     mode_t _mode;
     bool _doAutoScroll;
+    timestamp_mode_t _timestampMode;
 
     LinearTraceViewModel *_linearTraceViewModel;
     AggregatedTraceViewModel *_aggregatedTraceViewModel;
