@@ -77,12 +77,10 @@ void MainWindow::on_workspace_modified()
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    ui->mdiArea->closeAllSubWindows();
-    if (ui->mdiArea->currentSubWindow()) {
-        event->ignore();
-    } else {
-        //writeSettings();
+    if (askSaveBecauseWorkspaceModified()!=QMessageBox::Cancel) {
         event->accept();
+    } else {
+        event->ignore();
     }
 }
 
