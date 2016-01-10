@@ -6,11 +6,6 @@
 #include <Backend.h>
 #include <driver/socketcan/SocketCanDriver.h>
 
-class QDomElement;
-class Logger;
-class TraceWindow;
-class LogWindow;
-
 QT_BEGIN_NAMESPACE
 class QAction;
 class QMenu;
@@ -18,11 +13,15 @@ class QMdiArea;
 class QMdiSubWindow;
 class QWidget;
 class QSignalMapper;
+class QDomElement;
 QT_END_NAMESPACE
 
 namespace Ui {
 class MainWindow;
 }
+
+class MdiWindow;
+class Logger;
 
 class MainWindow : public QMainWindow
 {
@@ -42,6 +41,7 @@ public slots:
     void setActiveSubWindow(QWidget *window);
     bool showSetupDialog();
     void showAboutDialog();
+
     void startMeasurement();
     void stopMeasurement();
     void saveTraceToFile();
@@ -49,13 +49,12 @@ public slots:
     void updateMeasurementActions();
 
 private slots:
-    void on_action_TraceClear_triggered();
-
+    void on_workspace_modified();
+    void on_action_WorkspaceNew_triggered();
     void on_action_WorkspaceOpen_triggered();
-
-    void on_action_WorkspaceSaveAs_triggered();
-
     void on_action_WorkspaceSave_triggered();
+    void on_action_WorkspaceSaveAs_triggered();
+    void on_action_TraceClear_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -63,16 +62,30 @@ private:
     Backend backend;
     Logger *_logger;
     SocketCanDriver _socketcan;
+
+    bool _workspaceModified;
     QString _workspaceFileName;
+
+    QString _baseWindowTitle;
 
     QSignalMapper *windowMapper;
 
-    QMdiSubWindow *createSubWindow(QWidget *window);
+    QMdiSubWindow *createSubWindow(MdiWindow *window);
+
+    void stopAndClearMeasurement();
 
     bool loadWorkspaceWindow(QDomElement el);
     bool loadWorkspaceSetup(QDomElement el);
-    void loadWorkspace(QString filename);
-    void saveWorkspace(QString filename);
+    void loadWorkspaceFromFile(QString filename);
+    bool saveWorkspaceToFile(QString filename);
+
+    void newWorkspace();
+    void loadWorkspace();
+    bool saveWorkspace();
+    bool saveWorkspaceAs();
+
+    void setWorkspaceModified(bool modified);
+    int askSaveBecauseWorkspaceModified();
 
 };
 

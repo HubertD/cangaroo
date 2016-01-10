@@ -25,6 +25,8 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     _aggregatedProxyModel->setDynamicSortFilter(true);
 
     setMode(mode_linear);
+    setAutoScroll(false);
+
     ui->tree->setUniformRowHeights(true);
     ui->tree->setColumnWidth(0, 80);
     ui->tree->setColumnWidth(1, 70);
@@ -34,9 +36,7 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ui->tree->setColumnWidth(5, 50);
     ui->tree->setColumnWidth(6, 200);
 
-
     connect(_linearTraceViewModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
-    connect(ui->cbAggregated, SIGNAL(stateChanged(int)), this, SLOT(onCbTraceTypeChanged(int)));
 
 }
 
@@ -49,6 +49,7 @@ TraceWindow::~TraceWindow()
 
 void TraceWindow::setMode(TraceWindow::mode_t mode)
 {
+    bool isChanged = (_mode != mode);
     _mode = mode;
 
     if (_mode==mode_linear) {
@@ -59,6 +60,19 @@ void TraceWindow::setMode(TraceWindow::mode_t mode)
         ui->tree->setModel(_aggregatedProxyModel);
     }
 
+    if (isChanged) {
+        ui->cbAggregated->setChecked(_mode==mode_aggregated);
+        emit(settingsChanged(this));
+    }
+}
+
+void TraceWindow::setAutoScroll(bool doAutoScroll)
+{
+    if (doAutoScroll != _doAutoScroll) {
+        _doAutoScroll = doAutoScroll;
+        ui->cbAutoScroll->setChecked(_doAutoScroll);
+        emit(settingsChanged(this));
+    }
 }
 
 bool TraceWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
@@ -90,18 +104,13 @@ bool TraceWindow::loadXML(Backend &backend, QDomElement &el)
     setMode((el.attribute("mode", "linear") == "linear") ? mode_linear : mode_aggregated);
 
     QDomElement elLinear = el.firstChildElement("LinearTraceView");
-    ui->cbAutoScroll->setChecked(elLinear.attribute("autoscroll", "0").toInt() != 0);
+    setAutoScroll(elLinear.attribute("autoscroll", "0").toInt() != 0);
 
     QDomElement elAggregated = el.firstChildElement("AggregatedTraceView");
     int sortColumn = elAggregated.attribute("SortColumn", "-1").toInt();
     ui->tree->sortByColumn(sortColumn);
 
     return true;
-}
-
-void TraceWindow::onCbTraceTypeChanged(int i)
-{
-    setMode( (i==Qt::Checked) ? mode_aggregated : mode_linear );
 }
 
 void TraceWindow::rowsInserted(const QModelIndex &parent, int first, int last)
@@ -114,4 +123,14 @@ void TraceWindow::rowsInserted(const QModelIndex &parent, int first, int last)
         ui->tree->scrollToBottom();
     }
 
+}
+
+void TraceWindow::on_cbAggregated_stateChanged(int i)
+{
+    setMode( (i==Qt::Checked) ? mode_aggregated : mode_linear );
+}
+
+void TraceWindow::on_cbAutoScroll_stateChanged(int i)
+{
+    setAutoScroll(i==Qt::Checked);
 }

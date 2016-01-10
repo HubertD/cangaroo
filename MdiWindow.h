@@ -17,6 +17,7 @@ public:
     virtual bool loadXML(Backend &backend, QDomElement &el);
 
 signals:
+    void settingsChanged(MdiWindow *sender);
 
 public slots:
 };

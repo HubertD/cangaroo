@@ -21,6 +21,7 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     _logger(logger)
 {
     ui->setupUi(this);
+    _baseWindowTitle = windowTitle();
 
     QIcon icon(":/assets/icon.png");
     setWindowIcon(icon);
@@ -49,13 +50,9 @@ MainWindow::MainWindow(Logger *logger, QWidget *parent) :
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
     backend.addCanDriver(&_socketcan);
-    backend.setSetup(backend.createDefaultSetup());
 
-    QMdiSubWindow *logWindow = createLogWindow();
-    logWindow->setGeometry(0, 500, 1000, 200);
-
-    QMdiSubWindow *traceViewWindow = createTraceWindow();
-    traceViewWindow->setGeometry(0, 0, 1000, 500);
+    setWorkspaceModified(false);
+    newWorkspace();
 
     /*QMdiSubWindow *graphViewWindow = createGraphView();
     graphViewWindow->setGeometry(0, 500, 1000, 200);
@@ -74,6 +71,11 @@ void MainWindow::updateMeasurementActions()
     ui->actionStop_Measurement->setEnabled(running);
 }
 
+void MainWindow::on_workspace_modified()
+{
+    setWorkspaceModified(true);
+}
+
 void MainWindow::closeEvent(QCloseEvent *event) {
     ui->mdiArea->closeAllSubWindows();
     if (ui->mdiArea->currentSubWindow()) {
@@ -84,11 +86,19 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 }
 
-QMdiSubWindow *MainWindow::createSubWindow(QWidget *window)
+QMdiSubWindow *MainWindow::createSubWindow(MdiWindow *window)
 {
     QMdiSubWindow *retval = ui->mdiArea->addSubWindow(window);
+    connect(window, SIGNAL(settingsChanged(MdiWindow*)), this, SLOT(on_workspace_modified()));
     window->show();
     return retval;
+}
+
+void MainWindow::stopAndClearMeasurement()
+{
+    backend.stopMeasurement();
+    QCoreApplication::processEvents();
+    backend.clearTrace();
 }
 
 bool MainWindow::loadWorkspaceWindow(QDomElement el)
@@ -130,7 +140,7 @@ bool MainWindow::loadWorkspaceSetup(QDomElement el)
     }
 }
 
-void MainWindow::loadWorkspace(QString filename)
+void MainWindow::loadWorkspaceFromFile(QString filename)
 {
 
     QFile file(filename);
@@ -147,6 +157,7 @@ void MainWindow::loadWorkspace(QString filename)
     }
     file.close();
 
+    stopAndClearMeasurement();
     ui->mdiArea->closeAllSubWindows();
 
     QDomElement windowsRoot = doc.firstChild().firstChildElement("windows");
@@ -161,12 +172,13 @@ void MainWindow::loadWorkspace(QString filename)
     QDomElement setupRoot = doc.firstChild().firstChildElement("setup");
     if (loadWorkspaceSetup(setupRoot)) {
         _workspaceFileName = filename;
+        setWorkspaceModified(false);
     } else {
         qCritical() << "Unable to read measurement setup from workspace config file" << filename;
     }
 }
 
-void MainWindow::saveWorkspace(QString filename)
+bool MainWindow::saveWorkspaceToFile(QString filename)
 {
     QDomDocument doc;
     QDomElement root = doc.createElement("cangaroo-workspace");
@@ -185,7 +197,7 @@ void MainWindow::saveWorkspace(QString filename)
         MdiWindow *mdiwin = dynamic_cast<MdiWindow*>(window->widget());
         if (!mdiwin->saveXML(backend, doc, wnode)) {
             qCritical() << "Cannot save window settings to file";
-            return;
+            return false;
         }
 
         windowsRoot.appendChild(wnode);
@@ -194,7 +206,7 @@ void MainWindow::saveWorkspace(QString filename)
     QDomElement setupRoot = doc.createElement("setup");
     if (!backend.getSetup()->saveXML(backend, doc, setupRoot)) {
         qCritical() << "Cannot save measurement setup to file";
-        return;
+        return false;
     }
     root.appendChild(setupRoot);
 
@@ -204,11 +216,95 @@ void MainWindow::saveWorkspace(QString filename)
         stream << doc.toString();
         outFile.close();
         _workspaceFileName = filename;
+        setWorkspaceModified(false);
+        qDebug() << "saved workspace settings to " << filename;
+        return true;
     } else {
         qCritical() << "Cannot open workspace file for writing:" << filename;
+        return false;
     }
 
-    qDebug() << "saved workspace settings to " << filename;
+}
+
+void MainWindow::newWorkspace()
+{
+    if (askSaveBecauseWorkspaceModified() != QMessageBox::Cancel) {
+        stopAndClearMeasurement();
+        _workspaceFileName.clear();
+        setWorkspaceModified(false);
+        ui->mdiArea->closeAllSubWindows();
+        createLogWindow()->setGeometry(0, 500, 1000, 200);
+        createTraceWindow()->setGeometry(0, 0, 1000, 500);
+        backend.setSetup(backend.createDefaultSetup());
+    }
+}
+
+void MainWindow::loadWorkspace()
+{
+    if (askSaveBecauseWorkspaceModified() != QMessageBox::Cancel) {
+        QString filename = QFileDialog::getOpenFileName(this, "Open workspace configuration", "", "Workspace config files (*.cangaroo)");
+        if (!filename.isNull()) {
+            loadWorkspaceFromFile(filename);
+        }
+    }
+}
+
+bool MainWindow::saveWorkspace()
+{
+    if (_workspaceFileName.isEmpty()) {
+        return saveWorkspaceAs();
+    } else {
+        return saveWorkspaceToFile(_workspaceFileName);
+    }
+}
+
+bool MainWindow::saveWorkspaceAs()
+{
+    QString filename = QFileDialog::getSaveFileName(this, "Save workspace configuration", "", "Workspace config files (*.cangaroo)");
+    if (!filename.isNull()) {
+        return saveWorkspaceToFile(filename);
+    } else {
+        return false;
+    }
+}
+
+void MainWindow::setWorkspaceModified(bool modified)
+{
+    _workspaceModified = modified;
+
+    QString title = _baseWindowTitle;
+    if (!_workspaceFileName.isEmpty()) {
+        QFileInfo fi(_workspaceFileName);
+        title += " - " + fi.fileName();
+    }
+    if (_workspaceModified) {
+        title += '*';
+    }
+    setWindowTitle(title);
+}
+
+int MainWindow::askSaveBecauseWorkspaceModified()
+{
+    if (_workspaceModified) {
+        QMessageBox msgBox;
+        msgBox.setText("The current workspace has been modified.");
+        msgBox.setInformativeText("Do you want to save your changes?");
+        msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Save);
+        int result = msgBox.exec();
+
+        if (result == QMessageBox::Save) {
+            if (saveWorkspace()) {
+                return QMessageBox::Save;
+            } else {
+                return QMessageBox::Cancel;
+            }
+        }
+
+        return result;
+    } else {
+        return QMessageBox::Discard;
+    }
 }
 
 QMdiSubWindow *MainWindow::createTraceWindow() {
@@ -237,6 +333,7 @@ bool MainWindow::showSetupDialog()
     MeasurementSetup *new_setup = dlg.showSetupDialog(*backend.getSetup());
     if (new_setup) {
         backend.setSetup(new_setup);
+        setWorkspaceModified(true);
         return true;
     } else {
         return false;
@@ -274,27 +371,22 @@ void MainWindow::on_action_TraceClear_triggered()
     backend.clearTrace();
 }
 
-void MainWindow::on_action_WorkspaceOpen_triggered()
-{
-    QString filename = QFileDialog::getOpenFileName(this, "Open workspace configuration", "", "Workspace config files (*.cangaroo)");
-    if (!filename.isNull()) {
-        loadWorkspace(filename);
-    }
-}
-
 void MainWindow::on_action_WorkspaceSave_triggered()
 {
-    if (_workspaceFileName.isEmpty()) {
-        on_action_WorkspaceSaveAs_triggered();
-    } else {
-        saveWorkspace(_workspaceFileName);
-    }
+    saveWorkspace();
 }
 
 void MainWindow::on_action_WorkspaceSaveAs_triggered()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "Save workspace configuration", "", "Workspace config files (*.cangaroo)");
-    if (!filename.isNull()) {
-        saveWorkspace(filename);
-    }
+    saveWorkspaceAs();
+}
+
+void MainWindow::on_action_WorkspaceOpen_triggered()
+{
+    loadWorkspace();
+}
+
+void MainWindow::on_action_WorkspaceNew_triggered()
+{
+    newWorkspace();
 }
