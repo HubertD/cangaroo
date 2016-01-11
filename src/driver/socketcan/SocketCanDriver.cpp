@@ -25,18 +25,16 @@ SocketCanDriver::~SocketCanDriver() {
 }
 
 void SocketCanDriver::update() {
-	int fd;
-	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
 
-	struct sockaddr_nl local;
+    struct sockaddr_nl local;
 
+    int fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
 	pid_t pid = getpid();
 
 	memset(&local, 0, sizeof(local));
 	local.nl_family = AF_NETLINK;
-	local.nl_pid = pid; /* can be obtained using getpid*/
+    local.nl_pid = pid;
 	local.nl_groups = 0;
-
 	if (bind(fd, (struct sockaddr *) &local, sizeof(local)) < 0) {
 		fprintf(stderr, "could not bind");
 		return;
@@ -119,6 +117,7 @@ void SocketCanDriver::update() {
 		}
 	}
 
+    close(fd);
 	return;
 }
 
