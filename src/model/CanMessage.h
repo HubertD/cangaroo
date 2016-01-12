@@ -59,7 +59,7 @@ public:
 	void setByte(const uint8_t index, const uint8_t value);
 
     uint64_t getU64() const;
-    uint64_t extractRawSignal(const uint8_t start_bit, const uint8_t length, const bool isBigEndian) const;
+    uint64_t extractRawSignal(uint8_t start_bit, const uint8_t length, const bool isBigEndian) const;
 
 	void setData(const uint8_t d0);
 	void setData(const uint8_t d0, const uint8_t d1);

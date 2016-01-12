@@ -159,20 +159,25 @@ uint64_t CanMessage::getU64() const
     return _u64;
 }
 
-uint64_t CanMessage::extractRawSignal(const uint8_t start_bit, const uint8_t length, const bool isBigEndian) const
+uint64_t CanMessage::extractRawSignal(uint8_t start_bit, const uint8_t length, const bool isBigEndian) const
 {
-    uint64_t result = isBigEndian ? le64toh(_u64) : be64toh(_u64);
-    result >>= start_bit;
-    uint64_t mask = 0xFFFFFFFFFFFFFFFF;
-    mask <<= length;
-    result &= ~mask;
+    uint64_t data = le64toh(_u64);
 
     if (isBigEndian) {
-        result = be64toh(result);
-        return result >> (64-length);
-    } else {
-        return le64toh(result);
+        // it's magic. just swap the byte order and adjust the startbit, then it works like little endian
+        data = __builtin_bswap64(data);
+        start_bit = 63 - start_bit - length;
     }
+
+    data >>= start_bit;
+
+    uint64_t mask =  0xFFFFFFFFFFFFFFFF;
+    mask <<= length;
+    mask = ~mask;
+
+    data &= mask;
+
+    return data;
 }
 
 void CanMessage::setData(const uint8_t d0) {
