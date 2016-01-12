@@ -9,7 +9,7 @@ Homepage: https://cangaroo.org/
 Package: cangaroo
 Architecture: any
 Depends: libqt5gui5, libqt5widgets5, libqt5core5a, libqt5xml5, ${misc:Depends}, ${shlibs:Depends}
-Description: A CAN Bus Analyzer
+Description: Qt-based CAN Bus Analyzer
  cangaroo is a open source CAN Bus Analyzer based on Qt5 and C++.
  It allows for monitoring multiple SocketCAN interfaces, load DBC files,
  analyze the CAN Traffic in different views and much more.
