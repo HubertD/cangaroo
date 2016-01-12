@@ -1,11 +1,17 @@
-cangaroo (0.1.1-1) UNRELEASED; urgency=low
+cangaroo (0.1.2-1) experimental; urgency=low
+  * fix device re-scan ("could not bind" console message)
+  * fix some dbc parsing issues (signed signals, ...)
+  * implement big endian signals
 
+ -- Hubert Denkmair <hubert@denkmair.de>  Tue, 12 Jan 2016 21:35:00 +0200
+
+cangaroo (0.1.1-1) experimental; urgency=low
   * change source structure to better fit debian packaging
+  * add debian packaging info
 
- -- Hubert Denkmair <hubert@denkmair.de>  Sun, 10 Jan 2016 21:00:00 +0200
+ -- Hubert Denkmair <hubert@denkmair.de>  Mon, 11 Jan 2016 00:30:00 +0200
 
-cangaroo (0.1.0-1) UNRELEASED; urgency=low
-
+cangaroo (0.1.0-1) experimental; urgency=low
   * Initial Release
 
  -- Hubert Denkmair <hubert@denkmair.de>  Sun, 10 Jan 2016 21:00:00 +0200

@@ -6,8 +6,10 @@ written by Hubert Denkmair <hubert@denkmair.de>
 ## changelog
 
 
-### v0.1.2 (unreleased)
+### v0.1.2 released 2016-01-12
 * fix device re-scan ("could not bind" console message)
+* fix some dbc parsing issues (signed signals, ...)
+* implement big endian signals
 
 ### v0.1.1 released 2016-01-11
 * change source structure to better fit debian packaging
