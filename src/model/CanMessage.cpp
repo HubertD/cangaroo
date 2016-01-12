@@ -169,7 +169,7 @@ uint64_t CanMessage::extractRawSignal(const uint8_t start_bit, const uint8_t len
 
     if (isBigEndian) {
         result = be64toh(result);
-        return result >> length;
+        return result >> (64-length);
     } else {
         return le64toh(result);
     }
