@@ -51,11 +51,11 @@ bool DbcParser::parseFile(QFile *file, CanDb &candb)
 DbcToken *DbcParser::createNewToken(QChar ch, int line, int column)
 {
     static const QString acceptableIdStartChars("ABCDEFGHIKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
-    static const QRegExp numberRegExp("^([-\\+]?\\d*(\\.\\d*)?(E[-+]?\\d*)?)$");
+    static const QRegExp numberRegExp("^([-\\+]?\\d+(\\.\\d*)?(E[-+]?\\d*)?)$");
 
     if (ch.isSpace()) {
         return new DbcWhitespaceToken(line, column);
-    } else if (ch.isDigit() || (ch=='-')) {
+    } else if (ch.isDigit()) {
         return new DbcRegExpToken(line, column, dbc_tok_number, numberRegExp);
     } else if (ch == '"') {
         return new DbcStringToken(line, column);
@@ -67,6 +67,8 @@ DbcToken *DbcParser::createNewToken(QChar ch, int line, int column)
         return new DbcSingleCharToken(line, column, dbc_tok_at, '@');
     } else if (ch == '+') {
         return new DbcSingleCharToken(line, column, dbc_tok_plus, '+');
+    } else if (ch == '-') {
+        return new DbcSingleCharToken(line, column, dbc_tok_minus, '-');
     } else if (ch == '(') {
         return new DbcSingleCharToken(line, column, dbc_tok_parenth_open, '(');
     } else if (ch == ')') {
@@ -141,17 +143,18 @@ DbcParser::error_t DbcParser::tokenize(QFile *file, DbcParser::DbcTokenList &tok
     return retval;
 }
 
-bool DbcParser::isSectionEnding(DbcToken *token)
+bool DbcParser::isSectionEnding(DbcToken *token, bool newLineIsSectionEnding)
 {
     if (!token) {
         return true;
     } else {
+        int numNewLinesForEnding = newLineIsSectionEnding ? 1 : 2;
         dbc_token_type_t type = token->getType();
-        return ( (type==dbc_tok_semicolon) || ( (type==dbc_tok_whitespace) && (token->countLineBreaks()>1)));
+        return ( (type==dbc_tok_semicolon) || ( (type==dbc_tok_whitespace) && (token->countLineBreaks()>=numNewLinesForEnding)));
     }
 }
 
-DbcToken *DbcParser::readToken(DbcParser::DbcTokenList &tokens, int typeMask, bool skipWhitespace, bool skipSectionEnding)
+DbcToken *DbcParser::readToken(DbcParser::DbcTokenList &tokens, int typeMask, bool skipWhitespace, bool skipSectionEnding, bool newLineIsSectionEnding)
 {
     while (true) {
         if (tokens.isEmpty()) { return 0; }
@@ -164,7 +167,7 @@ DbcToken *DbcParser::readToken(DbcParser::DbcTokenList &tokens, int typeMask, bo
             tokens.pop_front();
             return token;
 
-        } else if (isSectionEnding(token)) {
+        } else if (isSectionEnding(token, newLineIsSectionEnding)) {
 
             if (skipSectionEnding) {
                 tokens.pop_front();
@@ -190,7 +193,7 @@ DbcToken *DbcParser::readToken(DbcParser::DbcTokenList &tokens, int typeMask, bo
     return 0;
 }
 
-bool DbcParser::expectSectionEnding(DbcTokenList &tokens)
+bool DbcParser::expectSectionEnding(DbcTokenList &tokens, bool newLineIsSectionEnding)
 {
     if (tokens.isEmpty()) {
         return true;
@@ -201,7 +204,7 @@ bool DbcParser::expectSectionEnding(DbcTokenList &tokens)
         return false;
     }
 
-    if (!isSectionEnding(token)) {
+    if (!isSectionEnding(token, newLineIsSectionEnding)) {
         free(token);
         return false;
     } else {
@@ -237,10 +240,10 @@ bool DbcParser::expectAndSkipToken(DbcTokenList &tokens, dbc_token_type_t type, 
     }
 }
 
-bool DbcParser::expectData(DbcParser::DbcTokenList &tokens, dbc_token_type_t type, QString *data, bool skipWhitespace, bool skipSectionEnding)
+bool DbcParser::expectData(DbcParser::DbcTokenList &tokens, dbc_token_type_t type, QString *data, bool skipWhitespace, bool skipSectionEnding, bool newLineIsSectionEnding)
 {
     DbcToken *token;
-    if (!(token = readToken(tokens, type, skipWhitespace, skipSectionEnding))) {
+    if (!(token = readToken(tokens, type, skipWhitespace, skipSectionEnding, newLineIsSectionEnding))) {
         return false;
     }
 
@@ -253,9 +256,9 @@ bool DbcParser::expectData(DbcParser::DbcTokenList &tokens, dbc_token_type_t typ
     return true;
 }
 
-bool DbcParser::expectIdentifier(DbcParser::DbcTokenList &tokens, QString *id, bool skipWhitespace, bool skipSectionEnding)
+bool DbcParser::expectIdentifier(DbcParser::DbcTokenList &tokens, QString *id, bool skipWhitespace, bool skipSectionEnding, bool newLineIsSectionEnding)
 {
-    return expectData(tokens, dbc_tok_identifier, id, skipWhitespace, skipSectionEnding);
+    return expectData(tokens, dbc_tok_identifier, id, skipWhitespace, skipSectionEnding, newLineIsSectionEnding);
 }
 
 bool DbcParser::expectString(DbcParser::DbcTokenList &tokens, QString *str, bool skipWhitespace)
@@ -270,12 +273,32 @@ bool DbcParser::expectString(DbcParser::DbcTokenList &tokens, QString *str, bool
     }
 }
 
+bool DbcParser::expectNumber(DbcParser::DbcTokenList &tokens, QString *str, bool skipWhitespace)
+{
+    QString data;
+    if  (expectAndSkipToken(tokens, dbc_tok_minus, skipWhitespace)) {
+        *str = "-";
+    } else if (expectAndSkipToken(tokens, dbc_tok_plus, skipWhitespace)) {
+        *str = "+";
+    }
+
+    if (expectData(tokens, dbc_tok_number, &data, skipWhitespace)) {
+        *str += data;
+        return true;
+    } else {
+        return false;
+    }
+
+}
+
 bool DbcParser::expectInt(DbcParser::DbcTokenList &tokens, int *i, int base, bool skipWhitespace)
 {
     QString data;
-    bool convert_ok;
+    if (!expectNumber(tokens, &data, skipWhitespace)) {
+        return false;
+    }
 
-    if (!expectData(tokens, dbc_tok_number, &data, skipWhitespace)) { return false; }
+    bool convert_ok;
     *i = data.toInt(&convert_ok, base);
     return convert_ok;
 }
@@ -283,9 +306,11 @@ bool DbcParser::expectInt(DbcParser::DbcTokenList &tokens, int *i, int base, boo
 bool DbcParser::expectLongLong(DbcTokenList &tokens, long long *i, int base, bool skipWhitespace)
 {
     QString data;
-    bool convert_ok;
+    if (!expectNumber(tokens, &data, skipWhitespace)) {
+        return false;
+    }
 
-    if (!expectData(tokens, dbc_tok_number, &data, skipWhitespace)) { return false; }
+    bool convert_ok;
     *i = data.toLongLong(&convert_ok, base);
     return convert_ok;
 }
@@ -293,9 +318,11 @@ bool DbcParser::expectLongLong(DbcTokenList &tokens, long long *i, int base, boo
 bool DbcParser::expectDouble(DbcTokenList &tokens, double *df, bool skipWhitespace)
 {
     QString data;
-    bool convert_ok;
+    if (!expectNumber(tokens, &data, skipWhitespace)) {
+        return false;
+    }
 
-    if (!expectData(tokens, dbc_tok_number, &data, skipWhitespace)) { return false; }
+    bool convert_ok;
     *df = data.toDouble(&convert_ok);
     return convert_ok;
 }
@@ -314,20 +341,20 @@ void DbcParser::skipUntilSectionEnding(DbcTokenList &tokens)
     }
 }
 
-bool DbcParser::parseIdentifierList(DbcTokenList &tokens, QStringList *list)
+bool DbcParser::parseIdentifierList(DbcTokenList &tokens, QStringList *list, bool newLineIsSectionEnding)
 {
     if (!expectAndSkipToken(tokens, dbc_tok_colon)) {
         return false;
     }
 
     QString id;
-    while (expectIdentifier(tokens, &id)) {
+    while (expectIdentifier(tokens, &id, true, false, newLineIsSectionEnding)) {
         if (list) {
             list->append(id);
         }
     }
 
-    return expectSectionEnding(tokens);
+    return expectSectionEnding(tokens, newLineIsSectionEnding);
 }
 
 bool DbcParser::parse(CanDb &candb, DbcTokenList &tokens)
@@ -415,7 +442,7 @@ bool DbcParser::parseSectionBu(CanDb &candb, DbcParser::DbcTokenList &tokens)
     QStringList strings;
     QString s;
 
-    if (!parseIdentifierList(tokens, &strings)) {
+    if (!parseIdentifierList(tokens, &strings, true)) {
         return false;
     }
 
@@ -523,8 +550,11 @@ bool DbcParser::parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &
     if (expectAndSkipToken(tokens, dbc_tok_plus)) {
         signal->setUnsigned(true);
     } else {
-        // TODO check with DBC that actually contains signed values?!
-        signal->setUnsigned(false);
+        if (expectAndSkipToken(tokens, dbc_tok_minus)) {
+            signal->setUnsigned(false);
+        } else {
+            return false;
+        }
     }
 
     if (!expectAndSkipToken(tokens, dbc_tok_parenth_open)) { return false; }

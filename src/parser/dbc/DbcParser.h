@@ -60,23 +60,26 @@ private:
     DbcToken *createNewToken(QChar ch, int line, int column);
     error_t tokenize(QFile *file, DbcTokenList &tokens);
 
-    bool isSectionEnding(DbcToken *token);
-    bool expectSectionEnding(DbcTokenList &tokens);
+    bool isSectionEnding(DbcToken *token, bool newLineIsSectionEnding=false);
+    bool expectSectionEnding(DbcTokenList &tokens, bool newLineIsSectionEnding=false);
     bool expectLineBreak(DbcTokenList &tokens);
     bool expectAndSkipToken(DbcTokenList &tokens, dbc_token_type_t type, bool skipWhitespace=true, bool skipSectionEnding=false);
 
-    bool expectData(DbcTokenList &tokens, dbc_token_type_t type, QString *data, bool skipWhitespace=true, bool skipSectionEnding=false);
-    bool expectIdentifier(DbcTokenList &tokens, QString *id, bool skipWhitespace=true, bool skipSectionEnding=false);
+    bool expectData(DbcTokenList &tokens, dbc_token_type_t type, QString *data, bool skipWhitespace=true, bool skipSectionEnding=false, bool newLineIsSectionEnding=false);
+    bool expectIdentifier(DbcTokenList &tokens, QString *id, bool skipWhitespace=true, bool skipSectionEnding=false, bool newLineIsSectionEnding=false);
     bool expectString(DbcTokenList &tokens, QString *str, bool skipWhitespace=true);
+
+    bool expectNumber(DbcTokenList &tokens, QString *str, bool skipWhitespace=true);
+
     bool expectInt(DbcTokenList &tokens, int *i, int base=10, bool skipWhitespace=true);
     bool expectLongLong(DbcTokenList &tokens, long long *i, int base=10, bool skipWhitespace=true);
     bool expectDouble(DbcTokenList &tokens, double *df, bool skipWhitespace=true);
     void skipUntilSectionEnding(DbcTokenList &tokens);
 
-    DbcToken *readToken(DbcTokenList &tokens, int typeMask, bool skipWhitespace=true, bool skipSectionEnding=false);
+    DbcToken *readToken(DbcTokenList &tokens, int typeMask, bool skipWhitespace=true, bool skipSectionEnding=false, bool newLineIsSectionEnding=false);
 
     bool parse(CanDb &candb, DbcTokenList &tokens);
-    bool parseIdentifierList(DbcTokenList &tokens, QStringList *list);
+    bool parseIdentifierList(DbcTokenList &tokens, QStringList *list, bool newLineIsSectionEnding=false);
 
     bool parseSection(CanDb &candb, DbcTokenList &tokens);
     bool parseSectionVersion(CanDb &candb, DbcTokenList &tokens);
