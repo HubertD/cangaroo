@@ -33,14 +33,17 @@ enum {
 };
 
 CanMessage::CanMessage()
-  : _raw_id(0), _dlc(0), _u64(0)
+  : _raw_id(0), _dlc(0), _interface(0), _u64(0)
 {
+    _timestamp.tv_sec = 0;
+    _timestamp.tv_usec = 0;
 }
 
 CanMessage::CanMessage(uint32_t can_id)
-  : _dlc(0), _u64(0)
+  : _dlc(0), _interface(0), _u64(0)
 {
-    setId(can_id);
+    _timestamp.tv_sec = 0;
+    _timestamp.tv_usec = 0;
 }
 
 CanMessage::CanMessage(const CanMessage &msg)
