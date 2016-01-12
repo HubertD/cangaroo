@@ -67,12 +67,16 @@ public:
     bool isUnsigned() const;
     void setUnsigned(bool isUnsigned);
 
+    bool isBigEndian() const;
+    void setIsBigEndian(bool isBigEndian);
+
 private:
     CanDbMessage *_parent;
     QString _name;
     int _startBit;
     int _length;
     bool _isUnsigned;
+    bool _isBigEndian;
     double _factor;
     double _offset;
     double _min;

@@ -192,7 +192,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, i
             return dbsignal->name();
 
         case column_data:
-            raw_data = msg->extractRawSignal(dbsignal->startBit(), dbsignal->length(), false);
+            raw_data = msg->extractRawSignal(dbsignal->startBit(), dbsignal->length(), dbsignal->isBigEndian());
             value_name = dbsignal->getValueName(raw_data);
 
             if (value_name.isEmpty()) {

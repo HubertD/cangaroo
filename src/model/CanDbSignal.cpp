@@ -24,6 +24,7 @@
 CanDbSignal::CanDbSignal(CanDbMessage *parent)
   : _parent(parent),
     _isUnsigned(false),
+    _isBigEndian(false),
     _factor(1),
     _offset(0),
     _min(0),
@@ -147,4 +148,14 @@ void CanDbSignal::setUnsigned(bool isUnsigned)
 {
     _isUnsigned = isUnsigned;
 }
+bool CanDbSignal::isBigEndian() const
+{
+    return _isBigEndian;
+}
+
+void CanDbSignal::setIsBigEndian(bool isBigEndian)
+{
+    _isBigEndian = isBigEndian;
+}
+
 

@@ -551,6 +551,7 @@ bool DbcParser::parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &
 
     if (!expectAndSkipToken(tokens, dbc_tok_at)) { return false; }
     if (!expectInt(tokens, &byte_order)) { return false; }
+    signal->setIsBigEndian(byte_order==0);
 
     if (expectAndSkipToken(tokens, dbc_tok_plus)) {
         signal->setUnsigned(true);
