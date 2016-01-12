@@ -21,6 +21,7 @@
 
 #include "DbcParser.h"
 #include <QTextStream>
+#include <QDebug>
 #include "model/CanDb.h"
 #include <stdint.h>
 #include <iostream>
@@ -51,7 +52,7 @@ bool DbcParser::parseFile(QFile *file, CanDb &candb)
 DbcToken *DbcParser::createNewToken(QChar ch, int line, int column)
 {
     static const QString acceptableIdStartChars("ABCDEFGHIKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
-    static const QRegExp numberRegExp("^([-\\+]?\\d+(\\.\\d*)?(E[-+]?\\d*)?)$");
+    static const QRegExp numberRegExp("^(\\d+(\\.\\d*)?(E[-+]?\\d*)?)$");
 
     if (ch.isSpace()) {
         return new DbcWhitespaceToken(line, column);
@@ -408,6 +409,10 @@ bool DbcParser::parseSection(CanDb &candb, DbcTokenList &tokens) {
             retval = false;
         }
 
+    }
+
+    if (!retval) {
+        qCritical() << "DBC Parse error.";
     }
     return retval;
 
