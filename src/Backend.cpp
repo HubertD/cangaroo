@@ -21,7 +21,6 @@
 
 #include "Backend.h"
 
-#include <QDebug>
 #include <QDateTime>
 
 #include <model/CanTrace.h>
@@ -58,7 +57,8 @@ void Backend::addCanDriver(CanDriver *driver)
 
 bool Backend::startMeasurement()
 {
-    qDebug("starting measurement");
+    logMessage(log_level_info, "Starting measurement");
+
     _measurementStartTime = currentTimeStamp();
 
     int i=0;
@@ -69,10 +69,14 @@ bool Backend::startMeasurement()
             CanInterface *intf = getInterfaceById(mi->canInterface());
             intf->open();
 
-            qDebug() << "listening on interface" << intf->getName();
+            logMessage(log_level_info, QString("Listening on interface: %1").arg(intf->getName()));
 
             if (intf->getBitrate() != mi->bitrate()) {
-                qDebug() << "setting bitrate on" << intf->getName() << " from " << intf->getBitrate() << " to " << mi->bitrate();
+                logMessage(log_level_info, QString("Setting bitrate on %1 from %2 to %3").arg(
+                    intf->getName(),
+                    QString().number(intf->getBitrate()),
+                    QString().number(mi->bitrate())
+                ));
                 intf->setBitrate(mi->bitrate());
             }
 
@@ -95,14 +99,14 @@ bool Backend::stopMeasurement()
 
     foreach (CanListener *listener, _listeners) {
         listener->waitFinish();
-        qDebug() << "closing interface" << getInterfaceName(listener->getInterfaceId());
+        logMessage(log_level_info, QString("Closing interface: %1").arg(getInterfaceName(listener->getInterfaceId())));
         listener->getInterface().close();
     }
 
     qDeleteAll(_listeners);
     _listeners.clear();
 
-    qDebug("measurement stopped");
+    logMessage(log_level_info, "Measurement stopped");
 
     _measurementRunning = false;
 
@@ -189,7 +193,7 @@ CanDriver *Backend::getDriverById(CanInterfaceId id)
 {
     CanDriver *driver = _drivers.value((id>>8) & 0xFF);
     if (!driver) {
-        qWarning() << "unable to get driver for interface id" << id << ", this should never happen.";
+        logMessage(log_level_critical, QString("Unable to get driver for interface id: %1. This should never happen.").arg(QString().number(id)));
     }
     return driver;
 }
@@ -206,7 +210,7 @@ QString Backend::getInterfaceName(CanInterfaceId id)
     if (intf) {
         return intf->getName();
     } else {
-        qWarning() << "trying to get name from unknown interface id" << id << ", this should never happen.";
+        logMessage(log_level_critical, QString("Trying to get name from unknown interface id: %1. This should never happen.").arg(QString().number(id)));
         return "";
     }
 }
@@ -253,4 +257,9 @@ pCanDb Backend::loadDbc(QString filename)
 double Backend::getMeasurementStartTime() const
 {
     return _measurementStartTime;
+}
+
+void Backend::logMessage(const log_level_t level, const QString msg)
+{
+    emit onLogMessage(QDateTime::currentDateTime(), level, msg);
 }

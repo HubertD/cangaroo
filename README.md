@@ -9,6 +9,7 @@ written by Hubert Denkmair <hubert@denkmair.de>
 ### v0.1.3 unreleased
 * some performance improvements when receiving lots of messages 
 * bugfix with time-delta view: timestamps not shown when no previous message avail
+* new logging subsystem, do not use QDebug any more
 
 ### v0.1.2 released 2016-01-12
 * fix device re-scan ("could not bind" console message)
@@ -47,7 +48,6 @@ initial release \o/
 * maybe switch to docking window system
 
 ### logging subsystem
-* redo, don't use qDebug() and friends
 * show timestamps, log level etc. in log window
 
 ### trace window

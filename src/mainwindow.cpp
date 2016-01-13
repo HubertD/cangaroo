@@ -26,20 +26,17 @@
 #include <QMdiArea>
 #include <QSignalMapper>
 #include <QCloseEvent>
-#include <QDebug>
 #include <QDomDocument>
 
-#include "Logger.h"
 #include <model/MeasurementSetup.h>
 #include <window/TraceWindow/TraceWindow.h>
 #include <window/SetupDialog/SetupDialog.h>
 #include <window/LogWindow/LogWindow.h>
 #include <window/GraphWindow/GraphWindow.h>
 
-MainWindow::MainWindow(Logger *logger, QWidget *parent) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    _logger(logger)
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     _baseWindowTitle = windowTitle();
@@ -126,7 +123,7 @@ bool MainWindow::loadWorkspaceWindow(QDomElement el)
     MdiWindow *window;
     QString type = el.attribute("type");
     if (type=="LogWindow") {
-        window = new LogWindow(ui->mdiArea, *_logger);
+        window = new LogWindow(ui->mdiArea, backend);
     } else if (type=="TraceWindow") {
         window = new TraceWindow(ui->mdiArea, backend);
     } else if (type=="GraphWindow") {
@@ -164,14 +161,14 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
 
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qCritical() << "Cannot open workspace settings file:" << filename;
+        backend.logMessage(log_level_error, QString("Cannot open workspace settings file: %1").arg(filename));
         return;
     }
 
     QDomDocument doc;
     if (!doc.setContent(&file)) {
         file.close();
-        qCritical() << "Cannot load settings from" << filename;
+        backend.logMessage(log_level_error, QString("Cannot load settings from file: %1").arg(filename));
         return;
     }
     file.close();
@@ -183,7 +180,7 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
     QDomNodeList windows = windowsRoot.elementsByTagName("window");
     for (int i=0; i<windows.length(); i++) {
         if (!loadWorkspaceWindow(windows.item(i).toElement())) {
-            qDebug() << "Could not read window " << i << "settings from" << filename;
+            backend.logMessage(log_level_warning, QString("Could not read window %1 from file: %2").arg(QString::number(i), filename));
             continue;
         }
     }
@@ -193,7 +190,7 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
         _workspaceFileName = filename;
         setWorkspaceModified(false);
     } else {
-        qCritical() << "Unable to read measurement setup from workspace config file" << filename;
+        backend.logMessage(log_level_error, QString("Unable to read measurement setup from workspace config file: %1").arg(filename));
     }
 }
 
@@ -215,7 +212,7 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
 
         MdiWindow *mdiwin = dynamic_cast<MdiWindow*>(window->widget());
         if (!mdiwin->saveXML(backend, doc, wnode)) {
-            qCritical() << "Cannot save window settings to file";
+            backend.logMessage(log_level_error, QString("Cannot save window settings to file: %1").arg(filename));
             return false;
         }
 
@@ -224,7 +221,7 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
 
     QDomElement setupRoot = doc.createElement("setup");
     if (!backend.getSetup().saveXML(backend, doc, setupRoot)) {
-        qCritical() << "Cannot save measurement setup to file";
+        backend.logMessage(log_level_error, QString("Cannot save measurement setup to file: %1").arg(filename));
         return false;
     }
     root.appendChild(setupRoot);
@@ -236,10 +233,10 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
         outFile.close();
         _workspaceFileName = filename;
         setWorkspaceModified(false);
-        qDebug() << "saved workspace settings to " << filename;
+        backend.logMessage(log_level_info, QString("Saved workspace settings to file: %1").arg(filename));
         return true;
     } else {
-        qCritical() << "Cannot open workspace file for writing:" << filename;
+        backend.logMessage(log_level_error, QString("Cannot open workspace file for writing: %1").arg(filename));
         return false;
     }
 
@@ -332,7 +329,7 @@ QMdiSubWindow *MainWindow::createTraceWindow() {
 
 QMdiSubWindow *MainWindow::createLogWindow()
 {
-    return createSubWindow(new LogWindow(ui->mdiArea, *_logger));
+    return createSubWindow(new LogWindow(ui->mdiArea, backend));
 }
 
 QMdiSubWindow *MainWindow::createGraphWindow()

@@ -21,7 +21,6 @@
 
 #include "DbcParser.h"
 #include <QTextStream>
-#include <QDebug>
 #include "model/CanDb.h"
 #include <stdint.h>
 #include <iostream>
@@ -412,7 +411,7 @@ bool DbcParser::parseSection(CanDb &candb, DbcTokenList &tokens) {
     }
 
     if (!retval) {
-        qCritical() << "DBC Parse error.";
+        //qCritical() << "DBC Parse error.";
     }
     return retval;
 

@@ -23,16 +23,14 @@
 #include "ui_LogWindow.h"
 
 #include <QDomDocument>
+#include <Backend.h>
 
-#include "Logger.h"
-
-
-LogWindow::LogWindow(QWidget *parent, Logger &logger) :
+LogWindow::LogWindow(QWidget *parent, Backend &backend) :
     MdiWindow(parent),
     ui(new Ui::LogWindow)
 {
     ui->setupUi(this);
-    connect(&logger, SIGNAL(onLogMessage(QtMsgType,QString)), this, SLOT(onLogMessage(QtMsgType,QString)));
+    connect(&backend, SIGNAL(onLogMessage(QDateTime,log_level_t,QString)), this, SLOT(onLogMessage(QDateTime,log_level_t,QString)));
 }
 
 LogWindow::~LogWindow()
@@ -52,9 +50,10 @@ bool LogWindow::loadXML(Backend &backend, QDomElement &el)
     return MdiWindow::loadXML(backend, el);
 }
 
-void LogWindow::onLogMessage(QtMsgType type, const QString &msg)
+void LogWindow::onLogMessage(const QDateTime dt, const log_level_t level, const QString msg)
 {
-    (void) type;
+    (void) dt;
+    (void) level;
     ui->loglist->addItem(msg);
     ui->loglist->scrollToBottom();
 }

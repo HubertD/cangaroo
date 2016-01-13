@@ -42,14 +42,13 @@ class MainWindow;
 }
 
 class MdiWindow;
-class Logger;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(Logger *logger, QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
 protected:
@@ -81,7 +80,6 @@ private:
     Ui::MainWindow *ui;
 
     Backend backend;
-    Logger *_logger;
     SocketCanDriver _socketcan;
 
     bool _workspaceModified;

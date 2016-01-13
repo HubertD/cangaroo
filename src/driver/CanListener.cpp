@@ -22,7 +22,6 @@
 #include "CanListener.h"
 
 #include <QThread>
-#include <QDebug>
 
 #include <Backend.h>
 #include <model/CanTrace.h>

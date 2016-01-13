@@ -21,7 +21,6 @@
 
 #include "AggregatedTraceViewModel.h"
 #include <QColor>
-#include <QDebug>
 
 #include <Backend.h>
 #include <model/CanTrace.h>

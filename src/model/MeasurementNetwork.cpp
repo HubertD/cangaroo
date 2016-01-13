@@ -22,8 +22,6 @@
 #include "MeasurementNetwork.h"
 #include "MeasurementInterface.h"
 
-#include <QDebug>
-
 #include <Backend.h>
 
 
@@ -133,7 +131,7 @@ bool MeasurementNetwork::loadXML(Backend &backend, QDomElement el)
             MeasurementInterface *mi = addCanInterface(intf->getId());
             mi->setBitrate(bitrate);
         } else {
-            qCritical() << "could not find can interface" << driverName << deviceName << "which is referenced to in the workspace config file.";
+            backend.logMessage(log_level_error, QString("Could not find interface %1/%2, which is referenced in the workspace config file.").arg(driverName, deviceName));
         }
     }
 
@@ -145,7 +143,7 @@ bool MeasurementNetwork::loadXML(Backend &backend, QDomElement el)
         if (!filename.isEmpty()) {
             addCanDb(backend.loadDbc(filename));
         } else {
-            qCritical() << "could not load candb";
+            backend.logMessage(log_level_error, QString("Unable to load CanDB: %1").arg(filename));
         }
     }
 

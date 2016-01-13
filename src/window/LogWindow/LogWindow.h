@@ -23,6 +23,7 @@
 #define LOGWINDOW_H
 
 #include <MdiWindow.h>
+#include <Backend.h>
 
 namespace Ui {
 class LogWindow;
@@ -30,22 +31,20 @@ class LogWindow;
 
 class QDomDocument;
 class QDomElement;
-class Backend;
-class Logger;
 
 class LogWindow : public MdiWindow
 {
     Q_OBJECT
 
 public:
-    explicit LogWindow(QWidget *parent, Logger &logger);
+    explicit LogWindow(QWidget *parent, Backend &backend);
     ~LogWindow();
 
     virtual bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
     virtual bool loadXML(Backend &backend, QDomElement &el);
 
 public slots:
-    void onLogMessage(QtMsgType type, const QString &msg);
+    void onLogMessage(const QDateTime dt, const log_level_t level, const QString msg);
 
 private:
     Ui::LogWindow *ui;

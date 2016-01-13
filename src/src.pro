@@ -19,12 +19,10 @@ macx:OBJECTS_DIR = ../build/o/mac
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    Logger.cpp \
     Backend.cpp \
     MdiWindow.cpp
 
 HEADERS  += mainwindow.h \
-    Logger.h \
     Backend.h \
     MdiWindow.h
 

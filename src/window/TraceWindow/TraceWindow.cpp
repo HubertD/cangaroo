@@ -22,7 +22,6 @@
 #include "TraceWindow.h"
 #include "ui_TraceWindow.h"
 
-#include <QDebug>
 #include <QDomDocument>
 #include <QSortFilterProxyModel>
 #include "LinearTraceViewModel.h"
