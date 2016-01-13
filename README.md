@@ -7,7 +7,7 @@ written by Hubert Denkmair <hubert@denkmair.de>
 
 
 ### v0.1.3 unreleased
-* much better performance while transfering can messages from receiver threads to main
+* some performance improvements when receiving lots of messages 
 * bugfix with time-delta view: timestamps not shown when no previous message avail
 
 ### v0.1.2 released 2016-01-12
@@ -54,7 +54,6 @@ initial release \o/
 * assign colors to can interfaces / messages
 * limit displayed number of messages
 * show error frames and other non-message frames
-* bulk-receive messages also for aggregated trace view (reduce load / signalling overhead)
 
 ### raw message generator
 * provide a simple way to generate raw can messages
