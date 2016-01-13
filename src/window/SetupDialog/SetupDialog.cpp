@@ -82,7 +82,7 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     connect(ui->interfacesTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
 
 
-    connect(ui->cbInterfaceBitrate, SIGNAL(currentIndexChanged(QString)), this, SLOT(cbInterfaceBitrateChanged(QString)));
+    connect(ui->cbSocketCanBitrate, SIGNAL(currentIndexChanged(QString)), this, SLOT(cbInterfaceBitrateChanged(QString)));
 
     connect(_actionAddCanDb, SIGNAL(triggered()), this, SLOT(executeAddCanDb()));
     connect(_actionDeleteCanDb, SIGNAL(triggered()), this, SLOT(executeDeleteCanDb()));
@@ -133,15 +133,15 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
         ui->laInterfaceDriver->setText(_backend->getDriverName(item->intf->canInterface()));
         ui->laInterfaceName->setText(_backend->getInterfaceName(item->intf->canInterface()));
         int bitrate = item->intf->bitrate();
-        ui->cbInterfaceBitrate->clear();
+        ui->cbSocketCanBitrate->clear();
         CanInterface *intf = _backend->getInterfaceById(item->intf->canInterface());
         if (intf) {
             foreach (int br, intf->getAvailableBitrates()) {
-                ui->cbInterfaceBitrate->addItem(QString::number(br));
+                ui->cbSocketCanBitrate->addItem(QString::number(br));
             }
         }
 
-        ui->cbInterfaceBitrate->setCurrentText(QString::number(bitrate));
+        ui->cbSocketCanBitrate->setCurrentText(QString::number(bitrate));
     }
 
     if (item) {
@@ -251,6 +251,33 @@ void SetupDialog::addInterface(const QModelIndex &parent)
 
 }
 
+void SetupDialog::updateSocketCanUI()
+{
+
+    bool doConfig = ui->cbSocketCanConfigured->isChecked();
+    ui->wSocketCanOptions->setEnabled(doConfig);
+    ui->wSocketCanTiming->setEnabled(doConfig);
+
+    bool enableCanFd = ui->cbSocketCanCanFD->isChecked();
+    ui->wSocketCanAutoTimingCanFd->setEnabled(enableCanFd);
+    ui->wSocketCanManualTimingCanFd->setEnabled(enableCanFd);
+
+    bool autoTiming = ui->rbSocketCanAutomaticTiming->isChecked();
+    ui->stackedSocketCanTiming->setCurrentIndex(autoTiming ? 0 : 1);
+
+    bool configSjw = ui->cbSocketCanSJW->isChecked();
+    ui->leSocketCanSJW->setEnabled(configSjw);
+
+    bool configFdSjw = ui->cbSocketCanFdSJW->isChecked();
+    ui->leSocketCanFdSJW->setEnabled(configFdSjw);
+
+    bool autoRestart = ui->cbSocketCanRestart->isChecked();
+    ui->leSocketCanRestartTime->setEnabled(autoRestart);
+
+    ui->laSocketCanSamplePoint->setText(QString().sprintf("%.1f%%", ui->slSocketCanSamplePoint->value() / 10.0));
+    ui->laSocketCanFdSamplePoint->setText(QString().sprintf("%.1f%%", ui->slSocketCanFdSamplePoint->value() / 10.0));
+}
+
 void SetupDialog::executeAddInterface()
 {
     addInterface(ui->treeView->selectionModel()->currentIndex());
@@ -275,6 +302,7 @@ void SetupDialog::showInterfacePage(SetupDialogTreeItem *item)
 {
     (void) item;
     ui->stackedWidget->setCurrentWidget(ui->socketCanInterfacePage);
+    updateSocketCanUI();
 }
 
 void SetupDialog::addCanDb(const QModelIndex &parent)
@@ -325,4 +353,44 @@ void SetupDialog::on_btAddNetwork_clicked()
 void SetupDialog::on_btRemoveNetwork_clicked()
 {
     model->deleteNetwork(getSelectedIndex());
+}
+
+void SetupDialog::on_cbSocketCanConfigured_stateChanged(int arg1)
+{
+    updateSocketCanUI();
+}
+
+void SetupDialog::on_cbSocketCanCanFD_toggled(bool checked)
+{
+    updateSocketCanUI();
+}
+
+void SetupDialog::on_rbSocketCanManualTiming_toggled(bool checked)
+{
+    updateSocketCanUI();
+}
+
+void SetupDialog::on_cbSocketCanRestart_stateChanged(int arg1)
+{
+    updateSocketCanUI();
+}
+
+void SetupDialog::on_cbSocketCanSJW_stateChanged(int arg1)
+{
+    updateSocketCanUI();
+}
+
+void SetupDialog::on_cbSocketCanFdSJW_stateChanged(int arg1)
+{
+    updateSocketCanUI();
+}
+
+void SetupDialog::on_slSocketCanSamplePoint_valueChanged(int value)
+{
+    updateSocketCanUI();
+}
+
+void SetupDialog::on_slSocketCanFdSamplePoint_valueChanged(int value)
+{
+    updateSocketCanUI();
 }

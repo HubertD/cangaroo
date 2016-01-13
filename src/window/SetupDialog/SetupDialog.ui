@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>889</width>
-    <height>591</height>
+    <width>1036</width>
+    <height>835</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -112,7 +112,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>4</number>
          </property>
          <widget class="QWidget" name="emptyPage"/>
          <widget class="QWidget" name="networkPage">
@@ -246,46 +246,513 @@
           </layout>
          </widget>
          <widget class="QWidget" name="socketCanInterfacePage">
-          <layout class="QFormLayout" name="formLayout_2">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Driver:</string>
-             </property>
+          <widget class="QLabel" name="label_3">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>9</y>
+             <width>41</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Driver:</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="laInterfaceDriver">
+           <property name="geometry">
+            <rect>
+             <x>73</x>
+             <y>9</y>
+             <width>231</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_5">
+           <property name="geometry">
+            <rect>
+             <x>9</x>
+             <y>30</y>
+             <width>58</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Interface:</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="laInterfaceName">
+           <property name="geometry">
+            <rect>
+             <x>73</x>
+             <y>30</y>
+             <width>231</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_4">
+           <property name="geometry">
+            <rect>
+             <x>39</x>
+             <y>190</y>
+             <width>45</width>
+             <height>16</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Timing:</string>
+           </property>
+          </widget>
+          <widget class="QLabel" name="label_17">
+           <property name="geometry">
+            <rect>
+             <x>40</x>
+             <y>100</y>
+             <width>59</width>
+             <height>15</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Options:</string>
+           </property>
+          </widget>
+          <widget class="QWidget" name="wSocketCanOptions" native="true">
+           <property name="geometry">
+            <rect>
+             <x>100</x>
+             <y>90</y>
+             <width>141</width>
+             <height>90</height>
+            </rect>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QCheckBox" name="cbSocketCanListenOnly">
+              <property name="text">
+               <string>Listen only</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="cbSocketCanTripleSampling">
+              <property name="text">
+               <string>Triple Sampling</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="cbSocketCanCanFD">
+              <property name="text">
+               <string>enable CanFD</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="wSocketCanTiming" native="true">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="geometry">
+            <rect>
+             <x>100</x>
+             <y>190</y>
+             <width>631</width>
+             <height>311</height>
+            </rect>
+           </property>
+           <widget class="QRadioButton" name="rbSocketCanManualTiming">
+            <property name="geometry">
+             <rect>
+              <x>120</x>
+              <y>0</y>
+              <width>104</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>manual</string>
+            </property>
+           </widget>
+           <widget class="QRadioButton" name="rbSocketCanAutomaticTiming">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>104</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>automatic</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+           <widget class="QStackedWidget" name="stackedSocketCanTiming">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>30</y>
+              <width>591</width>
+              <height>191</height>
+             </rect>
+            </property>
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <widget class="QWidget" name="pageSocketCanAutoTiming">
+             <widget class="QSlider" name="slSocketCanSamplePoint">
+              <property name="geometry">
+               <rect>
+                <x>140</x>
+                <y>40</y>
+                <width>171</width>
+                <height>18</height>
+               </rect>
+              </property>
+              <property name="maximum">
+               <number>999</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+             <widget class="QComboBox" name="cbSocketCanBitrate">
+              <property name="geometry">
+               <rect>
+                <x>140</x>
+                <y>10</y>
+                <width>171</width>
+                <height>23</height>
+               </rect>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_20">
+              <property name="geometry">
+               <rect>
+                <x>20</x>
+                <y>10</y>
+                <width>59</width>
+                <height>16</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Bitrate:</string>
+              </property>
+             </widget>
+             <widget class="QLabel" name="laSocketCanSamplePoint">
+              <property name="geometry">
+               <rect>
+                <x>150</x>
+                <y>50</y>
+                <width>141</width>
+                <height>16</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>0.0%</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+             <widget class="QLabel" name="label_21">
+              <property name="geometry">
+               <rect>
+                <x>20</x>
+                <y>40</y>
+                <width>91</width>
+                <height>16</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>Sample Point:</string>
+              </property>
+             </widget>
+             <widget class="QWidget" name="wSocketCanAutoTimingCanFd" native="true">
+              <property name="geometry">
+               <rect>
+                <x>20</x>
+                <y>90</y>
+                <width>331</width>
+                <height>80</height>
+               </rect>
+              </property>
+              <widget class="QComboBox" name="cbSocketCanFdBitrate">
+               <property name="geometry">
+                <rect>
+                 <x>120</x>
+                 <y>0</y>
+                 <width>171</width>
+                 <height>23</height>
+                </rect>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_23">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>111</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>FD Bitrate:</string>
+               </property>
+              </widget>
+              <widget class="QLabel" name="label_22">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>30</y>
+                 <width>121</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>FD Sample Point:</string>
+               </property>
+              </widget>
+              <widget class="QSlider" name="slSocketCanFdSamplePoint">
+               <property name="geometry">
+                <rect>
+                 <x>120</x>
+                 <y>30</y>
+                 <width>171</width>
+                 <height>18</height>
+                </rect>
+               </property>
+               <property name="maximum">
+                <number>999</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+              <widget class="QLabel" name="laSocketCanFdSamplePoint">
+               <property name="geometry">
+                <rect>
+                 <x>130</x>
+                 <y>40</y>
+                 <width>141</width>
+                 <height>16</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>0.0%</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </widget>
             </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="laInterfaceDriver">
-             <property name="text">
-              <string>TextLabel</string>
-             </property>
+            <widget class="QWidget" name="pageSocketCanManualTiming">
+             <widget class="QWidget" name="widget_6" native="true">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>0</y>
+                <width>271</width>
+                <height>177</height>
+               </rect>
+              </property>
+              <layout class="QFormLayout" name="formLayout_2">
+               <item row="0" column="0">
+                <widget class="QLabel" name="laSocketCanTQ">
+                 <property name="text">
+                  <string>TQ:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="leSocketCanTQ"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="laSocketCanPropSeg">
+                 <property name="text">
+                  <string>Prop-Seg:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="leSocketCanPropSeg"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="laSocketCanPhaseSeg1">
+                 <property name="text">
+                  <string>Phase Seg 1:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="leSocketCanPhaseSeg1"/>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="laSocketCanPhaseSeg2">
+                 <property name="text">
+                  <string>Phase Seg 2:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="leSocketCanPhaseSeg2"/>
+               </item>
+               <item row="4" column="0">
+                <widget class="QCheckBox" name="cbSocketCanSJW">
+                 <property name="text">
+                  <string>SJW:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="leSocketCanSJW"/>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="wSocketCanManualTimingCanFd" native="true">
+              <property name="geometry">
+               <rect>
+                <x>290</x>
+                <y>0</y>
+                <width>291</width>
+                <height>177</height>
+               </rect>
+              </property>
+              <layout class="QFormLayout" name="formLayout_3">
+               <item row="0" column="0">
+                <widget class="QLabel" name="laSocketCanFdTQ">
+                 <property name="text">
+                  <string>FD TQ:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="leSocketCanFdTQ"/>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="laSocketCanFdPropSeg">
+                 <property name="text">
+                  <string>FD Prop-Seg:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="leSocketCanFdPropSeg"/>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="laSocketCanFdPhaseSeg1">
+                 <property name="text">
+                  <string>FD Phase Seq 1:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="leSocketCanFdPhaseSeg1"/>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="laSocketCanPhaseSeg2_2">
+                 <property name="text">
+                  <string>FD Phase Seg 2:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="leSocketCanFdPhaseSeg2"/>
+               </item>
+               <item row="4" column="0">
+                <widget class="QCheckBox" name="cbSocketCanFdSJW">
+                 <property name="text">
+                  <string>FD SJW:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="leSocketCanFdSJW"/>
+               </item>
+              </layout>
+             </widget>
             </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>Interface:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLabel" name="laInterfaceName">
-             <property name="text">
-              <string>TextLabel</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>Bitrate:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QComboBox" name="cbInterfaceBitrate"/>
-           </item>
-          </layout>
+           </widget>
+           <widget class="QLabel" name="label_19">
+            <property name="geometry">
+             <rect>
+              <x>90</x>
+              <y>260</y>
+              <width>59</width>
+              <height>15</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>ms</string>
+            </property>
+           </widget>
+           <widget class="QCheckBox" name="cbSocketCanRestart">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>220</y>
+              <width>301</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Automatic restart after bus of condition:</string>
+            </property>
+           </widget>
+           <widget class="QLineEdit" name="leSocketCanRestartTime">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>250</y>
+              <width>61</width>
+              <height>27</height>
+             </rect>
+            </property>
+            <property name="statusTip">
+             <string>Automatic restart delay time. If set to a non-zero value, a restart of the CAN controller will be triggered automatically in case of a bus-off condition after the specified delay time in milliseconds. By default it's off.</string>
+            </property>
+           </widget>
+          </widget>
+          <widget class="QCheckBox" name="cbSocketCanConfigured">
+           <property name="geometry">
+            <rect>
+             <x>10</x>
+             <y>60</y>
+             <width>411</width>
+             <height>20</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>let cangaroo configure this interface</string>
+           </property>
+          </widget>
          </widget>
         </widget>
        </widget>
@@ -314,8 +781,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>581</y>
+     <x>266</x>
+     <y>825</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -330,8 +797,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>581</y>
+     <x>334</x>
+     <y>825</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
