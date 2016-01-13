@@ -33,12 +33,15 @@ MdiWindow::MdiWindow(QWidget *parent) : QWidget(parent)
 
 bool MdiWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
 {
+    (void) backend;
+    (void) xml;
     root.setAttribute("title", windowTitle());
     return true;
 }
 
 bool MdiWindow::loadXML(Backend &backend, QDomElement &el)
 {
+    (void) backend;
     setWindowTitle(el.attribute("title", ""));
     return true;
 }
