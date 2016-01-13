@@ -57,6 +57,7 @@ initial release \o/
 * show error frames and other non-message frames
 * hide unused muxed signals in linear trace view
 * handle muxed signals properly in aggregated trace view
+* sort signals by startbit, name or position in candb
 
 ### raw message generator
 * provide a simple way to generate raw can messages
