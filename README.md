@@ -6,6 +6,10 @@ written by Hubert Denkmair <hubert@denkmair.de>
 ## changelog
 
 
+### v0.1.3 unreleased
+* much better performance while transfering can messages from receiver threads to main
+* bugfix with time-delta view: timestamps not shown when no previous message avail
+
 ### v0.1.2 released 2016-01-12
 * fix device re-scan ("could not bind" console message)
 * fix some dbc parsing issues (signed signals, ...)
@@ -25,7 +29,6 @@ initial release \o/
 ### backend
 * allow for canfd frames
 * support non-message frames in traces (e.g. markers)
-* change message transfer from CanListeners to Backend (don't use signals/slots across threads?)
 * implement plugin API
 * embed python for scripting
 
@@ -51,6 +54,7 @@ initial release \o/
 * assign colors to can interfaces / messages
 * limit displayed number of messages
 * show error frames and other non-message frames
+* bulk-receive messages also for aggregated trace view (reduce load / signalling overhead)
 
 ### raw message generator
 * provide a simple way to generate raw can messages

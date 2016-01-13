@@ -76,8 +76,7 @@ bool Backend::startMeasurement()
                 intf->setBitrate(mi->bitrate());
             }
 
-            CanListener *listener = new CanListener(0, intf);
-            connect(listener, SIGNAL(messageReceived(CanMessage)), _trace, SLOT(enqueueMessage(CanMessage)));
+            CanListener *listener = new CanListener(0, *this, *intf);
             listener->startThread();
             _listeners.append(listener);
         }
@@ -97,7 +96,7 @@ bool Backend::stopMeasurement()
     foreach (CanListener *listener, _listeners) {
         listener->waitFinish();
         qDebug() << "closing interface" << getInterfaceName(listener->getInterfaceId());
-        listener->getInterface()->close();
+        listener->getInterface().close();
     }
 
     qDeleteAll(_listeners);

@@ -73,7 +73,7 @@ private slots:
     void updateItem(const CanMessage &msg);
     void onUpdateTimer();
 
-    void messageReceived(const CanMessage &msg);
+    void messageReceived(int idx);
     void beforeClear();
     void afterClear();
 };

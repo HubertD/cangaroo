@@ -43,19 +43,17 @@ public:
 
     unsigned long size();
     void clear();
-    const CanMessage *getMessage(unsigned long idx);
+    const CanMessage *getMessage(int idx);
+    void enqueueMessage(const CanMessage &msg, bool more_to_follow=false);
 
     void saveCanDump(QString filename);
 
 signals:
-    void messageEnqueued(const CanMessage &msg);
+    void messageEnqueued(int idx);
     void beforeAppend(int num_messages);
     void afterAppend();
     void beforeClear();
     void afterClear();
-
-public slots:
-    void enqueueMessage(const CanMessage &msg, bool more_to_follow=false);
 
 private slots:
     void flushQueue();
@@ -70,9 +68,13 @@ private:
     QVector<CanMessage> _data;
     int _dataRowsUsed;
     int _newRows;
+    bool _isTimerRunning;
 
     QMutex _mutex;
+    QMutex _timerMutex;
     QTimer _flushTimer;
+
+    void startTimer();
 
 
 };

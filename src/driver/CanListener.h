@@ -28,17 +28,18 @@
 
 class QThread;
 class CanMessage;
+class Backend;
 
 class CanListener : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit CanListener(QObject *parent, CanInterface *intf);
+    explicit CanListener(QObject *parent, Backend &backend, CanInterface &intf);
     virtual ~CanListener();
 
     CanInterfaceId getInterfaceId();
-    CanInterface *getInterface();
+    CanInterface &getInterface();
 
 signals:
     void messageReceived(const CanMessage &msg);
@@ -51,7 +52,8 @@ public slots:
     void waitFinish();
 
 private:
-    CanInterface *_intf;
+    Backend &_backend;
+    CanInterface &_intf;
     bool _shouldBeRunning;
     QThread *_thread;
 

@@ -99,6 +99,7 @@ void MainWindow::on_workspace_modified()
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (askSaveBecauseWorkspaceModified()!=QMessageBox::Cancel) {
+        backend.stopMeasurement();
         event->accept();
     } else {
         event->ignore();

@@ -31,7 +31,10 @@
 CanTrace::CanTrace(Backend &backend, QObject *parent, int flushInterval)
   : QObject(parent),
     _backend(backend),
-    _mutex(QMutex::Recursive)
+    _isTimerRunning(false),
+    _mutex(QMutex::Recursive),
+    _timerMutex(),
+    _flushTimer(this)
 {
     clear();
     _flushTimer.setSingleShot(true);
@@ -55,10 +58,10 @@ void CanTrace::clear()
     emit afterClear();
 }
 
-const CanMessage *CanTrace::getMessage(unsigned long idx)
+const CanMessage *CanTrace::getMessage(int idx)
 {
     QMutexLocker locker(&_mutex);
-    if (idx >= size()) {
+    if (idx >= (_dataRowsUsed + _newRows)) {
         return 0;
     } else {
         return &_data[idx];
@@ -78,16 +81,19 @@ void CanTrace::enqueueMessage(const CanMessage &msg, bool more_to_follow)
     _newRows++;
 
     if (!more_to_follow) {
-        if (!_flushTimer.isActive()) {
-            _flushTimer.start();
-        }
+        startTimer();
     }
 
-    emit messageEnqueued(_data[idx]);
+    emit messageEnqueued(idx);
 }
 
 void CanTrace::flushQueue()
 {
+    {
+        QMutexLocker locker(&_timerMutex);
+        _isTimerRunning = false;
+    }
+
     QMutexLocker locker(&_mutex);
     if (_newRows) {
         emit beforeAppend(_newRows);
@@ -96,6 +102,15 @@ void CanTrace::flushQueue()
         emit afterAppend();
     }
 
+}
+
+void CanTrace::startTimer()
+{
+    QMutexLocker locker(&_timerMutex);
+    if (!_isTimerRunning) {
+        _isTimerRunning = true;
+        QMetaObject::invokeMethod(&_flushTimer, "start", Qt::QueuedConnection);
+    }
 }
 
 void CanTrace::saveCanDump(QString filename)

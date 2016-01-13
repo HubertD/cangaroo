@@ -24,11 +24,14 @@
 #include <QThread>
 #include <QDebug>
 
-#include "model/CanMessage.h"
+#include <Backend.h>
+#include <model/CanTrace.h>
+#include <model/CanMessage.h>
 #include "CanInterface.h"
 
-CanListener::CanListener(QObject *parent, CanInterface *intf)
+CanListener::CanListener(QObject *parent, Backend &backend, CanInterface &intf)
   : QObject(parent),
+    _backend(backend),
     _intf(intf),
     _shouldBeRunning(true)
 {
@@ -42,10 +45,10 @@ CanListener::~CanListener()
 
 CanInterfaceId CanListener::getInterfaceId()
 {
-    return _intf->getId();
+    return _intf.getId();
 }
 
-CanInterface *CanListener::getInterface()
+CanInterface &CanListener::getInterface()
 {
     return _intf;
 }
@@ -53,9 +56,10 @@ CanInterface *CanListener::getInterface()
 void CanListener::run()
 {
     CanMessage msg;
+    CanTrace *trace = _backend.getTrace();
     while (_shouldBeRunning) {
-        if (_intf->readMessage(msg, 1000)) {
-            emit messageReceived(msg);
+        if (_intf.readMessage(msg, 1000)) {
+            trace->enqueueMessage(msg, false);
         }
     }
     _thread->quit();
