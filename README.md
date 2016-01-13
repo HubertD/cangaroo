@@ -52,6 +52,9 @@ initial release \o/
 ### logging subsystem
 * show timestamps, log level etc. in log window
 
+### interface status window
+* show status (error mode, tx/rx counts, ...) of all can interfaces
+
 ### trace window
 * message filtering
 * assign colors to can interfaces / messages
