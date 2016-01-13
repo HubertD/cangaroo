@@ -29,6 +29,7 @@ initial release \o/
 
 ### backend
 * allow for canfd frames
+* define driver features like detailed bittimings, bus status, statistics
 * support non-message frames in traces (e.g. markers)
 * implement plugin API
 * embed python for scripting
@@ -41,7 +42,7 @@ initial release \o/
 * windows vector driver
 
 ### import / export
-* export to other file formats (e.g. Vector ASC, BLF)
+* export to other file formats (e.g. Vector ASC, BLF, MDF)
 * import CAN-Traces
 
 ### general ui
