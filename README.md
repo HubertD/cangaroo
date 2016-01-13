@@ -37,6 +37,7 @@ initial release \o/
 
 ### can drivers
 * redo socketcan driver (clean qt/c++ implementation, suid binary for interface configuration)
+* socketcan: use hardware timestamps (SIOCSHWTSTAMP) if possible
 * cannelloni support
 * windows peak can driver
 * windows vector driver
