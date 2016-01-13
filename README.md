@@ -31,6 +31,7 @@ initial release \o/
 * support non-message frames in traces (e.g. markers)
 * implement plugin API
 * embed python for scripting
+* implement muxed signals
 
 ### can drivers
 * redo socketcan driver (clean qt/c++ implementation, suid binary for interface configuration)
@@ -54,6 +55,8 @@ initial release \o/
 * assign colors to can interfaces / messages
 * limit displayed number of messages
 * show error frames and other non-message frames
+* hide unused muxed signals in linear trace view
+* handle muxed signals properly in aggregated trace view
 
 ### raw message generator
 * provide a simple way to generate raw can messages
