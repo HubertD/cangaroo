@@ -25,8 +25,6 @@
 #include <QAbstractItemModel>
 #include <QMap>
 #include <QList>
-#include <QTimer>
-
 #include <sys/time.h>
 
 #include "BaseTraceViewModel.h"
@@ -56,7 +54,6 @@ public:
 private:
     CanIdMap _map;
     AggregatedTraceViewItem *_rootItem;
-    QTimer *_updateTimer;
     QList<CanMessage> _pendingMessageUpdates;
     QMap<unique_key_t, CanMessage> _pendingMessageInserts;
 
@@ -71,9 +68,9 @@ protected:
 private slots:
     void createItem(const CanMessage &msg);
     void updateItem(const CanMessage &msg);
-    void onUpdateTimer();
+    void onUpdateModel();
 
-    void messageReceived(int idx);
+    void beforeAppend(int num_messages);
     void beforeClear();
     void afterClear();
 };

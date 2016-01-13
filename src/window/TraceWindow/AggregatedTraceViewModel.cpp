@@ -31,13 +31,9 @@ AggregatedTraceViewModel::AggregatedTraceViewModel(Backend &backend)
   : BaseTraceViewModel(backend)
 {
     _rootItem = new AggregatedTraceViewItem(0);
-    _updateTimer = new QTimer(this);
-    connect(_updateTimer, SIGNAL(timeout()), this, SLOT(onUpdateTimer()));
-    connect(backend.getTrace(), SIGNAL(messageEnqueued(int)), this, SLOT(messageReceived(int)));
+    connect(backend.getTrace(), SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
     connect(backend.getTrace(), SIGNAL(beforeClear()), this, SLOT(beforeClear()));
     connect(backend.getTrace(), SIGNAL(afterClear()), this, SLOT(afterClear()));
-
-    _updateTimer->setSingleShot(true);
 }
 
 void AggregatedTraceViewModel::createItem(const CanMessage &msg)
@@ -65,7 +61,7 @@ void AggregatedTraceViewModel::updateItem(const CanMessage &msg)
     }
 }
 
-void AggregatedTraceViewModel::onUpdateTimer()
+void AggregatedTraceViewModel::onUpdateModel()
 {
 
     if (!_pendingMessageInserts.isEmpty()) {
@@ -90,21 +86,22 @@ void AggregatedTraceViewModel::onUpdateTimer()
 
 }
 
-void AggregatedTraceViewModel::messageReceived(int idx)
+void AggregatedTraceViewModel::beforeAppend(int num_messages)
 {
-    const CanMessage *msg = backend()->getTrace()->getMessage(idx);
-    if (msg) {
+    CanTrace *trace = backend()->getTrace();
+    int start_id = trace->size();
+
+    for (int i=start_id; i<start_id + num_messages; i++) {
+        const CanMessage *msg = trace->getMessage(i);
         unique_key_t key = makeUniqueKey(*msg);
         if (_map.contains(key) || _pendingMessageInserts.contains(key)) {
             _pendingMessageUpdates.append(*msg);
         } else {
             _pendingMessageInserts[key] = *msg;
         }
-
-        if (!_updateTimer->isActive()) {
-            _updateTimer->start(100);
-        }
     }
+
+    onUpdateModel();
 }
 
 void AggregatedTraceViewModel::beforeClear()
