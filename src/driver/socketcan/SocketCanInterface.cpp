@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <time.h>
 #include <QString>
 
 #include <net/if.h>
@@ -40,7 +41,8 @@ SocketCanInterface::SocketCanInterface(SocketCanDriver *driver, int index, QStri
   : CanInterface((CanDriver *)driver),
 	_idx(index),
 	_fd(0),
-	_name(name)
+    _name(name),
+    _ts_mode(ts_mode_SIOCSHWTSTAMP)
 {
 }
 
@@ -125,8 +127,10 @@ void SocketCanInterface::sendMessage(const CanMessage &msg) {
 bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
 
     struct can_frame frame;
+    struct timespec ts_rcv;
     struct timeval tv_rcv;
     struct timeval timeout;
+    //struct ifreq hwtstamp;
     fd_set fdset;
 
     timeout.tv_sec = timeout_ms / 1000;
@@ -135,14 +139,33 @@ bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
     FD_ZERO(&fdset);
     FD_SET(_fd, &fdset);
 
+
     int rv = select(_fd+1, &fdset, NULL, NULL, &timeout);
     if (rv>0) {
-        ::read(_fd, &frame, sizeof(struct can_frame));
 
-        ioctl(_fd, SIOCGSTAMP, &tv_rcv);
+        if (read(_fd, &frame, sizeof(struct can_frame)) < 0) {
+            return false;
+        }
+
+        if (_ts_mode == ts_mode_SIOCSHWTSTAMP) {
+            // TODO implement me
+            _ts_mode = ts_mode_SIOCGSTAMPNS;
+        }
+
+        if (_ts_mode==ts_mode_SIOCGSTAMPNS) {
+            if (ioctl(_fd, SIOCGSTAMPNS, &ts_rcv) == 0) {
+                msg.setTimestamp(ts_rcv.tv_sec, ts_rcv.tv_nsec/1000);
+            } else {
+                _ts_mode = ts_mode_SIOCGSTAMP;
+            }
+        }
+
+        if (_ts_mode==ts_mode_SIOCGSTAMP) {
+            ioctl(_fd, SIOCGSTAMP, &tv_rcv);
+            msg.setTimestamp(tv_rcv.tv_sec, tv_rcv.tv_usec);
+        }
 
         msg.setId(frame.can_id);
-        msg.setTimestamp(tv_rcv);
         msg.setExtended((frame.can_id & CAN_EFF_FLAG)!=0);
         msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
         msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);

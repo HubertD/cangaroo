@@ -72,6 +72,7 @@ public:
 
     struct timeval getTimestamp() const;
     void setTimestamp(const struct timeval timestamp);
+    void setTimestamp(const uint64_t seconds, const uint32_t micro_seconds);
 
     double getFloatTimestamp() const;
 

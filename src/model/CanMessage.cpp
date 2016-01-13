@@ -268,6 +268,12 @@ void CanMessage::setTimestamp(const timeval timestamp)
     _timestamp = timestamp;
 }
 
+void CanMessage::setTimestamp(const uint64_t seconds, const uint32_t micro_seconds)
+{
+    _timestamp.tv_sec = seconds;
+    _timestamp.tv_usec = micro_seconds;
+}
+
 double CanMessage::getFloatTimestamp() const
 {
     return (double)_timestamp.tv_sec + ((double)_timestamp.tv_usec/1000000);

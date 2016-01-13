@@ -46,9 +46,17 @@ public:
     int getIfIndex();
 
 private:
+    typedef enum {
+        ts_mode_SIOCSHWTSTAMP,
+        ts_mode_SIOCGSTAMPNS,
+        ts_mode_SIOCGSTAMP
+    } ts_mode_t;
+
     int _idx;
 	int _fd;
     QString _name;
+
+    ts_mode_t _ts_mode;
 };
 
 #endif /* SOCKETCAN_SOCKETCANINTERFACE_H_ */
