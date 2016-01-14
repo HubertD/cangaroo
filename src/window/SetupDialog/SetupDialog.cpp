@@ -260,19 +260,19 @@ void SetupDialog::updateSocketCanUI()
 
     bool enableCanFd = ui->cbSocketCanCanFD->isChecked();
     ui->wSocketCanAutoTimingCanFd->setEnabled(enableCanFd);
-    ui->wSocketCanManualTimingCanFd->setEnabled(enableCanFd);
+    ui->wSocketCanFdManualTiming->setEnabled(enableCanFd);
 
     bool autoTiming = ui->rbSocketCanAutomaticTiming->isChecked();
     ui->stackedSocketCanTiming->setCurrentIndex(autoTiming ? 0 : 1);
 
     bool configSjw = ui->cbSocketCanSJW->isChecked();
-    ui->leSocketCanSJW->setEnabled(configSjw);
+    ui->spSocketCanSJW->setEnabled(configSjw);
 
     bool configFdSjw = ui->cbSocketCanFdSJW->isChecked();
-    ui->leSocketCanFdSJW->setEnabled(configFdSjw);
+    ui->spSocketCanFdSJW->setEnabled(configFdSjw);
 
     bool autoRestart = ui->cbSocketCanRestart->isChecked();
-    ui->leSocketCanRestartTime->setEnabled(autoRestart);
+    ui->spSocketCanRestartTime->setEnabled(autoRestart);
 
     ui->laSocketCanSamplePoint->setText(QString().sprintf("%.1f%%", ui->slSocketCanSamplePoint->value() / 10.0));
     ui->laSocketCanFdSamplePoint->setText(QString().sprintf("%.1f%%", ui->slSocketCanFdSamplePoint->value() / 10.0));
