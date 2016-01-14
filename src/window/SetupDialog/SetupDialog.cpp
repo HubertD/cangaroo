@@ -89,6 +89,16 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
 
     connect(_actionAddInterface, SIGNAL(triggered()), this, SLOT(executeAddInterface()));
     connect(_actionDeleteInterface, SIGNAL(triggered()), this, SLOT(executeDeleteInterface()));
+
+    connect(ui->cbSocketCanConfigured, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
+    connect(ui->cbSocketCanCanFD, SIGNAL(toggled(bool)), this, SLOT(updateSocketCanUI()));
+    connect(ui->rbSocketCanAutomaticTiming, SIGNAL(toggled(bool)), this, SLOT(updateSocketCanUI()));
+    connect(ui->cbSocketCanRestart, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
+    connect(ui->cbSocketCanSJW, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
+    connect(ui->cbSocketCanFdSJW, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
+    connect(ui->slSocketCanSamplePoint, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
+    connect(ui->slSocketCanFdSamplePoint, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
+
 }
 
 SetupDialog::~SetupDialog()
@@ -355,42 +365,3 @@ void SetupDialog::on_btRemoveNetwork_clicked()
     model->deleteNetwork(getSelectedIndex());
 }
 
-void SetupDialog::on_cbSocketCanConfigured_stateChanged(int arg1)
-{
-    updateSocketCanUI();
-}
-
-void SetupDialog::on_cbSocketCanCanFD_toggled(bool checked)
-{
-    updateSocketCanUI();
-}
-
-void SetupDialog::on_rbSocketCanManualTiming_toggled(bool checked)
-{
-    updateSocketCanUI();
-}
-
-void SetupDialog::on_cbSocketCanRestart_stateChanged(int arg1)
-{
-    updateSocketCanUI();
-}
-
-void SetupDialog::on_cbSocketCanSJW_stateChanged(int arg1)
-{
-    updateSocketCanUI();
-}
-
-void SetupDialog::on_cbSocketCanFdSJW_stateChanged(int arg1)
-{
-    updateSocketCanUI();
-}
-
-void SetupDialog::on_slSocketCanSamplePoint_valueChanged(int value)
-{
-    updateSocketCanUI();
-}
-
-void SetupDialog::on_slSocketCanFdSamplePoint_valueChanged(int value)
-{
-    updateSocketCanUI();
-}

@@ -68,25 +68,11 @@ private slots:
     void executeAddInterface();
     void executeDeleteInterface();
 
-    void on_btAddNetwork_clicked();
+    void updateSocketCanUI();
 
+    void on_btAddNetwork_clicked();
     void on_btRemoveNetwork_clicked();
 
-    void on_cbSocketCanConfigured_stateChanged(int arg1);
-
-    void on_cbSocketCanCanFD_toggled(bool checked);
-
-    void on_rbSocketCanManualTiming_toggled(bool checked);
-
-    void on_cbSocketCanRestart_stateChanged(int arg1);
-
-    void on_cbSocketCanSJW_stateChanged(int arg1);
-
-    void on_cbSocketCanFdSJW_stateChanged(int arg1);
-
-    void on_slSocketCanSamplePoint_valueChanged(int value);
-
-    void on_slSocketCanFdSamplePoint_valueChanged(int value);
 
 private:
     Ui::SetupDialog *ui;
@@ -108,7 +94,6 @@ private:
     void addCanDb(const QModelIndex &parent);
     void addInterface(const QModelIndex &parent);
 
-    void updateSocketCanUI();
 
 };
 
