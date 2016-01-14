@@ -307,6 +307,9 @@ void SetupDialog::loadInterface(const MeasurementInterface &intf)
     ui->cbSocketCanFdSJW->setChecked(intf.doSetFdSJW());
     ui->spSocketCanFdSJW->setValue(intf.fdSJW());
 
+    ui->cbSocketCanRestart->setChecked(intf.doAutoRestart());
+    ui->spSocketCanRestartTime->setValue(intf.autoRestartMs());
+
     _enableSocketCanUpdates = true;
     updateSocketCanUI();
 }

@@ -124,12 +124,10 @@ bool MeasurementNetwork::loadXML(Backend &backend, QDomElement el)
         QDomElement elIntf = ifList.item(i).toElement();
         QString driverName = elIntf.attribute("driver");
         QString deviceName = elIntf.attribute("name");
-        int bitrate = elIntf.attribute("bitrate", "100000").toInt();
-
         CanInterface *intf = backend.getInterfaceByDriverAndName(driverName, deviceName);
         if (intf) {
             MeasurementInterface *mi = addCanInterface(intf->getId());
-            mi->setBitrate(bitrate);
+            mi->loadXML(backend, elIntf);
         } else {
             backend.logMessage(log_level_error, QString("Could not find interface %1/%2, which is referenced in the workspace config file.").arg(driverName, deviceName));
         }

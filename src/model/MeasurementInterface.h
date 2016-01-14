@@ -39,6 +39,7 @@ public:
     void setCanInterface(CanInterfaceId canif);
 
     void cloneFrom(MeasurementInterface &origin);
+    bool loadXML(Backend &backend, QDomElement &el);
     bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
 
     bool doConfigure() const;
