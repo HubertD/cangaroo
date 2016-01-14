@@ -76,6 +76,7 @@ private slots:
 private:
     Ui::SetupDialog *ui;
     Backend *_backend;
+    bool _enableSocketCanUpdates;
 
     QAction *_actionDeleteInterface;
     QAction *_actionDeleteCanDb;

@@ -26,7 +26,29 @@
 #include <driver/CanInterface.h>
 
 MeasurementInterface::MeasurementInterface()
-  : _bitrate(500000)
+  : _doConfigure(false),
+    _isListenOnlyMode(false),
+    _isTripleSampling(false),
+    _isCanFD(false),
+    _isSimpleTiming(true),
+    _bitrate(500000),
+    _samplePoint(0),
+    _fdBitrate(4000000),
+    _fdSamplePoint(0),
+    _tq(125),
+    _propSeg(6),
+    _phaseSeg1(7),
+    _phaseSeg2(2),
+    _doSetSJW(false),
+    _sjw(1),
+    _fdTq(12),
+    _fdPropSeg(7),
+    _fdPhaseSeg1(2),
+    _fdPhaseSeg2(1),
+    _doSetFdSJW(false),
+    _fdSjw(1),
+    _doAutoRestart(true),
+    _autoRestartMs(100)
 {
 
 }

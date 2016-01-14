@@ -41,6 +41,7 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SetupDialog),
     _backend(&backend),
+    _enableSocketCanUpdates(true),
     _currentNetwork(0)
 {
     ui->setupUi(this);
@@ -262,6 +263,8 @@ void SetupDialog::loadInterface(const MeasurementInterface &intf)
 {
     CanInterface *ci = _backend->getInterfaceById(intf.canInterface());
 
+    _enableSocketCanUpdates = false;
+
     ui->laInterfaceDriver->setText(_backend->getDriverName(intf.canInterface()));
     ui->laInterfaceName->setText(_backend->getInterfaceName(intf.canInterface()));
 
@@ -278,6 +281,7 @@ void SetupDialog::loadInterface(const MeasurementInterface &intf)
         }
     }
     ui->cbSocketCanBitrate->setCurrentText(QString::number(intf.bitrate()));
+    ui->slSocketCanSamplePoint->setValue(intf.samplePoint());
 
     ui->cbSocketCanFdBitrate->clear();
     if (ci) {
@@ -286,6 +290,7 @@ void SetupDialog::loadInterface(const MeasurementInterface &intf)
         }
     }
     ui->cbSocketCanFdBitrate->setCurrentText(QString::number(intf.fdBitrate()));
+    ui->slSocketCanFdSamplePoint->setValue(intf.fdSamplePoint());
 
 
     ui->rbSocketCanManualTiming->setChecked(!intf.isSimpleTiming());
@@ -302,10 +307,16 @@ void SetupDialog::loadInterface(const MeasurementInterface &intf)
     ui->cbSocketCanFdSJW->setChecked(intf.doSetFdSJW());
     ui->spSocketCanFdSJW->setValue(intf.fdSJW());
 
+    _enableSocketCanUpdates = true;
+    updateSocketCanUI();
 }
 
 void SetupDialog::updateSocketCanUI()
 {
+
+    if (!_enableSocketCanUpdates) {
+        return;
+    }
 
     bool doConfig = ui->cbSocketCanConfigured->isChecked();
     ui->wSocketCanOptions->setEnabled(doConfig);
