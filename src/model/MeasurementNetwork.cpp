@@ -34,7 +34,7 @@ void MeasurementNetwork::cloneFrom(MeasurementNetwork &origin)
     _name = origin._name;
     foreach (MeasurementInterface *omi, origin._interfaces) {
         MeasurementInterface *mi = new MeasurementInterface();
-        mi->cloneFrom(omi);
+        mi->cloneFrom(*omi);
         _interfaces.append(mi);
     }
     _canDbs = origin._canDbs;

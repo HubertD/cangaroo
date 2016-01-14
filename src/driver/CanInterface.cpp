@@ -42,6 +42,13 @@ QList<int> CanInterface::getAvailableBitrates()
     return retval;
 }
 
+QList<int> CanInterface::getAvailableFdBitrates()
+{
+    QList<int> retval;
+    retval << 1000000 << 2000000 << 4000000 << 8000000 << 16000000;
+    return retval;
+}
+
 void CanInterface::open() {
 }
 

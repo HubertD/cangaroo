@@ -53,7 +53,6 @@ public slots:
 
 private slots:
     void edNetworkNameChanged();
-    void cbInterfaceBitrateChanged(QString value);
 
     void on_btAddInterface_clicked();
     void on_btRemoveInterface_clicked();
@@ -93,6 +92,8 @@ private:
     void showInterfacePage(SetupDialogTreeItem *item);
     void addCanDb(const QModelIndex &parent);
     void addInterface(const QModelIndex &parent);
+
+    void loadInterface(const MeasurementInterface &intf);
 
 
 };

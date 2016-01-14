@@ -112,7 +112,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>4</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="emptyPage"/>
          <widget class="QWidget" name="networkPage">
@@ -433,7 +433,7 @@
             <item>
              <widget class="QStackedWidget" name="stackedSocketCanTiming">
               <property name="currentIndex">
-               <number>1</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="pageSocketCanAutoTiming">
                <widget class="QWidget" name="wSocketCanAutoTimingCanFd" native="true">
