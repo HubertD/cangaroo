@@ -2,9 +2,6 @@
 
   Copyright (c) 2015, 2016 Hubert Denkmair
 
-  netlink code largely based on this tutorial by Jean Lorchat:
-  http://iijean.blogspot.de/2010/03/howto-get-list-of-network-interfaces-in.html
-
   This file is part of cangaroo.
 
   cangaroo is free software: you can redistribute it and/or modify
@@ -28,7 +25,12 @@
 
 #include <Backend.h>
 
+#include <sys/socket.h>
+#include <linux/if.h>
+#include <linux/if_arp.h>
+#include <linux/can/netlink.h>
 #include <netlink/route/link.h>
+#include <netlink/route/link/can.h>
 #include <errno.h>
 #include <cstring>
 #include <stdio.h>
@@ -60,8 +62,9 @@ bool SocketCanDriver::update() {
         for (struct nl_object *obj = nl_cache_get_first(cache); obj!=0; obj=nl_cache_get_next(obj)) {
             struct rtnl_link *link = (struct rtnl_link *)obj;
 
-            if (rtnl_link_get_arptype(link)==280) { // a socketcan device
-                createOrUpdateInterface(rtnl_link_get_ifindex(link), QString(rtnl_link_get_name(link)));
+            if (rtnl_link_get_arptype(link)==ARPHRD_CAN) {
+                SocketCanInterface *intf = createOrUpdateInterface(rtnl_link_get_ifindex(link), QString(rtnl_link_get_name(link)));
+                intf->readConfigFromLink(link);
             }
         }
     }
@@ -77,17 +80,18 @@ QString SocketCanDriver::getName() {
 	return "SocketCAN";
 }
 
-void SocketCanDriver::createOrUpdateInterface(int index, QString name) {
+SocketCanInterface *SocketCanDriver::createOrUpdateInterface(int index, QString name) {
 
     foreach (CanInterface *intf, getInterfaces()) {
         SocketCanInterface *scif = dynamic_cast<SocketCanInterface*>(intf);
 		if (scif->getIfIndex() == index) {
 			scif->setName(name);
-			return;
+            return scif;
 		}
 	}
 
 
     SocketCanInterface *scif = new SocketCanInterface(this, index, name);
     addInterface(scif);
+    return scif;
 }

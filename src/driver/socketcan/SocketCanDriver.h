@@ -25,6 +25,8 @@
 #include <QString>
 #include <driver/CanDriver.h>
 
+class SocketCanInterface;
+
 class SocketCanDriver: public CanDriver {
 public:
     SocketCanDriver();
@@ -34,7 +36,7 @@ public:
     virtual bool update();
 
 private:
-    void createOrUpdateInterface(int index, QString name);
+    SocketCanInterface *createOrUpdateInterface(int index, QString name);
 };
 
 #endif /* SOCKETCAN_SOCKETCANDRIVER_H_ */

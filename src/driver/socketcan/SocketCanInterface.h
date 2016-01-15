@@ -23,6 +23,7 @@
 #define SOCKETCAN_SOCKETCANINTERFACE_H_
 
 #include "../CanInterface.h"
+#include <linux/can/netlink.h>
 
 class SocketCanDriver;
 
@@ -35,6 +36,9 @@ public:
     void setName(QString name);
 
     virtual void applyConfig(const MeasurementInterface &mi);
+
+    virtual bool readConfig();
+    virtual bool readConfigFromLink(struct rtnl_link *link);
 
     virtual int getBitrate();
 	virtual void setBitrate(int bitrate);
@@ -57,6 +61,18 @@ private:
     int _idx;
 	int _fd;
     QString _name;
+
+    struct {
+        bool supports_canfd;
+        bool supports_timing;
+        uint32_t state;
+        uint32_t base_freq;
+        uint32_t sample_point;
+        uint32_t ctrl_mode;
+        uint32_t restart_ms;
+        struct can_bittiming bit_timing;
+    } _config;
+
 
     ts_mode_t _ts_mode;
 

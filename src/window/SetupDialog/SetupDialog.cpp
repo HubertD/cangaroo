@@ -263,6 +263,10 @@ void SetupDialog::loadInterface(const MeasurementInterface &intf)
 {
     CanInterface *ci = _backend->getInterfaceById(intf.canInterface());
 
+    if (ci) {
+        ci->getBitrate();
+    }
+
     _enableSocketCanUpdates = false;
 
     ui->laInterfaceDriver->setText(_backend->getDriverName(intf.canInterface()));

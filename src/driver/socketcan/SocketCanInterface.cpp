@@ -24,14 +24,12 @@
 #include <Backend.h>
 #include <model/MeasurementInterface.h>
 #include <model/CanMessage.h>
-#include "libsocketcan/libsocketcan.h"
 
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
 #include <QString>
 
-#include <net/if.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -39,6 +37,9 @@
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
+#include <linux/can/netlink.h>
+#include <netlink/route/link.h>
+#include <netlink/route/link/can.h>
 
 SocketCanInterface::SocketCanInterface(SocketCanDriver *driver, int index, QString name)
   : CanInterface((CanDriver *)driver),
@@ -75,10 +76,10 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
 
     } else {
         backend.logMessage(log_level_info, QString("taking down interface %1 for configuration").arg(getName()));
-        can_do_stop(cname());
+//        can_do_stop(cname());
 
         setBitrate(mi.bitrate()); // TODO: remove this leftover
-        can_do_start(cname());
+//        can_do_start(cname());
 
         QStringList cmd;
         cmd.append("ip");
@@ -148,17 +149,61 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
     }
 }
 
+bool SocketCanInterface::readConfig()
+{
+    bool retval = false;
+
+    struct nl_sock *sock = nl_socket_alloc();
+    struct nl_cache *cache;
+    struct rtnl_link *link;
+
+    nl_connect(sock, NETLINK_ROUTE);
+    int result = rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache);
+
+    if (result>=0) {
+
+        if (rtnl_link_get_kernel(sock, _idx, 0, &link) == 0) {
+            retval = readConfigFromLink(link);
+        }
+
+    }
+
+    nl_cache_free(cache);
+    nl_close(sock);
+    nl_socket_free(sock);
+
+    return retval;
+}
+
+bool SocketCanInterface::readConfigFromLink(rtnl_link *link)
+{
+    _config.supports_canfd = (rtnl_link_get_mtu(link)==72);
+    _config.supports_timing = rtnl_link_is_can(link);
+    if (_config.supports_timing) {
+        rtnl_link_can_freq(link, &_config.base_freq);
+        rtnl_link_can_state(link, &_config.state);
+        rtnl_link_can_get_ctrlmode(link, &_config.ctrl_mode);
+        rtnl_link_can_get_bittiming(link, &_config.bit_timing);
+        rtnl_link_can_get_sample_point(link, &_config.sample_point);
+        rtnl_link_can_get_restart_ms(link, &_config.restart_ms);
+
+    } else {
+        // maybe a vcan interface?
+    }
+    return true;
+}
+
 int SocketCanInterface::getBitrate() {
-	struct can_bittiming bt;
-    if (can_get_bittiming(cname(), &bt) == 0) {
-		return bt.bitrate;
-	} else {
-		return 0;
-	}
+
+    if (readConfig()) {
+        return _config.bit_timing.bitrate;
+    } else {
+        return 0;
+    }
 }
 
 void SocketCanInterface::setBitrate(int bitrate) {
-    can_set_bitrate(cname(), bitrate);
+    //can_set_bitrate(cname(), bitrate);
 }
 
 int SocketCanInterface::getIfIndex() {
