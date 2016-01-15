@@ -78,8 +78,9 @@ bool Backend::startMeasurement()
 
             CanInterface *intf = getInterfaceById(mi->canInterface());
             if (intf) {
-                logMessage(log_level_info, QString("Listening on interface: %1").arg(intf->getName()));
                 intf->applyConfig(*mi);
+
+                logMessage(log_level_info, QString("Listening on interface: %1").arg(intf->getName()));
                 intf->open();
 
                 CanListener *listener = new CanListener(0, *this, *intf);

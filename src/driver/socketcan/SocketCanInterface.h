@@ -59,6 +59,8 @@ private:
     QString _name;
 
     ts_mode_t _ts_mode;
+
+    const char *cname();
 };
 
 #endif /* SOCKETCAN_SOCKETCANINTERFACE_H_ */

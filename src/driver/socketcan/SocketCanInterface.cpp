@@ -69,19 +69,88 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
         return;
     }
 
-    if (getBitrate() != mi.bitrate()) {
-        backend.logMessage(log_level_info, QString("Setting bitrate on %1 from %2 to %3").arg(
-            getName(),
-            QString().number(getBitrate()),
-            QString().number(mi.bitrate())
-        ));
-        setBitrate(mi.bitrate());
+    if (getBitrate() == mi.bitrate()) { // TODO carefully compare active configuration with the desired one
+
+        backend.logMessage(log_level_info, QString("interface %1 already configured correctly, not touching configuration").arg(getName()));
+
+    } else {
+        backend.logMessage(log_level_info, QString("taking down interface %1 for configuration").arg(getName()));
+        can_do_stop(cname());
+
+        setBitrate(mi.bitrate()); // TODO: remove this leftover
+        can_do_start(cname());
+
+        QStringList cmd;
+        cmd.append("ip");
+        cmd.append("link");
+        cmd.append("set");
+        cmd.append(getName());
+        cmd.append("up");
+        cmd.append("type");
+        cmd.append("can");
+
+        if (mi.isSimpleTiming()) {
+            cmd.append("bitrate");
+            cmd.append(QString().number(mi.bitrate()));
+            cmd.append("sample-point");
+            cmd.append(QString().number((float)mi.samplePoint()/1000.0, 'f', 3));
+
+            if (mi.isCanFD()) {
+                cmd.append("dbitrate");
+                cmd.append(QString().number(mi.fdBitrate()));
+                cmd.append("dsample-point");
+                cmd.append(QString().number((float)mi.fdSamplePoint()/1000.0, 'f', 3));
+                cmd.append("fd");
+                cmd.append("on");
+            }
+
+        } else {
+
+            cmd.append("tq");
+            cmd.append(QString().number(mi.tq()));
+            cmd.append("prop-seg");
+            cmd.append(QString().number(mi.propSeg()));
+            cmd.append("phase-seg1");
+            cmd.append(QString().number(mi.phaseSeg1()));
+            cmd.append("phase-seg2");
+            cmd.append(QString().number(mi.phaseSeg2()));
+
+            if (mi.doSetSJW()) {
+                cmd.append("sjw");
+                cmd.append(QString().number(mi.SJW()));
+            }
+
+            if (mi.isCanFD()) {
+                cmd.append("dtq");
+                cmd.append(QString().number(mi.fdTq()));
+                cmd.append("dprop-seg");
+                cmd.append(QString().number(mi.fdPropSeg()));
+                cmd.append("dphase-seg1");
+                cmd.append(QString().number(mi.fdPhaseSeg1()));
+                cmd.append("dphase-seg2");
+                cmd.append(QString().number(mi.fdPhaseSeg2()));
+
+                if (mi.doSetFdSJW()) {
+                    cmd.append("dsjw");
+                    cmd.append(QString().number(mi.fdSJW()));
+                }
+            }
+        }
+
+        cmd.append("restart-ms");
+        if (mi.doAutoRestart()) {
+            cmd.append(QString().number(mi.autoRestartMs()));
+        } else {
+            cmd.append("0");
+        }
+
+        backend.logMessage(log_level_info, cmd.join(' '));
     }
 }
 
 int SocketCanInterface::getBitrate() {
 	struct can_bittiming bt;
-    if (can_get_bittiming(_name.toStdString().c_str(), &bt) == 0) {
+    if (can_get_bittiming(cname(), &bt) == 0) {
 		return bt.bitrate;
 	} else {
 		return 0;
@@ -89,11 +158,16 @@ int SocketCanInterface::getBitrate() {
 }
 
 void SocketCanInterface::setBitrate(int bitrate) {
-    can_set_bitrate(_name.toStdString().c_str(), bitrate);
+    can_set_bitrate(cname(), bitrate);
 }
 
 int SocketCanInterface::getIfIndex() {
-	return _idx;
+    return _idx;
+}
+
+const char *SocketCanInterface::cname()
+{
+    return _name.toStdString().c_str();
 }
 
 void SocketCanInterface::open() {
