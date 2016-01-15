@@ -48,7 +48,9 @@ class Backend : public QObject
 {
     Q_OBJECT
 public:
-    explicit Backend(QObject *parent = 0);
+    static Backend &instance();
+
+    explicit Backend();
     virtual ~Backend();
 
     void addCanDriver(CanDriver *driver);
@@ -95,6 +97,8 @@ signals:
 public slots:
 
 private:
+    static Backend *_instance;
+
     bool _measurementRunning;
     double _measurementStartTime;
     QList<CanDriver*> _drivers;

@@ -79,7 +79,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    Backend backend;
+    Backend &backend;
     SocketCanDriver _socketcan;
 
     bool _workspaceModified;

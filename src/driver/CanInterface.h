@@ -27,6 +27,7 @@
 
 class CanDriver;
 class CanMessage;
+class MeasurementInterface;
 
 class CanInterface {
 public:
@@ -35,7 +36,9 @@ public:
     virtual CanDriver *getDriver();
     virtual QString getName() const = 0;
 
-	virtual int getBitrate() = 0;
+    virtual void applyConfig(const MeasurementInterface &mi) = 0;
+
+    virtual int getBitrate() = 0;
 	virtual void setBitrate(int bitrate) = 0;
     virtual QList<int> getAvailableBitrates();
     virtual QList<int> getAvailableFdBitrates();

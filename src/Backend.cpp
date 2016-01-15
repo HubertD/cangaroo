@@ -32,8 +32,10 @@
 #include <driver/CanListener.h>
 #include <parser/dbc/DbcParser.h>
 
-Backend::Backend(QObject *parent)
-  : QObject(parent),
+Backend *Backend::_instance = 0;
+
+Backend::Backend()
+  : QObject(0),
     _measurementRunning(false),
     _measurementStartTime(0),
     _setup(this)
@@ -42,6 +44,14 @@ Backend::Backend(QObject *parent)
 
     setDefaultSetup();
     _trace = new CanTrace(*this, this, 100);
+}
+
+Backend &Backend::instance()
+{
+    if (!_instance) {
+        _instance = new Backend;
+    }
+    return *_instance;
 }
 
 Backend::~Backend()
@@ -67,22 +77,15 @@ bool Backend::startMeasurement()
         foreach (MeasurementInterface *mi, network->interfaces()) {
 
             CanInterface *intf = getInterfaceById(mi->canInterface());
-            intf->open();
+            if (intf) {
+                logMessage(log_level_info, QString("Listening on interface: %1").arg(intf->getName()));
+                intf->applyConfig(*mi);
+                intf->open();
 
-            logMessage(log_level_info, QString("Listening on interface: %1").arg(intf->getName()));
-
-            if (intf->getBitrate() != mi->bitrate()) {
-                logMessage(log_level_info, QString("Setting bitrate on %1 from %2 to %3").arg(
-                    intf->getName(),
-                    QString().number(intf->getBitrate()),
-                    QString().number(mi->bitrate())
-                ));
-                intf->setBitrate(mi->bitrate());
+                CanListener *listener = new CanListener(0, *this, *intf);
+                listener->startThread();
+                _listeners.append(listener);
             }
-
-            CanListener *listener = new CanListener(0, *this, *intf);
-            listener->startThread();
-            _listeners.append(listener);
         }
     }
 

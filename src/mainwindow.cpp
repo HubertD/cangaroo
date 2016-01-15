@@ -36,7 +36,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    backend(Backend::instance())
 {
     ui->setupUi(this);
     _baseWindowTitle = windowTitle();

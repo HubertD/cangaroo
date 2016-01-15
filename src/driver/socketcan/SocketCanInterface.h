@@ -34,7 +34,9 @@ public:
     virtual QString getName() const;
     void setName(QString name);
 
-	virtual int getBitrate();
+    virtual void applyConfig(const MeasurementInterface &mi);
+
+    virtual int getBitrate();
 	virtual void setBitrate(int bitrate);
 
 	virtual void open();

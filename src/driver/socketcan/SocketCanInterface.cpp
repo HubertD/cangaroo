@@ -20,7 +20,10 @@
 */
 
 #include "SocketCanInterface.h"
-#include "model/CanMessage.h"
+
+#include <Backend.h>
+#include <model/MeasurementInterface.h>
+#include <model/CanMessage.h>
 #include "libsocketcan/libsocketcan.h"
 
 #include <stdio.h>
@@ -54,7 +57,26 @@ QString SocketCanInterface::getName() const {
 }
 
 void SocketCanInterface::setName(QString name) {
-	_name = name;
+    _name = name;
+}
+
+void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
+{
+    Backend &backend = Backend::instance();
+
+    if (!mi.doConfigure()) {
+        backend.logMessage(log_level_info, QString("interface %1 not managed by cangaroo, not touching configuration").arg(getName()));
+        return;
+    }
+
+    if (getBitrate() != mi.bitrate()) {
+        backend.logMessage(log_level_info, QString("Setting bitrate on %1 from %2 to %3").arg(
+            getName(),
+            QString().number(getBitrate()),
+            QString().number(mi.bitrate())
+        ));
+        setBitrate(mi.bitrate());
+    }
 }
 
 int SocketCanInterface::getBitrate() {
