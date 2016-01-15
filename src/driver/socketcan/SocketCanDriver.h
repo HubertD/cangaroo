@@ -22,8 +22,6 @@
 #ifndef SOCKETCAN_SOCKETCANDRIVER_H_
 #define SOCKETCAN_SOCKETCANDRIVER_H_
 
-#include <sys/types.h>
-#include <linux/netlink.h>
 #include <QString>
 #include <driver/CanDriver.h>
 
@@ -33,10 +31,9 @@ public:
     virtual ~SocketCanDriver();
 
     virtual QString getName();
-	virtual void update();
+    virtual bool update();
 
 private:
-	void addNetlinkInterface(struct nlmsghdr *h);
     void createOrUpdateInterface(int index, QString name);
 };
 

@@ -8,6 +8,7 @@ written by Hubert Denkmair <hubert@denkmair.de>
 
 ### v0.1.3 unreleased
 * new can interface configuration GUI (missing a suid binary to actually set the config)
+* use libnl-route-3 for socketcan device config
 * new logging subsystem, do not use QDebug any more
 * some performance improvements when receiving lots of messages 
 * bugfix with time-delta view: timestamps not shown when no previous message avail
@@ -30,7 +31,6 @@ initial release \o/
 
 ### backend
 * allow for canfd frames
-* define driver features like detailed bittimings, bus status, statistics
 * support non-message frames in traces (e.g. markers)
 * implement plugin API
 * embed python for scripting

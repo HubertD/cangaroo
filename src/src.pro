@@ -7,6 +7,10 @@ QT += xml
 TARGET = cangaroo
 TEMPLATE = app
 CONFIG += warn_on
+CONFIG += link_pkgconfig
+
+PKGCONFIG += libnl-3.0
+PKGCONFIG += libnl-route-3.0
 
 DESTDIR = ../bin
 MOC_DIR = ../build/moc
