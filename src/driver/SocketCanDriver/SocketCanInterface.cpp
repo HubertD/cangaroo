@@ -76,10 +76,6 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
 
     } else {
         backend.logMessage(log_level_info, QString("taking down interface %1 for configuration").arg(getName()));
-//        can_do_stop(cname());
-
-        setBitrate(mi.bitrate()); // TODO: remove this leftover
-//        can_do_start(cname());
 
         QStringList cmd;
         cmd.append("ip");
@@ -195,16 +191,22 @@ bool SocketCanInterface::supportsTimingConfiguration()
     return _config.supports_timing;
 }
 
+bool SocketCanInterface::supportsCanFD()
+{
+    return _config.supports_canfd;
+}
+
+bool SocketCanInterface::supportsTripleSampling()
+{
+    return false;
+}
+
 int SocketCanInterface::getBitrate() {
     if (readConfig()) {
         return _config.bit_timing.bitrate;
     } else {
         return 0;
     }
-}
-
-void SocketCanInterface::setBitrate(int bitrate) {
-    //can_set_bitrate(cname(), bitrate);
 }
 
 int SocketCanInterface::getIfIndex() {

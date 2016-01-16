@@ -52,8 +52,9 @@ public:
     virtual bool readConfigFromLink(struct rtnl_link *link);
 
     bool supportsTimingConfiguration();
+    bool supportsCanFD();
+    bool supportsTripleSampling();
     virtual int getBitrate();
-	virtual void setBitrate(int bitrate);
 
 	virtual void open();
 	virtual void close();

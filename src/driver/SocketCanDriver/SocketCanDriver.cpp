@@ -46,7 +46,6 @@ SocketCanDriver::SocketCanDriver(Backend &backend)
 }
 
 SocketCanDriver::~SocketCanDriver() {
-    delete setupPage;
 }
 
 bool SocketCanDriver::update() {

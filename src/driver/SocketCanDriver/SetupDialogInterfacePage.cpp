@@ -82,10 +82,11 @@ void SetupDialogInterfacePage::onSetupDialogCreated(SetupDialog &dlg)
 
 void SetupDialogInterfacePage::onShowInterfacePage(SetupDialog &dlg, MeasurementInterface *mi)
 {
-    SocketCanInterface *sci;
+    SocketCanInterface *sci = 0;
     if (mi && (backend().getDriverName(mi->canInterface()) == "SocketCAN")) {
         _mi = mi;
          sci = (SocketCanInterface*)backend().getInterfaceById(_mi->canInterface());
+         sci->readConfig();
     } else {
         return;
     }
@@ -143,17 +144,30 @@ void SetupDialogInterfacePage::onShowInterfacePage(SetupDialog &dlg, Measurement
 
 void SetupDialogInterfacePage::updateUI()
 {
-    if (!_enable_ui_updates) {
+    SocketCanInterface *sci = (SocketCanInterface*)backend().getInterfaceById(_mi->canInterface());
+
+    if ((!_enable_ui_updates) || (sci==0)) {
         return;
     }
 
+    if (sci->supportsCanFD()) {
+        ui->cbCanFD->setEnabled(true);
+    } else {
+        ui->cbCanFD->setEnabled(false);
+        ui->cbCanFD->setChecked(false);
+    }
 
-    //ui->wSocketCanTimingMode->setEnabled(_supportsTimingConfig);
-    //ui->wSocketCanTiming->setEnabled(_supportsTimingConfig);
+    if (sci->supportsTripleSampling()) {
+        ui->cbTripleSampling->setEnabled(true);
+    } else {
+        ui->cbTripleSampling->setEnabled(false);
+        ui->cbTripleSampling->setChecked(false);
+    }
 
     bool doConfig = ui->cbConfigure->isChecked();
     ui->wOptions->setEnabled(doConfig);
-    ui->wTiming->setEnabled(doConfig);
+    ui->wTiming->setEnabled(doConfig && sci->supportsTimingConfiguration());
+
 
     bool enableCanFd = ui->cbCanFD->isChecked();
     ui->wAutoTimingCanFd->setEnabled(enableCanFd);

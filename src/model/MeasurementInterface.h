@@ -110,12 +110,13 @@ public:
 
 private:
     CanInterfaceId _canif;
+
     bool _doConfigure;
     bool _isListenOnlyMode;
     bool _isTripleSampling;
     bool _isCanFD;
-    bool _isSimpleTiming;
 
+    bool _isSimpleTiming;
     int _bitrate;
     int _samplePoint;
 
