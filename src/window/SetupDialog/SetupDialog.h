@@ -35,8 +35,6 @@ class SetupDialogTreeModel;
 
 namespace Ui {
 class SetupDialog;
-class SocketCanInterfacePage;
-
 }
 
 class SetupDialog : public QDialog
@@ -48,6 +46,11 @@ public:
     ~SetupDialog();
 
     bool showSetupDialog(MeasurementSetup &setup);
+    void addPage(QWidget *widget);
+    void displayPage(QWidget *widget);
+
+signals:
+    void onShowInterfacePage(SetupDialog &dlg, MeasurementInterface *mi);
 
 public slots:
     void treeViewSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
@@ -69,19 +72,13 @@ private slots:
     void executeAddInterface();
     void executeDeleteInterface();
 
-    void updateSocketCanUI();
-
     void on_btAddNetwork_clicked();
     void on_btRemoveNetwork_clicked();
 
 
 private:
     Ui::SetupDialog *ui;
-    Ui::SocketCanInterfacePage *socketCanPageUI;
-    QWidget *_socketCanPage;
-
     Backend *_backend;
-    bool _enableSocketCanUpdates;
 
     QAction *_actionDeleteInterface;
     QAction *_actionDeleteCanDb;
@@ -90,17 +87,12 @@ private:
 
     SetupDialogTreeModel *model;
     MeasurementNetwork *_currentNetwork;
-    MeasurementInterface *_currentInterface;
 
     QModelIndex getSelectedIndex();
     SetupDialogTreeItem *getSelectedItem();
 
-    void showInterfacePage(SetupDialogTreeItem *item);
     void addCanDb(const QModelIndex &parent);
     void addInterface(const QModelIndex &parent);
-
-    void loadInterface(const MeasurementInterface &intf);
-
 
 };
 

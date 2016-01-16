@@ -59,10 +59,10 @@ Backend::~Backend()
     delete _trace;
 }
 
-void Backend::addCanDriver(CanDriver *driver)
+void Backend::addCanDriver(CanDriver &driver)
 {
-    driver->setId(_drivers.size());
-    _drivers.append(driver);
+    driver.init(_drivers.size());
+    _drivers.append(&driver);
 }
 
 bool Backend::startMeasurement()

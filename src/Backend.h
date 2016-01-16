@@ -34,6 +34,7 @@ class MeasurementNetwork;
 class CanTrace;
 class CanListener;
 class CanDbMessage;
+class SetupDialog;
 
 typedef enum log_level {
     log_level_debug,
@@ -53,7 +54,7 @@ public:
     explicit Backend();
     virtual ~Backend();
 
-    void addCanDriver(CanDriver *driver);
+    void addCanDriver(CanDriver &driver);
 
     bool startMeasurement();
     bool stopMeasurement();
@@ -93,6 +94,8 @@ signals:
     void endMeasurement();
 
     void onLogMessage(const QDateTime dt, const log_level_t level, const QString msg);
+
+    void onSetupDialogCreated(SetupDialog &dlg);
 
 public slots:
 

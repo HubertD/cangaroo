@@ -22,14 +22,16 @@
 #ifndef SOCKETCAN_SOCKETCANDRIVER_H_
 #define SOCKETCAN_SOCKETCANDRIVER_H_
 
+#include <Backend.h>
 #include <QString>
 #include <driver/CanDriver.h>
 
 class SocketCanInterface;
+class SetupDialogInterfacePage;
 
 class SocketCanDriver: public CanDriver {
 public:
-    SocketCanDriver();
+    SocketCanDriver(Backend &backend);
     virtual ~SocketCanDriver();
 
     virtual QString getName();
@@ -37,6 +39,7 @@ public:
 
 private:
     SocketCanInterface *createOrUpdateInterface(int index, QString name);
+    SetupDialogInterfacePage *setupPage;
 };
 
 #endif /* SOCKETCAN_SOCKETCANDRIVER_H_ */

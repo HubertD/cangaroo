@@ -12,5 +12,4 @@ HEADERS += \
 
 FORMS += \
     $$PWD/SetupDialog.ui \
-    $$PWD/SelectCanInterfacesDialog.ui \
-    $$PWD/SocketCanInterfacePage.ui
+    $$PWD/SelectCanInterfacesDialog.ui

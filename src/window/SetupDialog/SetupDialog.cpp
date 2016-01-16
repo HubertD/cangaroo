@@ -21,7 +21,6 @@
 
 #include "SetupDialog.h"
 #include "ui_SetupDialog.h"
-#include "ui_SocketCanInterfacePage.h"
 #include <QItemSelectionModel>
 #include <QMenu>
 #include <QFileDialog>
@@ -31,8 +30,6 @@
 #include <model/MeasurementSetup.h>
 #include <driver/CanInterface.h>
 #include <driver/CanDriver.h>
-#include <driver/socketcan/SocketCanInterface.h>
-
 
 #include "SetupDialogTreeModel.h"
 #include "SetupDialogTreeItem.h"
@@ -42,14 +39,10 @@
 SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SetupDialog),
-    socketCanPageUI(new Ui::SocketCanInterfacePage),
-    _socketCanPage(new QWidget(this)),
     _backend(&backend),
-    _enableSocketCanUpdates(true),
     _currentNetwork(0)
 {
     ui->setupUi(this);
-    socketCanPageUI->setupUi(_socketCanPage);
 
     QIcon icon(":/assets/cangaroo.png");
     setWindowIcon(icon);
@@ -80,9 +73,6 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     ui->candbsTreeView->setColumnHidden(SetupDialogTreeModel::column_filename, false);
     ui->candbsTreeView->setColumnHidden(SetupDialogTreeModel::column_path, false);
 
-    ui->stackedWidget->addWidget(_socketCanPage);
-
-
     connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(treeViewContextMenu(QPoint)));
     connect(ui->edNetworkName, SIGNAL(textChanged(QString)), this, SLOT(edNetworkNameChanged()));
 
@@ -90,45 +80,29 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     connect(ui->candbsTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
     connect(ui->interfacesTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
 
-
-
     connect(_actionAddCanDb, SIGNAL(triggered()), this, SLOT(executeAddCanDb()));
     connect(_actionDeleteCanDb, SIGNAL(triggered()), this, SLOT(executeDeleteCanDb()));
 
     connect(_actionAddInterface, SIGNAL(triggered()), this, SLOT(executeAddInterface()));
     connect(_actionDeleteInterface, SIGNAL(triggered()), this, SLOT(executeDeleteInterface()));
 
-    connect(socketCanPageUI->cbSocketCanConfigured, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->cbSocketCanListenOnly, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->cbSocketCanTripleSampling, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->cbSocketCanCanFD, SIGNAL(toggled(bool)), this, SLOT(updateSocketCanUI()));
-
-    connect(socketCanPageUI->rbSocketCanAutomaticTiming, SIGNAL(toggled(bool)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->cbSocketCanBitrate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->slSocketCanSamplePoint, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->cbSocketCanFdBitrate, SIGNAL(currentIndexChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->slSocketCanFdSamplePoint, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-
-    connect(socketCanPageUI->spSocketCanTQ, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->spSocketCanPropSeg, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->spSocketCanPhaseSeg1, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->spSocketCanPhaseSeg2, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->cbSocketCanSJW, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
-
-    connect(socketCanPageUI->spSocketCanFdTQ, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->spSocketCanFdPropSeg, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->spSocketCanFdPhaseSeg1, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->spSocketCanFdPhaseSeg2, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->cbSocketCanFdSJW, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
-
-    connect(socketCanPageUI->cbSocketCanRestart, SIGNAL(stateChanged(int)), this, SLOT(updateSocketCanUI()));
-    connect(socketCanPageUI->spSocketCanRestartTime, SIGNAL(valueChanged(int)), this, SLOT(updateSocketCanUI()));
+    emit backend.onSetupDialogCreated(*this);
 }
 
 SetupDialog::~SetupDialog()
 {
     delete ui;
     delete model;
+}
+
+void SetupDialog::addPage(QWidget *widget)
+{
+    ui->stackedWidget->addWidget(widget);
+}
+
+void SetupDialog::displayPage(QWidget *widget)
+{
+    ui->stackedWidget->setCurrentWidget(widget);
 }
 
 bool SetupDialog::showSetupDialog(MeasurementSetup &setup)
@@ -157,14 +131,9 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
 
 
     _currentNetwork = item->network;
-    _currentInterface = item->intf;
 
     if (item->network) {
         ui->edNetworkName->setText(item->network->name());
-    }
-
-    if (item->intf) {
-        loadInterface(*item->intf);
     }
 
     if (item) {
@@ -180,7 +149,7 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
                 break;
 
             case SetupDialogTreeItem::type_interface:
-                showInterfacePage(item);
+                emit onShowInterfacePage(*this, item->intf);
                 break;
 
             case SetupDialogTreeItem::type_candb_root:
@@ -267,123 +236,6 @@ void SetupDialog::addInterface(const QModelIndex &parent)
 
 }
 
-void SetupDialog::loadInterface(const MeasurementInterface &intf)
-{
-    _enableSocketCanUpdates = false;
-
-    CanInterface *ci = _backend->getInterfaceById(intf.canInterface());
-    if (ci && (ci->getDriver()->getName()=="SocketCAN")) {
-        SocketCanInterface *sci = (SocketCanInterface*)ci;
-        //_supportsTimingConfig = sci->supportsTimingConfiguration();
-    }
-    socketCanPageUI->laInterfaceDriver->setText(_backend->getDriverName(intf.canInterface()));
-    socketCanPageUI->laInterfaceName->setText(_backend->getInterfaceName(intf.canInterface()));
-
-    socketCanPageUI->cbSocketCanConfigured->setChecked(intf.doConfigure());
-    socketCanPageUI->cbSocketCanListenOnly->setChecked(intf.isListenOnlyMode());
-    socketCanPageUI->cbSocketCanTripleSampling->setChecked(intf.isTripleSampling());
-    socketCanPageUI->cbSocketCanCanFD->setChecked(intf.isCanFD());
-
-    socketCanPageUI->rbSocketCanAutomaticTiming->setChecked(intf.isSimpleTiming());
-    socketCanPageUI->cbSocketCanBitrate->clear();
-    socketCanPageUI->cbSocketCanBitrate->setCurrentText(QString::number(intf.bitrate()));
-    socketCanPageUI->slSocketCanSamplePoint->setValue(intf.samplePoint());
-
-    socketCanPageUI->cbSocketCanFdBitrate->clear();
-    if (ci) {
-        foreach (int br, ci->getAvailableFdBitrates()) {
-            socketCanPageUI->cbSocketCanFdBitrate->addItem(QString::number(br));
-        }
-    }
-    socketCanPageUI->cbSocketCanFdBitrate->setCurrentText(QString::number(intf.fdBitrate()));
-    socketCanPageUI->slSocketCanFdSamplePoint->setValue(intf.fdSamplePoint());
-
-
-    socketCanPageUI->rbSocketCanManualTiming->setChecked(!intf.isSimpleTiming());
-    socketCanPageUI->spSocketCanTQ->setValue(intf.tq());
-    socketCanPageUI->spSocketCanPropSeg->setValue(intf.propSeg());
-    socketCanPageUI->spSocketCanPhaseSeg1->setValue(intf.phaseSeg1());
-    socketCanPageUI->spSocketCanPhaseSeg2->setValue(intf.phaseSeg2());
-    socketCanPageUI->cbSocketCanSJW->setChecked(intf.doSetSJW());
-    socketCanPageUI->spSocketCanSJW->setValue(intf.SJW());
-    socketCanPageUI->spSocketCanFdTQ->setValue(intf.fdTq());
-    socketCanPageUI->spSocketCanFdPropSeg->setValue(intf.fdPropSeg());
-    socketCanPageUI->spSocketCanFdPhaseSeg1->setValue(intf.fdPhaseSeg1());
-    socketCanPageUI->spSocketCanFdPhaseSeg2->setValue(intf.fdPhaseSeg2());
-    socketCanPageUI->cbSocketCanFdSJW->setChecked(intf.doSetFdSJW());
-    socketCanPageUI->spSocketCanFdSJW->setValue(intf.fdSJW());
-
-    socketCanPageUI->cbSocketCanRestart->setChecked(intf.doAutoRestart());
-    socketCanPageUI->spSocketCanRestartTime->setValue(intf.autoRestartMs());
-
-    _enableSocketCanUpdates = true;
-    updateSocketCanUI();
-}
-
-void SetupDialog::updateSocketCanUI()
-{
-
-    if (!_enableSocketCanUpdates) {
-        return;
-    }
-
-
-    //socketCanPageUI->wSocketCanTimingMode->setEnabled(_supportsTimingConfig);
-    //socketCanPageUI->wSocketCanTiming->setEnabled(_supportsTimingConfig);
-
-    bool doConfig = socketCanPageUI->cbSocketCanConfigured->isChecked();
-    socketCanPageUI->wSocketCanOptions->setEnabled(doConfig);
-    socketCanPageUI->wSocketCanTiming->setEnabled(doConfig);
-
-    bool enableCanFd = socketCanPageUI->cbSocketCanCanFD->isChecked();
-    socketCanPageUI->wSocketCanAutoTimingCanFd->setEnabled(enableCanFd);
-    socketCanPageUI->wSocketCanFdManualTiming->setEnabled(enableCanFd);
-
-    bool autoTiming = socketCanPageUI->rbSocketCanAutomaticTiming->isChecked();
-    socketCanPageUI->stackedSocketCanTiming->setCurrentIndex(autoTiming ? 0 : 1);
-
-    bool configSjw = socketCanPageUI->cbSocketCanSJW->isChecked();
-    socketCanPageUI->spSocketCanSJW->setEnabled(configSjw);
-
-    bool configFdSjw = socketCanPageUI->cbSocketCanFdSJW->isChecked();
-    socketCanPageUI->spSocketCanFdSJW->setEnabled(configFdSjw);
-
-    bool autoRestart = socketCanPageUI->cbSocketCanRestart->isChecked();
-    socketCanPageUI->spSocketCanRestartTime->setEnabled(autoRestart);
-
-    socketCanPageUI->laSocketCanSamplePoint->setText(QString().sprintf("%.1f%%", socketCanPageUI->slSocketCanSamplePoint->value() / 10.0));
-    socketCanPageUI->laSocketCanFdSamplePoint->setText(QString().sprintf("%.1f%%", socketCanPageUI->slSocketCanFdSamplePoint->value() / 10.0));
-
-    if (_currentInterface) {
-        _currentInterface->setDoConfigure(socketCanPageUI->cbSocketCanConfigured->isChecked());
-        _currentInterface->setListenOnlyMode(socketCanPageUI->cbSocketCanListenOnly->isChecked());
-        _currentInterface->setTripleSampling(socketCanPageUI->cbSocketCanTripleSampling->isChecked());
-        _currentInterface->setCanFD(socketCanPageUI->cbSocketCanCanFD->isChecked());
-        _currentInterface->setSimpleTiming(socketCanPageUI->rbSocketCanAutomaticTiming->isChecked());
-
-        _currentInterface->setBitrate(socketCanPageUI->cbSocketCanBitrate->currentText().toInt());
-        _currentInterface->setSamplePoint(socketCanPageUI->slSocketCanSamplePoint->value());
-        _currentInterface->setFdBitrate(socketCanPageUI->cbSocketCanFdBitrate->currentText().toInt());
-        _currentInterface->setFdSamplePoint(socketCanPageUI->slSocketCanFdSamplePoint->value());
-
-        _currentInterface->setTq(socketCanPageUI->spSocketCanTQ->value());
-        _currentInterface->setPropSeg(socketCanPageUI->spSocketCanPropSeg->value());
-        _currentInterface->setPhaseSeg1(socketCanPageUI->spSocketCanPhaseSeg1->value());
-        _currentInterface->setPhaseSeg2(socketCanPageUI->spSocketCanPhaseSeg2->value());
-        _currentInterface->setDoSetSJW(socketCanPageUI->cbSocketCanSJW->isChecked());
-
-        _currentInterface->setFdTq(socketCanPageUI->spSocketCanFdTQ->value());
-        _currentInterface->setFdPropSeg(socketCanPageUI->spSocketCanFdPropSeg->value());
-        _currentInterface->setFdPhaseSeg1(socketCanPageUI->spSocketCanFdPhaseSeg1->value());
-        _currentInterface->setFdPhaseSeg2(socketCanPageUI->spSocketCanFdPhaseSeg2->value());
-        _currentInterface->setDoSetFdSJW(socketCanPageUI->cbSocketCanFdSJW->isChecked());
-
-        _currentInterface->setAutoRestart(socketCanPageUI->cbSocketCanRestart->isChecked());
-        _currentInterface->setAutoRestartMs(socketCanPageUI->spSocketCanRestartTime->value());
-    }
-
-}
-
 void SetupDialog::executeAddInterface()
 {
     addInterface(ui->treeView->selectionModel()->currentIndex());
@@ -402,13 +254,6 @@ void SetupDialog::executeDeleteInterface()
 void SetupDialog::on_btRemoveInterface_clicked()
 {
     model->deleteInterface(ui->interfacesTreeView->selectionModel()->currentIndex());
-}
-
-void SetupDialog::showInterfacePage(SetupDialogTreeItem *item)
-{
-    (void) item;
-    ui->stackedWidget->setCurrentWidget(_socketCanPage);
-    updateSocketCanUI();
 }
 
 void SetupDialog::addCanDb(const QModelIndex &parent)

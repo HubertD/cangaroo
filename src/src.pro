@@ -36,6 +36,7 @@ RESOURCES = cangaroo.qrc
 
 include($$PWD/model/model.pri)
 include($$PWD/driver/driver.pri)
+include($$PWD/driver/SocketCanDriver/SocketCanDriver.pri)
 include($$PWD/parser/dbc/dbc.pri)
 include($$PWD/window/TraceWindow/TraceWindow.pri)
 include($$PWD/window/SetupDialog/SetupDialog.pri)

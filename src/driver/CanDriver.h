@@ -26,17 +26,20 @@
 #include <QString>
 #include "CanInterface.h"
 
-class CanInterface;
+class Backend;
 
 typedef uint16_t CanInterfaceId;
 typedef QList<uint16_t> CanInterfaceIdList;
 
 class CanDriver {
 public:
-    CanDriver();
+    CanDriver(Backend &backend);
     virtual ~CanDriver();
 
-    void setId(int id);
+    Backend &backend() const;
+
+    void init(int id);
+
     int id();
 
     virtual QString getName() = 0;
@@ -50,8 +53,11 @@ public:
     CanInterface *getInterfaceByName(QString ifName);
 
 private:
+    Backend &_backend;
     int _id;
     QList<CanInterface*> _interfaces;
+
+    void setId(int id);
 };
 
 #endif /* BASE_CANDRIVER_H_ */

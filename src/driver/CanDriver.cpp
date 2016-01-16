@@ -20,14 +20,26 @@
 */
 
 #include "CanDriver.h"
+#include <Backend.h>
 
-CanDriver::CanDriver()
+CanDriver::CanDriver(Backend &backend)
+  : _backend(backend)
 {
     setId(0);
 }
 
 CanDriver::~CanDriver() {
     // TODO Auto-generated destructor stub
+}
+
+Backend &CanDriver::backend() const
+{
+    return _backend;
+}
+
+void CanDriver::init(int id)
+{
+    setId(id);
 }
 
 void CanDriver::setId(int id)

@@ -22,7 +22,6 @@
 
 #include "SocketCanDriver.h"
 #include "SocketCanInterface.h"
-
 #include <Backend.h>
 
 #include <sys/socket.h>
@@ -37,12 +36,17 @@
 #include <unistd.h>
 #include <string.h>
 
-SocketCanDriver::SocketCanDriver()
-  : CanDriver()
+#include "SetupDialogInterfacePage.h"
+
+SocketCanDriver::SocketCanDriver(Backend &backend)
+  : CanDriver(backend),
+    setupPage(new SetupDialogInterfacePage(0, backend))
 {
+    QObject::connect(&backend, SIGNAL(onSetupDialogCreated(SetupDialog&)), setupPage, SLOT(onSetupDialogCreated(SetupDialog&)));
 }
 
 SocketCanDriver::~SocketCanDriver() {
+    delete setupPage;
 }
 
 bool SocketCanDriver::update() {

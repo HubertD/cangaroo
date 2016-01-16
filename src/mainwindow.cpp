@@ -37,7 +37,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    backend(Backend::instance())
+    _socketcan(Backend::instance())
 {
     ui->setupUi(this);
     _baseWindowTitle = windowTitle();
@@ -58,8 +58,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionStart_Measurement, SIGNAL(triggered()), this, SLOT(startMeasurement()));
     connect(ui->actionStop_Measurement, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
 
-    connect(&backend, SIGNAL(beginMeasurement()), this, SLOT(updateMeasurementActions()));
-    connect(&backend, SIGNAL(endMeasurement()), this, SLOT(updateMeasurementActions()));
+    connect(&backend(), SIGNAL(beginMeasurement()), this, SLOT(updateMeasurementActions()));
+    connect(&backend(), SIGNAL(endMeasurement()), this, SLOT(updateMeasurementActions()));
     updateMeasurementActions();
 
     connect(ui->actionSave_Trace_to_file, SIGNAL(triggered(bool)), this, SLOT(saveTraceToFile()));
@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
-    backend.addCanDriver(&_socketcan);
+    Backend::instance().addCanDriver(_socketcan);
 
     setWorkspaceModified(false);
     newWorkspace();
@@ -85,7 +85,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateMeasurementActions()
 {
-    bool running = backend.isMeasurementRunning();
+    bool running = backend().isMeasurementRunning();
     ui->actionStart_Measurement->setEnabled(!running);
     ui->actionStop_Measurement->setEnabled(running);
 }
@@ -97,7 +97,7 @@ void MainWindow::on_workspace_modified()
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (askSaveBecauseWorkspaceModified()!=QMessageBox::Cancel) {
-        backend.stopMeasurement();
+        backend().stopMeasurement();
         event->accept();
     } else {
         event->ignore();
@@ -112,11 +112,16 @@ QMdiSubWindow *MainWindow::createSubWindow(MdiWindow *window)
     return retval;
 }
 
+Backend &MainWindow::backend()
+{
+    return Backend::instance();
+}
+
 void MainWindow::stopAndClearMeasurement()
 {
-    backend.stopMeasurement();
+    backend().stopMeasurement();
     QCoreApplication::processEvents();
-    backend.clearTrace();
+    backend().clearTrace();
 }
 
 bool MainWindow::loadWorkspaceWindow(QDomElement el)
@@ -124,17 +129,17 @@ bool MainWindow::loadWorkspaceWindow(QDomElement el)
     MdiWindow *window;
     QString type = el.attribute("type");
     if (type=="LogWindow") {
-        window = new LogWindow(ui->mdiArea, backend);
+        window = new LogWindow(ui->mdiArea, backend());
     } else if (type=="TraceWindow") {
-        window = new TraceWindow(ui->mdiArea, backend);
+        window = new TraceWindow(ui->mdiArea, backend());
     } else if (type=="GraphWindow") {
-        window = new GraphWindow(ui->mdiArea, backend);
+        window = new GraphWindow(ui->mdiArea, backend());
     } else {
         qCritical() << "cannot construct window of unknown type" << type;
         window = new MdiWindow(ui->mdiArea);
     }
 
-    window->loadXML(backend, el);
+    window->loadXML(backend(), el);
     QMdiSubWindow *mdi = createSubWindow(window);
     mdi->setGeometry(
         el.attribute("left", "0").toInt(),
@@ -148,9 +153,9 @@ bool MainWindow::loadWorkspaceWindow(QDomElement el)
 
 bool MainWindow::loadWorkspaceSetup(QDomElement el)
 {
-    MeasurementSetup setup(&backend);
-    if (setup.loadXML(backend, el)) {
-        backend.setSetup(setup);
+    MeasurementSetup setup(&backend());
+    if (setup.loadXML(backend(), el)) {
+        backend().setSetup(setup);
         return true;
     } else {
         return false;
@@ -162,14 +167,14 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
 
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        backend.logMessage(log_level_error, QString("Cannot open workspace settings file: %1").arg(filename));
+        backend().logMessage(log_level_error, QString("Cannot open workspace settings file: %1").arg(filename));
         return;
     }
 
     QDomDocument doc;
     if (!doc.setContent(&file)) {
         file.close();
-        backend.logMessage(log_level_error, QString("Cannot load settings from file: %1").arg(filename));
+        backend().logMessage(log_level_error, QString("Cannot load settings from file: %1").arg(filename));
         return;
     }
     file.close();
@@ -181,7 +186,7 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
     QDomNodeList windows = windowsRoot.elementsByTagName("window");
     for (int i=0; i<windows.length(); i++) {
         if (!loadWorkspaceWindow(windows.item(i).toElement())) {
-            backend.logMessage(log_level_warning, QString("Could not read window %1 from file: %2").arg(QString::number(i), filename));
+            backend().logMessage(log_level_warning, QString("Could not read window %1 from file: %2").arg(QString::number(i), filename));
             continue;
         }
     }
@@ -191,7 +196,7 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
         _workspaceFileName = filename;
         setWorkspaceModified(false);
     } else {
-        backend.logMessage(log_level_error, QString("Unable to read measurement setup from workspace config file: %1").arg(filename));
+        backend().logMessage(log_level_error, QString("Unable to read measurement setup from workspace config file: %1").arg(filename));
     }
 }
 
@@ -212,8 +217,8 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
         wnode.setAttribute("height", window->geometry().height());
 
         MdiWindow *mdiwin = dynamic_cast<MdiWindow*>(window->widget());
-        if (!mdiwin->saveXML(backend, doc, wnode)) {
-            backend.logMessage(log_level_error, QString("Cannot save window settings to file: %1").arg(filename));
+        if (!mdiwin->saveXML(backend(), doc, wnode)) {
+            backend().logMessage(log_level_error, QString("Cannot save window settings to file: %1").arg(filename));
             return false;
         }
 
@@ -221,8 +226,8 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
     }
 
     QDomElement setupRoot = doc.createElement("setup");
-    if (!backend.getSetup().saveXML(backend, doc, setupRoot)) {
-        backend.logMessage(log_level_error, QString("Cannot save measurement setup to file: %1").arg(filename));
+    if (!backend().getSetup().saveXML(backend(), doc, setupRoot)) {
+        backend().logMessage(log_level_error, QString("Cannot save measurement setup to file: %1").arg(filename));
         return false;
     }
     root.appendChild(setupRoot);
@@ -234,10 +239,10 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
         outFile.close();
         _workspaceFileName = filename;
         setWorkspaceModified(false);
-        backend.logMessage(log_level_info, QString("Saved workspace settings to file: %1").arg(filename));
+        backend().logMessage(log_level_info, QString("Saved workspace settings to file: %1").arg(filename));
         return true;
     } else {
-        backend.logMessage(log_level_error, QString("Cannot open workspace file for writing: %1").arg(filename));
+        backend().logMessage(log_level_error, QString("Cannot open workspace file for writing: %1").arg(filename));
         return false;
     }
 
@@ -252,7 +257,7 @@ void MainWindow::newWorkspace()
         ui->mdiArea->closeAllSubWindows();
         createLogWindow()->setGeometry(0, 500, 1000, 200);
         createTraceWindow()->setGeometry(0, 0, 1000, 500);
-        backend.setDefaultSetup();
+        backend().setDefaultSetup();
     }
 }
 
@@ -325,17 +330,17 @@ int MainWindow::askSaveBecauseWorkspaceModified()
 }
 
 QMdiSubWindow *MainWindow::createTraceWindow() {
-    return createSubWindow(new TraceWindow(ui->mdiArea, backend));
+    return createSubWindow(new TraceWindow(ui->mdiArea, backend()));
 }
 
 QMdiSubWindow *MainWindow::createLogWindow()
 {
-    return createSubWindow(new LogWindow(ui->mdiArea, backend));
+    return createSubWindow(new LogWindow(ui->mdiArea, backend()));
 }
 
 QMdiSubWindow *MainWindow::createGraphWindow()
 {
-    return createSubWindow(new GraphWindow(ui->mdiArea, backend));
+    return createSubWindow(new GraphWindow(ui->mdiArea, backend()));
 }
 
 void MainWindow::setActiveSubWindow(QWidget *window) {
@@ -346,12 +351,12 @@ void MainWindow::setActiveSubWindow(QWidget *window) {
 
 bool MainWindow::showSetupDialog()
 {
-    MeasurementSetup new_setup(&backend);
-    new_setup.cloneFrom(backend.getSetup());
+    MeasurementSetup new_setup(&backend());
+    new_setup.cloneFrom(backend().getSetup());
 
-    SetupDialog dlg(backend, 0);
+    SetupDialog dlg(backend(), 0);
     if (dlg.showSetupDialog(new_setup)) {
-        backend.setSetup(new_setup);
+        backend().setSetup(new_setup);
         setWorkspaceModified(true);
         return true;
     } else {
@@ -375,27 +380,27 @@ void MainWindow::showAboutDialog()
 void MainWindow::startMeasurement()
 {
     if (showSetupDialog()) {
-        backend.startMeasurement();
+        backend().startMeasurement();
     }
 }
 
 void MainWindow::stopMeasurement()
 {
-    backend.stopMeasurement();
+    backend().stopMeasurement();
 }
 
 void MainWindow::saveTraceToFile()
 {
     QString filename = QFileDialog::getSaveFileName(this, "Save Trace to file", "", "Candump Files (*.candump)");
     if (!filename.isNull()) {
-        backend.saveCanDump(filename);
+        backend().saveCanDump(filename);
     }
 }
 
 
 void MainWindow::on_action_TraceClear_triggered()
 {
-    backend.clearTrace();
+    backend().clearTrace();
 }
 
 void MainWindow::on_action_WorkspaceSave_triggered()

@@ -25,7 +25,7 @@
 #include <QMainWindow>
 #include <QList>
 #include <Backend.h>
-#include <driver/socketcan/SocketCanDriver.h>
+#include <driver/SocketCanDriver/SocketCanDriver.h>
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -78,8 +78,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-
-    Backend &backend;
     SocketCanDriver _socketcan;
 
     bool _workspaceModified;
@@ -91,6 +89,7 @@ private:
 
     QMdiSubWindow *createSubWindow(MdiWindow *window);
 
+    Backend &backend();
     void stopAndClearMeasurement();
 
     bool loadWorkspaceWindow(QDomElement el);
