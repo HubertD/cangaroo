@@ -162,11 +162,9 @@ bool SocketCanInterface::readConfig()
     int result = rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache);
 
     if (result>=0) {
-
         if (rtnl_link_get_kernel(sock, _idx, 0, &link) == 0) {
             retval = readConfigFromLink(link);
         }
-
     }
 
     nl_cache_free(cache);
@@ -187,15 +185,18 @@ bool SocketCanInterface::readConfigFromLink(rtnl_link *link)
         rtnl_link_can_get_bittiming(link, &_config.bit_timing);
         rtnl_link_can_get_sample_point(link, &_config.sample_point);
         rtnl_link_can_get_restart_ms(link, &_config.restart_ms);
-
     } else {
         // maybe a vcan interface?
     }
     return true;
 }
 
-int SocketCanInterface::getBitrate() {
+bool SocketCanInterface::supportsTimingConfiguration()
+{
+    return _config.supports_timing;
+}
 
+int SocketCanInterface::getBitrate() {
     if (readConfig()) {
         return _config.bit_timing.bitrate;
     } else {

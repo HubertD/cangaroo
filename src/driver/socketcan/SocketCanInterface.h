@@ -27,6 +27,17 @@
 
 class SocketCanDriver;
 
+typedef struct {
+    bool supports_canfd;
+    bool supports_timing;
+    uint32_t state;
+    uint32_t base_freq;
+    uint32_t sample_point;
+    uint32_t ctrl_mode;
+    uint32_t restart_ms;
+    struct can_bittiming bit_timing;
+} can_config_t;
+
 class SocketCanInterface: public CanInterface {
 public:
     SocketCanInterface(SocketCanDriver *driver, int index, QString name);
@@ -40,6 +51,7 @@ public:
     virtual bool readConfig();
     virtual bool readConfigFromLink(struct rtnl_link *link);
 
+    bool supportsTimingConfiguration();
     virtual int getBitrate();
 	virtual void setBitrate(int bitrate);
 
@@ -62,17 +74,7 @@ private:
 	int _fd;
     QString _name;
 
-    struct {
-        bool supports_canfd;
-        bool supports_timing;
-        uint32_t state;
-        uint32_t base_freq;
-        uint32_t sample_point;
-        uint32_t ctrl_mode;
-        uint32_t restart_ms;
-        struct can_bittiming bit_timing;
-    } _config;
-
+    can_config_t _config;
 
     ts_mode_t _ts_mode;
 

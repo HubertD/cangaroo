@@ -35,6 +35,8 @@ class SetupDialogTreeModel;
 
 namespace Ui {
 class SetupDialog;
+class SocketCanInterfacePage;
+
 }
 
 class SetupDialog : public QDialog
@@ -75,6 +77,9 @@ private slots:
 
 private:
     Ui::SetupDialog *ui;
+    Ui::SocketCanInterfacePage *socketCanPageUI;
+    QWidget *_socketCanPage;
+
     Backend *_backend;
     bool _enableSocketCanUpdates;
 
