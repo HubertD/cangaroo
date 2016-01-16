@@ -58,6 +58,9 @@ class CanDbMessage
         QString getComment() const;
         void setComment(const QString &comment);
 
+        CanDbSignal *getMuxer() const;
+        void setMuxer(CanDbSignal *muxer);
+
 private:
         CanDb *_parent;
         QString _name;
@@ -66,6 +69,7 @@ private:
         CanDbNode *_sender;
         CanDbSignalList _signals;
         QString _comment;
+        CanDbSignal *_muxer;
 
 };
 

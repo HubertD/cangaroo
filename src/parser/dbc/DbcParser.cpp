@@ -24,6 +24,7 @@
 #include "model/CanDb.h"
 #include <stdint.h>
 #include <iostream>
+#include <Backend.h>
 
 #include "DbcTokens.h"
 
@@ -36,11 +37,11 @@ bool DbcParser::parseFile(QFile *file, CanDb &candb)
 {
     DbcTokenList tokens;
     if (tokenize(file, tokens) != err_ok) {
-        //std::cout << "error parsing file " << file->fileName();
+        QString msg = QString("error parsing dbc file %1").arg(file->fileName());
         if (_errorLine) {
-            //std::cout << " at line " << _errorLine << ", column " << _errorColumn;
+            msg += QString(" at line %1, column %2").arg(_errorLine).arg(_errorColumn);
         }
-        //std::cout << "." << std::endl;
+        Backend::instance().logMessage(log_level_error, msg);
         return false;
     }
 
@@ -411,7 +412,7 @@ bool DbcParser::parseSection(CanDb &candb, DbcTokenList &tokens) {
     }
 
     if (!retval) {
-        //qCritical() << "DBC Parse error.";
+        Backend::instance().logMessage(log_level_error, "dbc parse error");
     }
     return retval;
 
@@ -506,9 +507,6 @@ bool DbcParser::parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &
 
     QString signal_name;
     QString mux_indicator;
-    bool is_muxer = false;
-    bool is_muxed = false;
-    int  mux_value = 0;
     int start_bit = 0;
     int length = 0;
     int byte_order = 0;
@@ -529,11 +527,12 @@ bool DbcParser::parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &
 
     if (expectIdentifier(tokens, &mux_indicator)) {
         if (mux_indicator=="M") {
-            is_muxer = true;
+            signal->setIsMuxer(true);
+            msg->setMuxer(signal);
         } else if (mux_indicator.startsWith('m')) {
+            signal->setIsMuxed(true);
             bool ok;
-            is_muxed = true;
-            mux_value = mux_indicator.mid(1).toInt(&ok);
+            signal->setMuxValue(mux_indicator.mid(1).toUInt(&ok));
             if (!ok) { return false; }
         } else {
             return false;

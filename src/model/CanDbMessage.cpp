@@ -22,7 +22,7 @@
 #include "CanDbMessage.h"
 
 CanDbMessage::CanDbMessage(CanDb *parent)
-  : _parent(parent), _raw_id(0), _dlc(0), _sender(0)
+  : _parent(parent), _raw_id(0), _dlc(0), _sender(0), _muxer(0)
 {
 }
 
@@ -99,4 +99,14 @@ QString CanDbMessage::getComment() const
 void CanDbMessage::setComment(const QString &comment)
 {
     _comment = comment;
+}
+
+CanDbSignal *CanDbMessage::getMuxer() const
+{
+    return _muxer;
+}
+
+void CanDbMessage::setMuxer(CanDbSignal *muxer)
+{
+    _muxer = muxer;
 }

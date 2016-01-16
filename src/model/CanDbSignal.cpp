@@ -28,7 +28,10 @@ CanDbSignal::CanDbSignal(CanDbMessage *parent)
     _factor(1),
     _offset(0),
     _min(0),
-    _max(0)
+    _max(0),
+    _isMuxer(false),
+    _isMuxed(false),
+    _muxValue(0)
 {
 }
 
@@ -42,22 +45,22 @@ void CanDbSignal::setName(const QString &name)
     _name = name;
 }
 
-int CanDbSignal::startBit() const
+uint8_t CanDbSignal::startBit() const
 {
     return _startBit;
 }
 
-void CanDbSignal::setStartBit(int startBit)
+void CanDbSignal::setStartBit(uint8_t startBit)
 {
     _startBit = startBit;
 }
 
-int CanDbSignal::length() const
+uint8_t CanDbSignal::length() const
 {
     return _length;
 }
 
-void CanDbSignal::setLength(int length)
+void CanDbSignal::setLength(uint8_t length)
 {
     _length = length;
 }
@@ -97,6 +100,11 @@ double CanDbSignal::convertRawValueToPhysical(const uint32_t rawValue)
         v>>=(32-_length);
     }
     return v * _factor + _offset;
+}
+
+double CanDbSignal::extractPhysicalFromMessage(const CanMessage *msg)
+{
+    return convertRawValueToPhysical(extractRawDataFromMessage(msg));
 }
 
 double CanDbSignal::getFactor() const
@@ -156,6 +164,55 @@ bool CanDbSignal::isBigEndian() const
 void CanDbSignal::setIsBigEndian(bool isBigEndian)
 {
     _isBigEndian = isBigEndian;
+}
+
+bool CanDbSignal::isMuxer() const
+{
+    return _isMuxer;
+}
+
+void CanDbSignal::setIsMuxer(bool isMuxer)
+{
+    _isMuxer = isMuxer;
+}
+
+bool CanDbSignal::isMuxed() const
+{
+    return _isMuxed;
+}
+
+void CanDbSignal::setIsMuxed(bool isMuxed)
+{
+    _isMuxed = isMuxed;
+}
+
+uint32_t CanDbSignal::getMuxValue() const
+{
+    return _muxValue;
+}
+
+void CanDbSignal::setMuxValue(const uint32_t &muxValue)
+{
+    _muxValue = muxValue;
+}
+
+bool CanDbSignal::isPresentInMessage(const CanMessage *msg)
+{
+    if (!_isMuxed) { return true; }
+
+    CanDbSignal *muxer = _parent->getMuxer();
+    if (!muxer) { return false; }
+
+    return _muxValue == muxer->extractRawDataFromMessage(msg);
+}
+
+uint32_t CanDbSignal::extractRawDataFromMessage(const CanMessage *msg)
+{
+    if (msg) {
+        return msg->extractRawSignal(startBit(), length(), isBigEndian());
+    } else {
+        return 0;
+    }
 }
 
 

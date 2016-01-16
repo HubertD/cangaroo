@@ -38,19 +38,17 @@ public:
     QString name() const;
     void setName(const QString &name);
 
-    int startBit() const;
-    void setStartBit(int startBit);
+    uint8_t startBit() const;
+    void setStartBit(uint8_t startBit);
 
-    int length() const;
-    void setLength(int length);
+    uint8_t length() const;
+    void setLength(uint8_t length);
 
     QString comment() const;
     void setComment(const QString &comment);
 
     QString getValueName(const uint32_t value) const;
     void setValueName(const uint32_t value, const QString &name);
-
-    double convertRawValueToPhysical(const uint32_t rawValue);
 
     double getFactor() const;
     void setFactor(double factor);
@@ -70,17 +68,36 @@ public:
     bool isBigEndian() const;
     void setIsBigEndian(bool isBigEndian);
 
+    bool isMuxer() const;
+    void setIsMuxer(bool isMuxer);
+
+    bool isMuxed() const;
+    void setIsMuxed(bool isMuxed);
+
+    uint32_t getMuxValue() const;
+    void setMuxValue(const uint32_t &muxValue);
+
+    bool isPresentInMessage(const CanMessage *msg);
+    uint32_t extractRawDataFromMessage(const CanMessage *msg);
+
+    double convertRawValueToPhysical(const uint32_t rawValue);
+    double extractPhysicalFromMessage(const CanMessage *msg);
+
+
 private:
     CanDbMessage *_parent;
     QString _name;
-    int _startBit;
-    int _length;
+    uint8_t _startBit;
+    uint8_t _length;
     bool _isUnsigned;
     bool _isBigEndian;
     double _factor;
     double _offset;
     double _min;
     double _max;
+    bool _isMuxer;
+    bool _isMuxed;
+    uint32_t _muxValue;
     QString _comment;
     CanDbValueTable _valueTable;
 };

@@ -35,10 +35,9 @@ initial release \o/
 * support non-message frames in traces (e.g. markers)
 * implement plugin API
 * embed python for scripting
-* implement muxed signals
 
 ### can drivers
-* redo socketcan driver (clean qt/c++ implementation, suid binary for interface configuration)
+* allow socketcan interface config through suid binary
 * socketcan: use hardware timestamps (SIOCSHWTSTAMP) if possible
 * cannelloni support
 * windows peak can driver
