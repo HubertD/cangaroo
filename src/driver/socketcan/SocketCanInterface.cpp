@@ -40,6 +40,7 @@
 #include <linux/can/netlink.h>
 #include <netlink/route/link.h>
 #include <netlink/route/link/can.h>
+#include <net/if.h>
 
 SocketCanInterface::SocketCanInterface(SocketCanDriver *driver, int index, QString name)
   : CanInterface((CanDriver *)driver),
