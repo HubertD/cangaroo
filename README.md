@@ -6,9 +6,10 @@ written by Hubert Denkmair <hubert@denkmair.de>
 ## changelog
 
 
-### v0.1.3 unreleased
+### v0.1.3 released 2016-01-16
 * new can interface configuration GUI (missing a suid binary to actually set the config)
-* use libnl-route-3 for socketcan device config
+* use libnl-route-3 for socketcan device config read
+* query socketcan interfaces for supported config options
 * new logging subsystem, do not use QDebug any more
 * some performance improvements when receiving lots of messages 
 * bugfix with time-delta view: timestamps not shown when no previous message avail
