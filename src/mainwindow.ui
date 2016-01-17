@@ -58,6 +58,7 @@
      <addaction name="action_Trace_View"/>
      <addaction name="actionLog_View"/>
      <addaction name="actionGraph_View"/>
+     <addaction name="actionCan_Status_View"/>
     </widget>
     <addaction name="menu_New"/>
    </widget>
@@ -198,6 +199,11 @@
    </property>
    <property name="shortcut">
     <string>Esc</string>
+   </property>
+  </action>
+  <action name="actionCan_Status_View">
+   <property name="text">
+    <string>Can &amp;Status View</string>
    </property>
   </action>
  </widget>

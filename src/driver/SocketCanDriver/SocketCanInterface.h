@@ -38,6 +38,18 @@ typedef struct {
     struct can_bittiming bit_timing;
 } can_config_t;
 
+typedef struct {
+    uint32_t can_state;
+
+    uint64_t rx_count;
+    int rx_errors;
+    uint64_t rx_overruns;
+
+    uint64_t tx_count;
+    int tx_errors;
+    uint64_t tx_dropped;
+} can_status_t;
+
 class SocketCanInterface: public CanInterface {
 public:
     SocketCanInterface(SocketCanDriver *driver, int index, QString name);
@@ -62,6 +74,17 @@ public:
     virtual void sendMessage(const CanMessage &msg);
     virtual bool readMessage(CanMessage &msg, unsigned int timeout_ms);
 
+    virtual bool updateStatistics();
+    virtual uint32_t getState();
+    virtual int getNumRxFrames();
+    virtual int getNumRxErrors();
+    virtual int getNumRxOverruns();
+
+    virtual int getNumTxFrames();
+    virtual int getNumTxErrors();
+    virtual int getNumTxDropped();
+
+
     int getIfIndex();
 
 private:
@@ -76,10 +99,11 @@ private:
     QString _name;
 
     can_config_t _config;
-
+    can_status_t _status;
     ts_mode_t _ts_mode;
 
     const char *cname();
+    bool updateStatus();
 };
 
 #endif /* SOCKETCAN_SOCKETCANINTERFACE_H_ */

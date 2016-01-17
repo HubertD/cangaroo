@@ -145,6 +145,50 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
     }
 }
 
+bool SocketCanInterface::updateStatus()
+{
+    bool retval = false;
+
+    struct nl_sock *sock = nl_socket_alloc();
+    struct nl_cache *cache;
+    struct rtnl_link *link;
+    uint32_t state;
+
+    _status.can_state = state_unknown;
+
+    nl_connect(sock, NETLINK_ROUTE);
+    if (rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache) >= 0) {
+        if (rtnl_link_get_kernel(sock, _idx, 0, &link) == 0) {
+
+            _status.rx_count = rtnl_link_get_stat(link, RTNL_LINK_RX_PACKETS);
+            _status.rx_overruns = rtnl_link_get_stat(link, RTNL_LINK_RX_OVER_ERR);
+            _status.tx_count = rtnl_link_get_stat(link, RTNL_LINK_TX_PACKETS);
+            _status.tx_dropped = rtnl_link_get_stat(link, RTNL_LINK_TX_DROPPED);
+
+            if (rtnl_link_is_can(link)) {
+                if (rtnl_link_can_state(link, &state)==0) {
+                    _status.can_state = state;
+                    _status.rx_errors = rtnl_link_can_berr_rx(link);
+                    _status.tx_errors = rtnl_link_can_berr_tx(link);
+                    retval = true;
+                }
+            } else {
+                _status.can_state = state_unknown;
+                _status.rx_errors = 0;
+                _status.tx_errors = 0;
+                retval = true;
+            }
+        }
+    }
+
+    nl_cache_free(cache);
+    nl_close(sock);
+    nl_socket_free(sock);
+
+    return retval;
+}
+
+
 bool SocketCanInterface::readConfig()
 {
     bool retval = false;
@@ -207,6 +251,53 @@ int SocketCanInterface::getBitrate() {
     } else {
         return 0;
     }
+}
+
+bool SocketCanInterface::updateStatistics()
+{
+    return updateStatus();
+}
+
+uint32_t SocketCanInterface::getState()
+{
+    switch (_status.can_state) {
+        case CAN_STATE_ERROR_ACTIVE: return state_ok;
+        case CAN_STATE_ERROR_WARNING: return state_warning;
+        case CAN_STATE_ERROR_PASSIVE: return state_passive;
+        case CAN_STATE_BUS_OFF: return state_bus_off;
+        case CAN_STATE_STOPPED: return state_stopped;
+        default: return state_unknown;
+    }
+}
+
+int SocketCanInterface::getNumRxFrames()
+{
+    return _status.rx_count;
+}
+
+int SocketCanInterface::getNumRxErrors()
+{
+    return _status.rx_errors;
+}
+
+int SocketCanInterface::getNumTxFrames()
+{
+    return _status.tx_count;
+}
+
+int SocketCanInterface::getNumTxErrors()
+{
+    return _status.tx_errors;
+}
+
+int SocketCanInterface::getNumRxOverruns()
+{
+    return _status.rx_overruns;
+}
+
+int SocketCanInterface::getNumTxDropped()
+{
+    return _status.tx_dropped;
 }
 
 int SocketCanInterface::getIfIndex() {

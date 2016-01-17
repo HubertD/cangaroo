@@ -33,6 +33,7 @@
 #include <window/SetupDialog/SetupDialog.h>
 #include <window/LogWindow/LogWindow.h>
 #include <window/GraphWindow/GraphWindow.h>
+#include <window/CanStatusWindow/CanStatusWindow.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -257,8 +258,9 @@ void MainWindow::newWorkspace()
         _workspaceFileName.clear();
         setWorkspaceModified(false);
         ui->mdiArea->closeAllSubWindows();
-        createLogWindow()->setGeometry(0, 500, 1000, 200);
-        createTraceWindow()->setGeometry(0, 0, 1000, 500);
+        createLogWindow()->setGeometry(0, 400, 1200, 150);
+        createCanStatusWindow()->setGeometry(0, 550, 1200, 150);
+        createTraceWindow()->setGeometry(0, 0, 1200, 400);
         backend().setDefaultSetup();
     }
 }
@@ -345,6 +347,16 @@ QMdiSubWindow *MainWindow::createGraphWindow()
     return createSubWindow(new GraphWindow(ui->mdiArea, backend()));
 }
 
+QMdiSubWindow *MainWindow::createCanStatusWindow()
+{
+    return createSubWindow(new CanStatusWindow(ui->mdiArea, backend()));
+}
+
+void MainWindow::on_actionCan_Status_View_triggered()
+{
+    createCanStatusWindow();
+}
+
 void MainWindow::setActiveSubWindow(QWidget *window) {
     if (window) {
         ui->mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
@@ -423,3 +435,4 @@ void MainWindow::on_action_WorkspaceNew_triggered()
 {
     newWorkspace();
 }
+

@@ -7,6 +7,7 @@ written by Hubert Denkmair <hubert@denkmair.de>
 
 ### v0.1.4 unreleased
 * handle muxed signals in backend and trace window
+* can status window
 * bugfixes in setup dialog
 * do not try to extract signals from messages when DLC too short
 
@@ -57,8 +58,8 @@ initial release \o/
 ### logging subsystem
 * show timestamps, log level etc. in log window
 
-### interface status window
-* show status (error mode, tx/rx counts, ...) of all can interfaces
+### can status window
+* display #warnings, #passive, #busoff, #restarts of socketcan devices
 
 ### trace window
 * message filtering

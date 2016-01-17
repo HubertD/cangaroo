@@ -31,6 +31,16 @@ class MeasurementInterface;
 
 class CanInterface {
 public:
+    enum {
+        state_ok,
+        state_warning,
+        state_passive,
+        state_bus_off,
+        state_stopped,
+        state_unknown
+    };
+
+public:
     CanInterface(CanDriver *driver);
 	virtual ~CanInterface();
     virtual CanDriver *getDriver();
@@ -48,6 +58,17 @@ public:
 
     virtual void sendMessage(const CanMessage &msg) = 0;
     virtual bool readMessage(CanMessage &msg, unsigned int timeout_ms) = 0;
+
+    virtual bool updateStatistics();
+    virtual uint32_t getState() = 0;
+    virtual int getNumRxFrames() = 0;
+    virtual int getNumRxErrors() = 0;
+    virtual int getNumTxFrames() = 0;
+    virtual int getNumTxErrors() = 0;
+    virtual int getNumRxOverruns() = 0;
+    virtual int getNumTxDropped() = 0;
+
+    QString getStateText();
 
     uint8_t getId();
     void setId(uint8_t id);

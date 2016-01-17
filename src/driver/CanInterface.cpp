@@ -55,6 +55,24 @@ void CanInterface::open() {
 void CanInterface::close() {
 }
 
+bool CanInterface::updateStatistics()
+{
+    return false;
+}
+
+QString CanInterface::getStateText()
+{
+    switch (getState()) {
+        case state_ok: return "ok";
+        case state_warning: return "warning";
+        case state_passive: return "error passive";
+        case state_bus_off: return "bus off";
+        case state_stopped: return "stopped";
+        case state_unknown: return "unknown";
+        default: return "";
+    }
+}
+
 uint8_t CanInterface::getId()
 {
     return _id;
