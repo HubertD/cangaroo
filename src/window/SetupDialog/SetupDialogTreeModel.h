@@ -71,7 +71,7 @@ private:
     SetupDialogTreeItem *_rootItem;
     SetupDialogTreeItem *itemOrRoot(const QModelIndex &index) const;
 
-    SetupDialogTreeItem *loadNetwork(MeasurementNetwork &network);
+    SetupDialogTreeItem *loadNetwork(SetupDialogTreeItem *root, MeasurementNetwork &network);
     SetupDialogTreeItem *loadMeasurementInterface(SetupDialogTreeItem &parent, MeasurementInterface *intf);
     SetupDialogTreeItem *loadCanDb(SetupDialogTreeItem &parent, pCanDb &db);
 };

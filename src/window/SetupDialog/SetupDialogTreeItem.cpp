@@ -107,7 +107,6 @@ QVariant SetupDialogTreeItem::dataDisplayRole(const QModelIndex &index) const
         case type_candb_root: return "Can Databases";
         case type_candb: return dataCanDb(index);
     }
-candb->getFileName();
     return QVariant();
 }
 

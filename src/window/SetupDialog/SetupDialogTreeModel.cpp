@@ -126,7 +126,7 @@ SetupDialogTreeItem *SetupDialogTreeModel::addNetwork()
     beginInsertRows(QModelIndex(), _rootItem->getChildCount(), _rootItem->getChildCount());
     MeasurementNetwork *network = _rootItem->setup->createNetwork();
     network->setName(s);
-    SetupDialogTreeItem *item = loadNetwork(*network);
+    SetupDialogTreeItem *item = loadNetwork(_rootItem, *network);
     endInsertRows();
 
     return item;
@@ -220,9 +220,9 @@ SetupDialogTreeItem *SetupDialogTreeModel::loadCanDb(SetupDialogTreeItem &parent
     return item;
 }
 
-SetupDialogTreeItem *SetupDialogTreeModel::loadNetwork(MeasurementNetwork &network)
+SetupDialogTreeItem *SetupDialogTreeModel::loadNetwork(SetupDialogTreeItem *root, MeasurementNetwork &network)
 {
-    SetupDialogTreeItem *item_network = new SetupDialogTreeItem(SetupDialogTreeItem::type_network, _backend, _rootItem);
+    SetupDialogTreeItem *item_network = new SetupDialogTreeItem(SetupDialogTreeItem::type_network, _backend, root);
     item_network->network = &network;
 
     SetupDialogTreeItem *item_intf_root = new SetupDialogTreeItem(SetupDialogTreeItem::type_interface_root, _backend, item_network);
@@ -241,18 +241,23 @@ SetupDialogTreeItem *SetupDialogTreeModel::loadNetwork(MeasurementNetwork &netwo
         loadCanDb(*item_candb_root, candb);
     }
 
-    _rootItem->appendChild(item_network);
+    root->appendChild(item_network);
     return item_network;
 }
 
 void SetupDialogTreeModel::load(MeasurementSetup &setup)
 {
-    _rootItem = new SetupDialogTreeItem(SetupDialogTreeItem::type_root, 0);
-    _rootItem->setup = &setup;
+    SetupDialogTreeItem *_newRoot = new SetupDialogTreeItem(SetupDialogTreeItem::type_root, 0);
+    _newRoot->setup = &setup;
 
     foreach (MeasurementNetwork *network, setup.getNetworks()) {
-        loadNetwork(*network);
+        loadNetwork(_newRoot, *network);
     }
 
+    beginResetModel();
+    SetupDialogTreeItem *_oldRoot = _rootItem;
+    _rootItem = _newRoot;
+    delete _oldRoot;
+    endResetModel();
 }
 
