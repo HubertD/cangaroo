@@ -91,11 +91,14 @@ QModelIndex SetupDialogTreeModel::parent(const QModelIndex &index) const
 
 int SetupDialogTreeModel::rowCount(const QModelIndex &parent) const
 {
+    int retval = 0;
     if (parent.column() <= 0) {
-        return itemOrRoot(parent)->getChildCount();
-    } else {
-        return 0;
+        SetupDialogTreeItem *item = itemOrRoot(parent);
+        if (item) {
+            retval = item->getChildCount();
+        }
     }
+    return retval;
 }
 
 int SetupDialogTreeModel::columnCount(const QModelIndex &parent) const

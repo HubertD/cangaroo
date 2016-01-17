@@ -42,6 +42,7 @@ class MainWindow;
 }
 
 class MdiWindow;
+class SetupDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -78,6 +79,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    SetupDialog *_setupDlg;
     SocketCanDriver _socketcan;
 
     bool _workspaceModified;

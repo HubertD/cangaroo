@@ -73,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setWorkspaceModified(false);
     newWorkspace();
 
+    _setupDlg = new SetupDialog(Backend::instance(), 0); // NOTE: must be called after drivers/plugins are initialized
+
     /*QMdiSubWindow *graphViewWindow = createGraphView();
     graphViewWindow->setGeometry(0, 500, 1000, 200);
 */
@@ -354,8 +356,7 @@ bool MainWindow::showSetupDialog()
     MeasurementSetup new_setup(&backend());
     new_setup.cloneFrom(backend().getSetup());
 
-    SetupDialog dlg(backend(), 0);
-    if (dlg.showSetupDialog(new_setup)) {
+    if (_setupDlg->showSetupDialog(new_setup)) {
         backend().setSetup(new_setup);
         setWorkspaceModified(true);
         return true;
