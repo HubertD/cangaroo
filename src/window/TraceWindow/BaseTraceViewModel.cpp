@@ -207,7 +207,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, i
             }
 
         case column_comment:
-            return dbsignal->comment();
+            return dbsignal->comment().replace('\n', ' ');
 
         default:
             return QVariant();
