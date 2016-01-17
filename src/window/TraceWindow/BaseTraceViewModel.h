@@ -28,6 +28,7 @@
 class Backend;
 class CanTrace;
 class CanMessage;
+class CanDbSignal;
 
 class BaseTraceViewModel : public QAbstractItemModel
 {
@@ -61,9 +62,10 @@ public:
 protected:
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;
     virtual QVariant data_DisplayRole_Message(const QModelIndex &index, int role, const CanMessage &currentMsg, const CanMessage &lastMsg) const;
-    virtual QVariant data_DisplayRole_Signal(const QModelIndex &index, int role, const CanMessage *msg) const;
+    virtual QVariant data_DisplayRole_Signal(const QModelIndex &index, int role, const CanMessage &msg) const;
     virtual QVariant data_TextAlignmentRole(const QModelIndex &index, int role) const;
     virtual QVariant data_TextColorRole(const QModelIndex &index, int role) const;
+    virtual QVariant data_TextColorRole_Signal(const QModelIndex &index, int role, const CanMessage &msg) const;
 
     QVariant formatTimestamp(timestamp_mode_t mode, const CanMessage &currentMsg, const CanMessage &lastMsg) const;
 

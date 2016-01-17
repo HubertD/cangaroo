@@ -184,7 +184,7 @@ QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, in
     if (item->parent() == _rootItem) { // CanMessage row
         return data_DisplayRole_Message(index, role, item->_lastmsg, item->_prevmsg);
     } else { // CanSignal Row
-        return data_DisplayRole_Signal(index, role, &item->parent()->_lastmsg);
+        return data_DisplayRole_Signal(index, role, item->parent()->_lastmsg);
     }
 }
 
@@ -204,7 +204,9 @@ QVariant AggregatedTraceViewModel::data_TextColorRole(const QModelIndex &index, 
         if (color<0) { color = 0; }
 
         return QVariant::fromValue(QColor(color, color, color));
-    } else {
+    } else { // CanSignal Row
+
+        return data_TextColorRole_Signal(index, role, item->parent()->_lastmsg);
         return QVariant();
     }
 }

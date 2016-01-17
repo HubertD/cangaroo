@@ -112,7 +112,7 @@ QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int ro
     if (!msg) { return QVariant(); }
 
     if (id & 0x80000000) {
-        return data_DisplayRole_Signal(index, role, msg);
+        return data_DisplayRole_Signal(index, role, *msg);
     } else if (id) {
         if (msg_id>1) {
             const CanMessage *prev_msg = trace()->getMessage(msg_id-1);

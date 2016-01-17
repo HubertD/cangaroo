@@ -22,6 +22,7 @@
 #include "BaseTraceViewModel.h"
 
 #include <QDateTime>
+#include <QColor>
 
 #include <Backend.h>
 #include <model/CanTrace.h>
@@ -174,13 +175,13 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
     }
 }
 
-QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, int role, const CanMessage *msg) const
+QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, int role, const CanMessage &msg) const
 {
     (void) role;
     uint32_t raw_data;
     QString value_name;
 
-    CanDbMessage *dbmsg = backend()->findDbMessage(*msg);
+    CanDbMessage *dbmsg = backend()->findDbMessage(msg);
     if (!dbmsg) { return QVariant(); }
 
     CanDbSignal *dbsignal = dbmsg->getSignal(index.row());
@@ -192,13 +193,17 @@ QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, i
             return dbsignal->name();
 
         case column_data:
-            raw_data = msg->extractRawSignal(dbsignal->startBit(), dbsignal->length(), dbsignal->isBigEndian());
+            if (!dbsignal->isPresentInMessage(msg)) {
+                return QVariant();
+            }
+
+            raw_data = dbsignal->extractRawDataFromMessage(msg);
             value_name = dbsignal->getValueName(raw_data);
 
             if (value_name.isEmpty()) {
-                return dbsignal->convertRawValueToPhysical(raw_data);
+                return dbsignal->extractPhysicalFromMessage(msg);
             } else {
-                return QString().number(raw_data) + " - " + value_name;
+                return QString("%1 - %2").arg(raw_data).arg(value_name);
             }
 
         case column_comment:
@@ -231,4 +236,21 @@ QVariant BaseTraceViewModel::data_TextColorRole(const QModelIndex &index, int ro
     (void) index;
     (void) role;
     return QVariant();
+}
+
+QVariant BaseTraceViewModel::data_TextColorRole_Signal(const QModelIndex &index, int role, const CanMessage &msg) const
+{
+    (void) role;
+
+    CanDbMessage *dbmsg = backend()->findDbMessage(msg);
+    if (!dbmsg) { return QVariant(); }
+
+    CanDbSignal *dbsignal = dbmsg->getSignal(index.row());
+    if (!dbsignal) { return QVariant(); }
+
+    if (dbsignal->isPresentInMessage(msg)) {
+        return QVariant(); // default text color
+    } else {
+        return QVariant::fromValue(QColor(200,200,200));
+    }
 }
