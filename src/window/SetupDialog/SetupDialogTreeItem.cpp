@@ -101,7 +101,7 @@ QVariant SetupDialogTreeItem::dataDisplayRole(const QModelIndex &index) const
 {
     switch (_type) {
         case type_root: return "Setup";
-        case type_network: return network->name();
+        case type_network: return (network!=0) ? network->name() : QVariant();
         case type_interface_root: return "Interfaces";
         case type_interface: return dataInterface(index);
         case type_candb_root: return "Can Databases";

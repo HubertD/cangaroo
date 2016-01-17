@@ -198,6 +198,10 @@ void CanDbSignal::setMuxValue(const uint32_t &muxValue)
 
 bool CanDbSignal::isPresentInMessage(const CanMessage &msg)
 {
+    if ((_startBit + _length)>(8*msg.getLength())) {
+        return false;
+    }
+
     if (!_isMuxed) { return true; }
 
     CanDbSignal *muxer = _parent->getMuxer();
