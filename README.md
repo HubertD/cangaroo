@@ -5,6 +5,10 @@ written by Hubert Denkmair <hubert@denkmair.de>
 
 ## changelog
 
+### v0.1.4 unreleased
+* handle muxed signals in backend and trace window
+* bugfixes in setup dialog
+* do not try to extract signals from messages when DLC too short
 
 ### v0.1.3 released 2016-01-16
 * new can interface configuration GUI (missing a suid binary to actually set the config)
@@ -61,8 +65,6 @@ initial release \o/
 * assign colors to can interfaces / messages
 * limit displayed number of messages
 * show error frames and other non-message frames
-* hide unused muxed signals in linear trace view
-* handle muxed signals properly in aggregated trace view
 * sort signals by startbit, name or position in candb
 
 ### raw message generator
