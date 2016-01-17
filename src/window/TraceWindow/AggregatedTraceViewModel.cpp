@@ -205,9 +205,7 @@ QVariant AggregatedTraceViewModel::data_TextColorRole(const QModelIndex &index, 
 
         return QVariant::fromValue(QColor(color, color, color));
     } else { // CanSignal Row
-
         return data_TextColorRole_Signal(index, role, item->parent()->_lastmsg);
-        return QVariant();
     }
 }
 

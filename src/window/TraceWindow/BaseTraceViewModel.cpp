@@ -193,15 +193,18 @@ QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, i
             return dbsignal->name();
 
         case column_data:
-            if (!dbsignal->isPresentInMessage(msg)) {
-                return QVariant();
+
+            if (dbsignal->isPresentInMessage(msg)) {
+                raw_data = dbsignal->extractRawDataFromMessage(msg);
+            } else {
+                if (!trace()->getMuxedSignalFromCache(dbsignal, &raw_data)) {
+                    return QVariant();
+                }
             }
 
-            raw_data = dbsignal->extractRawDataFromMessage(msg);
             value_name = dbsignal->getValueName(raw_data);
-
             if (value_name.isEmpty()) {
-                return dbsignal->extractPhysicalFromMessage(msg);
+                return dbsignal->convertRawValueToPhysical(raw_data);
             } else {
                 return QString("%1 - %2").arg(raw_data).arg(value_name);
             }

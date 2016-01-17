@@ -124,3 +124,20 @@ QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int ro
 
     return QVariant();
 }
+
+QVariant LinearTraceViewModel::data_TextColorRole(const QModelIndex &index, int role) const
+{
+    (void) role;
+
+    quintptr id = index.internalId();
+
+    if (id & 0x80000000) { // CanSignal row
+        int msg_id = (id & ~0x80000000)-1;
+        const CanMessage *msg = trace()->getMessage(msg_id);
+        if (msg) {
+            return data_TextColorRole_Signal(index, role, *msg);
+        }
+    }
+
+    return QVariant();
+}

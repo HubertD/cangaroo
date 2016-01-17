@@ -26,6 +26,8 @@
 
 #include <Backend.h>
 #include <model/CanMessage.h>
+#include <model/CanDbMessage.h>
+#include <model/CanDbSignal.h>
 #include <driver/CanInterface.h>
 
 CanTrace::CanTrace(Backend &backend, QObject *parent, int flushInterval)
@@ -97,6 +99,21 @@ void CanTrace::flushQueue()
     QMutexLocker locker(&_mutex);
     if (_newRows) {
         emit beforeAppend(_newRows);
+
+        // see if we have muxed messages. cache muxed values, if any.
+        MeasurementSetup &setup = _backend.getSetup();
+        for (int i=_dataRowsUsed; i<_dataRowsUsed + _newRows; i++) {
+            CanMessage &msg = _data[i];
+            CanDbMessage *dbmsg = setup.findDbMessage(msg);
+            if (dbmsg && dbmsg->getMuxer()) {
+                foreach (CanDbSignal *signal, dbmsg->getSignals()) {
+                    if (signal->isMuxed() && signal->isPresentInMessage(msg)) {
+                        _muxCache[signal] = signal->extractRawDataFromMessage(msg);
+                    }
+                }
+            }
+        }
+
         _dataRowsUsed += _newRows;
         _newRows = 0;
         emit afterAppend();
@@ -135,5 +152,15 @@ void CanTrace::saveCanDump(QString filename)
             stream << line << endl;
         }
         file.close();
+    }
+}
+
+bool CanTrace::getMuxedSignalFromCache(const CanDbSignal *signal, uint32_t *raw_value)
+{
+    if (_muxCache.contains(signal)) {
+        *raw_value = _muxCache[signal];
+        return true;
+    } else {
+        return false;
     }
 }

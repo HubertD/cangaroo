@@ -50,6 +50,7 @@ private slots:
 
 private:
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;
+    virtual QVariant data_TextColorRole(const QModelIndex &index, int role) const;
 };
 
 #endif // LINEARTRACEVIEWMODEL_H

@@ -26,11 +26,13 @@
 #include <QMutex>
 #include <QTimer>
 #include <QVector>
+#include <QMap>
 
 #include "CanMessage.h"
 
 class CanInterface;
 class CanDbMessage;
+class CanDbSignal;
 class MeasurementSetup;
 class Backend;
 
@@ -47,6 +49,8 @@ public:
     void enqueueMessage(const CanMessage &msg, bool more_to_follow=false);
 
     void saveCanDump(QString filename);
+
+    bool getMuxedSignalFromCache(const CanDbSignal *signal, uint32_t *raw_value);
 
 signals:
     void messageEnqueued(int idx);
@@ -69,6 +73,8 @@ private:
     int _dataRowsUsed;
     int _newRows;
     bool _isTimerRunning;
+
+    QMap<const CanDbSignal*,uint32_t> _muxCache;
 
     QMutex _mutex;
     QMutex _timerMutex;
