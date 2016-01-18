@@ -49,6 +49,9 @@ private slots:
     void afterClear();
 
 private:
+    uint32_t _max_rows;
+    uint32_t _first_visible_row;
+    int visibleMessages() const;
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;
     virtual QVariant data_TextColorRole(const QModelIndex &index, int role) const;
 };

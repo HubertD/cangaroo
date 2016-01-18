@@ -25,7 +25,9 @@
 #include <Backend.h>
 
 LinearTraceViewModel::LinearTraceViewModel(Backend &backend)
-  : BaseTraceViewModel(backend)
+  : BaseTraceViewModel(backend),
+    _max_rows(10000),
+    _first_visible_row(0)
 {
     connect(backend.getTrace(), SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
     connect(backend.getTrace(), SIGNAL(afterAppend()), this, SLOT(afterAppend()));
@@ -38,7 +40,7 @@ QModelIndex LinearTraceViewModel::index(int row, int column, const QModelIndex &
     if (parent.isValid() && parent.internalId()) {
         return createIndex(row, column, (unsigned int)(0x80000000 | parent.internalId()));
     } else {
-        return createIndex(row, column, row+1);
+        return createIndex(row, column, row+1+_first_visible_row);
     }
 }
 
@@ -68,7 +70,7 @@ int LinearTraceViewModel::rowCount(const QModelIndex &parent) const
             }
         }
     } else {
-        return trace()->size();
+        return visibleMessages();
     }
 }
 
@@ -83,9 +85,23 @@ bool LinearTraceViewModel::hasChildren(const QModelIndex &parent) const
     return rowCount(parent)>0;
 }
 
+int LinearTraceViewModel::visibleMessages() const
+{
+    return trace()->size() - _first_visible_row;
+}
+
 void LinearTraceViewModel::beforeAppend(int num_messages)
 {
-    beginInsertRows(QModelIndex(), trace()->size(), trace()->size()+num_messages-1);
+    int rows_avail = _max_rows - visibleMessages();
+
+    int num_remove = num_messages - rows_avail;
+    if (num_remove>0) {
+        beginRemoveRows(QModelIndex(), 0, num_remove-1);
+        _first_visible_row += num_remove;
+        endRemoveRows();
+    }
+
+    beginInsertRows(QModelIndex(), visibleMessages(), visibleMessages()+num_messages-1);
 }
 
 void LinearTraceViewModel::afterAppend()
