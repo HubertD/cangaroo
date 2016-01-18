@@ -165,19 +165,20 @@ bool SocketCanInterface::updateStatus()
             _status.tx_count = rtnl_link_get_stat(link, RTNL_LINK_TX_PACKETS);
             _status.tx_dropped = rtnl_link_get_stat(link, RTNL_LINK_TX_DROPPED);
 
+            /*
+             * TODO find a new way to get can state, libnl-route-3-200:amd64 3.2.21-1
+             * does not define rtnl_link_can_state()
+             */
+            _status.can_state = state_unknown;
+
             if (rtnl_link_is_can(link)) {
-                if (rtnl_link_can_state(link, &state)==0) {
-                    _status.can_state = state;
-                    _status.rx_errors = rtnl_link_can_berr_rx(link);
-                    _status.tx_errors = rtnl_link_can_berr_tx(link);
-                    retval = true;
-                }
+                _status.rx_errors = rtnl_link_can_berr_rx(link);
+                _status.tx_errors = rtnl_link_can_berr_tx(link);
             } else {
-                _status.can_state = state_unknown;
                 _status.rx_errors = 0;
                 _status.tx_errors = 0;
-                retval = true;
             }
+            retval = true;
         }
     }
 
@@ -215,11 +216,11 @@ bool SocketCanInterface::readConfig()
 
 bool SocketCanInterface::readConfigFromLink(rtnl_link *link)
 {
+    _config.state = state_unknown;
     _config.supports_canfd = (rtnl_link_get_mtu(link)==72);
     _config.supports_timing = rtnl_link_is_can(link);
     if (_config.supports_timing) {
         rtnl_link_can_freq(link, &_config.base_freq);
-        rtnl_link_can_state(link, &_config.state);
         rtnl_link_can_get_ctrlmode(link, &_config.ctrl_mode);
         rtnl_link_can_get_bittiming(link, &_config.bit_timing);
         rtnl_link_can_get_sample_point(link, &_config.sample_point);
