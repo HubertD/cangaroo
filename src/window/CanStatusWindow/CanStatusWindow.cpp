@@ -69,16 +69,9 @@ void CanStatusWindow::beginMeasurement()
         item->setTextAlignment(column_driver, Qt::AlignLeft);
         item->setTextAlignment(column_interface, Qt::AlignLeft);
         item->setTextAlignment(column_state, Qt::AlignCenter);
-        item->setTextAlignment(column_rx_frames, Qt::AlignRight);
-        item->setTextAlignment(column_rx_errors, Qt::AlignRight);
-        item->setTextAlignment(column_rx_overrun, Qt::AlignRight);
-        item->setTextAlignment(column_tx_frames, Qt::AlignRight);
-        item->setTextAlignment(column_tx_errors, Qt::AlignRight);
-        item->setTextAlignment(column_tx_dropped, Qt::AlignRight);
-        item->setTextAlignment(column_num_warning, Qt::AlignRight);
-        item->setTextAlignment(column_num_passive, Qt::AlignRight);
-        item->setTextAlignment(column_num_busoff, Qt::AlignRight);
-        item->setTextAlignment(column_num_restarts, Qt::AlignRight);
+        for (int i=column_rx_frames; i<column_count; i++) {
+            item->setTextAlignment(i, Qt::AlignRight);
+        }
 
         ui->treeWidget->addTopLevelItem(item);
     }
