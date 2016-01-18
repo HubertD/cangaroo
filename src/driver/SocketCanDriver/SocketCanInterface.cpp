@@ -39,6 +39,7 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include <linux/can/netlink.h>
+#include <netlink/version.h>
 #include <netlink/route/link.h>
 #include <netlink/route/link/can.h>
 
@@ -146,6 +147,15 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
     }
 }
 
+#if (LIBNL_CURRENT<=216)
+#warning we need at least libnl3 version 3.2.22 to be able to get link status via netlink
+int rtnl_link_can_state(struct rtnl_link *link, uint32_t *state) {
+    (void) link;
+    (void) state;
+    return -1;
+}
+#endif
+
 bool SocketCanInterface::updateStatus()
 {
     bool retval = false;
@@ -166,11 +176,9 @@ bool SocketCanInterface::updateStatus()
             _status.tx_count = rtnl_link_get_stat(link, RTNL_LINK_TX_PACKETS);
             _status.tx_dropped = rtnl_link_get_stat(link, RTNL_LINK_TX_DROPPED);
 
-            /*
-             * TODO find a new way to get can state, libnl-route-3-200:amd64 3.2.21-1
-             * does not define rtnl_link_can_state()
-             */
-            _status.can_state = state_unknown;
+            if (rtnl_link_can_state(link, &state)==0) {
+                _status.can_state = state;
+            }
 
             if (rtnl_link_is_can(link)) {
                 _status.rx_errors = rtnl_link_can_berr_rx(link);
