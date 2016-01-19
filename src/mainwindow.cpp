@@ -35,10 +35,13 @@
 #include <window/GraphWindow/GraphWindow.h>
 #include <window/CanStatusWindow/CanStatusWindow.h>
 
+#if defined(__linux__)
+#include <driver/SocketCanDriver/SocketCanDriver.h>
+#endif
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    _socketcan(Backend::instance())
+    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     _baseWindowTitle = windowTitle();
@@ -69,7 +72,9 @@ MainWindow::MainWindow(QWidget *parent) :
     windowMapper = new QSignalMapper(this);
     connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
-    Backend::instance().addCanDriver(_socketcan);
+#if defined(__linux__)
+    Backend::instance().addCanDriver(*(new SocketCanDriver(Backend::instance())));
+#endif
 
     setWorkspaceModified(false);
     newWorkspace();

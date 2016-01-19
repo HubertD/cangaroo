@@ -25,7 +25,6 @@
 #include <QMainWindow>
 #include <QList>
 #include <Backend.h>
-#include <driver/SocketCanDriver/SocketCanDriver.h>
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -83,7 +82,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
     SetupDialog *_setupDlg;
-    SocketCanDriver _socketcan;
 
     bool _workspaceModified;
     QString _workspaceFileName;

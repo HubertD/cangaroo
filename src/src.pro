@@ -9,9 +9,6 @@ TEMPLATE = app
 CONFIG += warn_on
 CONFIG += link_pkgconfig
 
-PKGCONFIG += libnl-3.0
-PKGCONFIG += libnl-route-3.0
-
 DESTDIR = ../bin
 MOC_DIR = ../build/moc
 RCC_DIR = ../build/rcc
@@ -28,7 +25,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     Backend.h \
-    MdiWindow.h
+    MdiWindow.h \
+    portable_endian.h
 
 FORMS    += mainwindow.ui
 
@@ -36,10 +34,13 @@ RESOURCES = cangaroo.qrc
 
 include($$PWD/model/model.pri)
 include($$PWD/driver/driver.pri)
-include($$PWD/driver/SocketCanDriver/SocketCanDriver.pri)
 include($$PWD/parser/dbc/dbc.pri)
 include($$PWD/window/TraceWindow/TraceWindow.pri)
 include($$PWD/window/SetupDialog/SetupDialog.pri)
 include($$PWD/window/LogWindow/LogWindow.pri)
 include($$PWD/window/GraphWindow/GraphWindow.pri)
 include($$PWD/window/CanStatusWindow/CanStatusWindow.pri)
+
+unix:PKGCONFIG += libnl-3.0
+unix:PKGCONFIG += libnl-route-3.0
+unix:include($$PWD/driver/SocketCanDriver/SocketCanDriver.pri)

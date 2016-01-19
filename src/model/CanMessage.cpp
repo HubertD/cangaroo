@@ -22,7 +22,7 @@
 
 
 #include "CanMessage.h"
-#include <endian.h>
+#include <portable_endian.h>
 
 enum {
 	id_flag_extended = 0x80000000,
