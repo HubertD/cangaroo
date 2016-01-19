@@ -176,11 +176,10 @@ bool SocketCanInterface::updateStatus()
             _status.tx_count = rtnl_link_get_stat(link, RTNL_LINK_TX_PACKETS);
             _status.tx_dropped = rtnl_link_get_stat(link, RTNL_LINK_TX_DROPPED);
 
-            if (rtnl_link_can_state(link, &state)==0) {
-                _status.can_state = state;
-            }
-
             if (rtnl_link_is_can(link)) {
+                if (rtnl_link_can_state(link, &state)==0) {
+                    _status.can_state = state;
+                }
                 _status.rx_errors = rtnl_link_can_berr_rx(link);
                 _status.tx_errors = rtnl_link_can_berr_tx(link);
             } else {
