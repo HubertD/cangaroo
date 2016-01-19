@@ -33,6 +33,8 @@ AggregatedTraceViewModel::AggregatedTraceViewModel(Backend &backend)
     connect(backend.getTrace(), SIGNAL(beforeAppend(int)), this, SLOT(beforeAppend(int)));
     connect(backend.getTrace(), SIGNAL(beforeClear()), this, SLOT(beforeClear()));
     connect(backend.getTrace(), SIGNAL(afterClear()), this, SLOT(afterClear()));
+
+    connect(&backend, SIGNAL(onSetupChanged()), this, SLOT(onSetupChanged()));
 }
 
 void AggregatedTraceViewModel::createItem(const CanMessage &msg)
@@ -83,6 +85,12 @@ void AggregatedTraceViewModel::onUpdateModel()
         dataChanged(createIndex(0, 0, _rootItem->firstChild()), createIndex(_rootItem->childCount()-1, column_count-1, _rootItem->lastChild()));
     }
 
+}
+
+void AggregatedTraceViewModel::onSetupChanged()
+{
+    beginResetModel();
+    endResetModel();
 }
 
 void AggregatedTraceViewModel::beforeAppend(int num_messages)

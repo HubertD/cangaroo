@@ -44,6 +44,8 @@ Backend::Backend()
 
     setDefaultSetup();
     _trace = new CanTrace(*this, this, 100);
+
+    connect(&_setup, SIGNAL(onSetupChanged()), this, SIGNAL(onSetupChanged()));
 }
 
 Backend &Backend::instance()

@@ -69,6 +69,7 @@ private slots:
     void createItem(const CanMessage &msg);
     void updateItem(const CanMessage &msg);
     void onUpdateModel();
+    void onSetupChanged();
 
     void beforeAppend(int num_messages);
     void beforeClear();

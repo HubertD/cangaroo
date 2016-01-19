@@ -56,6 +56,9 @@ public:
     bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
     bool loadXML(Backend &backend, QDomElement &el);
 
+signals:
+    void onSetupChanged();
+
 private:
     QList<MeasurementNetwork*> _networks;
 };

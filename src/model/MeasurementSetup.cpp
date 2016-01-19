@@ -42,6 +42,7 @@ void MeasurementSetup::clear()
 {
     qDeleteAll(_networks);
     _networks.clear();
+    emit onSetupChanged();
 }
 
 void MeasurementSetup::cloneFrom(MeasurementSetup &origin)
@@ -52,6 +53,7 @@ void MeasurementSetup::cloneFrom(MeasurementSetup &origin)
         network_copy->cloneFrom(*network);
         _networks.append(network_copy);
     }
+    emit onSetupChanged();
 }
 
 bool MeasurementSetup::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
@@ -78,6 +80,7 @@ bool MeasurementSetup::loadXML(Backend &backend, QDomElement &el)
         }
     }
 
+    emit onSetupChanged();
     return true;
 }
 
