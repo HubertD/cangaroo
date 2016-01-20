@@ -39,6 +39,7 @@ public:
 
 private:
     uint32_t _handle;
+    int64_t _timestampOffset;
     void *_autoResetEvent;
 
 

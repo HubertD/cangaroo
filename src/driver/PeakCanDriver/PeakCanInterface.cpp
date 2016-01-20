@@ -10,6 +10,7 @@ PeakCanInterface::PeakCanInterface(PeakCanDriver *driver, uint32_t handle)
   : CanInterface(driver),
     _handle(handle)
 {
+    _timestampOffset = QDateTime::currentMSecsSinceEpoch() - GetTickCount();
     _autoResetEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 }
 
@@ -135,8 +136,8 @@ bool PeakCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
             msg.setByte(i, buf.DATA[i]);
         }
 
-        // FIXME set correct timestamp
         uint64_t ms = (uint64_t)timestamp.millis + 0x100000000 * (uint64_t)timestamp.millis_overflow;
+        ms += _timestampOffset;
         msg.setTimestamp(ms/1000, (1000*(ms%1000)) + timestamp.micros);
 
         return true;
