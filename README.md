@@ -10,7 +10,8 @@ written by Hubert Denkmair <hubert@denkmair.de>
 * can status window
 * bugfixes in setup dialog
 * do not try to extract signals from messages when DLC too short
-* fix build windows on windows (no windows can drivers yet, so not very useful)
+* fix windows build
+* windows PCAN-basic driver
 
 ### v0.1.3 released 2016-01-16
 * new can interface configuration GUI (missing a suid binary to actually set the config)
@@ -46,7 +47,6 @@ initial release \o/
 * allow socketcan interface config through suid binary
 * socketcan: use hardware timestamps (SIOCSHWTSTAMP) if possible
 * cannelloni support
-* windows peak can driver
 * windows vector driver
 
 ### import / export
