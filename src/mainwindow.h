@@ -70,7 +70,6 @@ public slots:
     void updateMeasurementActions();
 
 private slots:
-    void on_workspace_modified();
     void on_action_WorkspaceNew_triggered();
     void on_action_WorkspaceOpen_triggered();
     void on_action_WorkspaceSave_triggered();

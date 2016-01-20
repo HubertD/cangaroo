@@ -102,11 +102,6 @@ void MainWindow::updateMeasurementActions()
     ui->actionStop_Measurement->setEnabled(running);
 }
 
-void MainWindow::on_workspace_modified()
-{
-    setWorkspaceModified(true);
-}
-
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (askSaveBecauseWorkspaceModified()!=QMessageBox::Cancel) {
         backend().stopMeasurement();
@@ -119,7 +114,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 QMdiSubWindow *MainWindow::createSubWindow(MdiWindow *window)
 {
     QMdiSubWindow *retval = ui->mdiArea->addSubWindow(window);
-    connect(window, SIGNAL(settingsChanged(MdiWindow*)), this, SLOT(on_workspace_modified()));
     window->show();
     return retval;
 }
