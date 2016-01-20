@@ -10,12 +10,12 @@ PeakCanInterface::PeakCanInterface(PeakCanDriver *driver, uint32_t handle)
   : CanInterface(driver),
     _handle(handle)
 {
-
+    _autoResetEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 }
 
 PeakCanInterface::~PeakCanInterface()
 {
-
+    CloseHandle(_autoResetEvent);
 }
 
 void PeakCanInterface::update()
@@ -88,6 +88,10 @@ void PeakCanInterface::open()
     } else {
         Backend::instance().logMessage(log_level_error, QString("could not initialize CAN channel: %1").arg(getName()));
     }
+
+    if (CAN_SetValue(_handle, PCAN_RECEIVE_EVENT, &_autoResetEvent, sizeof(_autoResetEvent))!=PCAN_ERROR_OK) {
+        Backend::instance().logMessage(log_level_error, QString("could not set read event for CAN channel: %1").arg(getName()));
+    }
 }
 
 void PeakCanInterface::close()
@@ -106,7 +110,12 @@ bool PeakCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
 {
     TPCANMsg buf;
     TPCANTimestamp timestamp;
-    // TODO work with windows events
+
+    /*
+    if (WaitForSingleObject(_autoResetEvent, timeout_ms) != WAIT_OBJECT_0) {
+        return false;
+    }*/
+
     TPCANStatus result = CAN_Read(_handle, &buf, &timestamp);
     if (result == PCAN_ERROR_OK) {
         if ((buf.MSGTYPE & PCAN_MESSAGE_STATUS) != 0) {

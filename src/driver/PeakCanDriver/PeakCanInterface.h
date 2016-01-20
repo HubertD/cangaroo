@@ -39,6 +39,7 @@ public:
 
 private:
     uint32_t _handle;
+    void *_autoResetEvent;
 
 
 };

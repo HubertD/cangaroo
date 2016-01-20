@@ -22,11 +22,12 @@
 #ifndef BASE_CANDRIVER_H_
 #define BASE_CANDRIVER_H_
 
+#include <stdint.h>
 #include <QList>
 #include <QString>
-#include "CanInterface.h"
 
 class Backend;
+class CanInterface;
 
 typedef uint16_t CanInterfaceId;
 typedef QList<uint16_t> CanInterfaceIdList;
