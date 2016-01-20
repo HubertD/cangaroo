@@ -111,10 +111,9 @@ bool PeakCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
     TPCANMsg buf;
     TPCANTimestamp timestamp;
 
-    /*
     if (WaitForSingleObject(_autoResetEvent, timeout_ms) != WAIT_OBJECT_0) {
         return false;
-    }*/
+    }
 
     TPCANStatus result = CAN_Read(_handle, &buf, &timestamp);
     if (result == PCAN_ERROR_OK) {
