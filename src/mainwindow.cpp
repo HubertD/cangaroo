@@ -37,6 +37,8 @@
 
 #if defined(__linux__)
 #include <driver/SocketCanDriver/SocketCanDriver.h>
+#else
+#include <driver/PeakCanDriver/PeakCanDriver.h>
 #endif
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -74,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 #if defined(__linux__)
     Backend::instance().addCanDriver(*(new SocketCanDriver(Backend::instance())));
+#else
+    Backend::instance().addCanDriver(*(new PeakCanDriver(Backend::instance())));
 #endif
 
     setWorkspaceModified(false);
