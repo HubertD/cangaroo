@@ -5,6 +5,7 @@
 #include <driver/CanDriver.h>
 
 class PeakCanInterface;
+class PeakCanSetupPage;
 
 class PeakCanDriver : public CanDriver
 {
@@ -16,6 +17,7 @@ public:
 
 private:
     PeakCanInterface *createOrUpdateInterface(uint32_t hnd);
+    PeakCanSetupPage *setupPage;
 
 };
 

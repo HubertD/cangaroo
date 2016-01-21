@@ -84,7 +84,12 @@ QList<int> PeakCanInterface::getAvailableFdBitrates()
 
 void PeakCanInterface::open()
 {
-    if (CAN_Initialize(_handle, PCAN_BAUD_500K)==PCAN_ERROR_OK) {
+    uint32_t bitrate_adapt = PCAN_PARAMETER_ON;
+    if (CAN_SetValue(_handle, PCAN_BITRATE_ADAPTING, &bitrate_adapt, sizeof(bitrate_adapt))!=PCAN_ERROR_OK) {
+        Backend::instance().logMessage(log_level_error, QString("could not set bitrate adapt parameter for CAN channel: %1").arg(getName()));
+    }
+
+    if (CAN_Initialize(_handle, PCAN_BAUD_500K)==PCAN_ERROR_OK) { // TODO check if bitrate could not be changed...
         Backend::instance().logMessage(log_level_info, QString("CAN channel %1 initialized").arg(getName()));
     } else {
         Backend::instance().logMessage(log_level_error, QString("could not initialize CAN channel: %1").arg(getName()));
