@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QListWidget" name="loglist"/>
+    <widget class="QTreeView" name="treeView"/>
    </item>
   </layout>
  </widget>
