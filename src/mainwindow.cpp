@@ -50,12 +50,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QIcon icon(":/assets/cangaroo.png");
     setWindowIcon(icon);
-
+/*
     QImage bgimg(":/assets/mdibg.png");
     ui->mdiArea->setBackground(bgimg);
     ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-
+*/
     connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createTraceWindow()));
     connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(createLogWindow()));
     connect(ui->actionGraph_View, SIGNAL(triggered()), this, SLOT(createGraphWindow()));
@@ -71,8 +71,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionSave_Trace_to_file, SIGNAL(triggered(bool)), this, SLOT(saveTraceToFile()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
 
-    windowMapper = new QSignalMapper(this);
-    connect(windowMapper, SIGNAL(mapped(QWidget*)), this, SLOT(setActiveSubWindow(QWidget*)));
 
 #if defined(__linux__)
     Backend::instance().addCanDriver(*(new SocketCanDriver(Backend::instance())));
@@ -85,9 +83,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _setupDlg = new SetupDialog(Backend::instance(), 0); // NOTE: must be called after drivers/plugins are initialized
 
-    /*QMdiSubWindow *graphViewWindow = createGraphView();
-    graphViewWindow->setGeometry(0, 500, 1000, 200);
-*/
 }
 
 MainWindow::~MainWindow()
@@ -113,9 +108,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 QMdiSubWindow *MainWindow::createSubWindow(MdiWindow *window)
 {
-    QMdiSubWindow *retval = ui->mdiArea->addSubWindow(window);
-    window->show();
-    return retval;
+    //QMdiSubWindow *retval = ui->mdiArea->addSubWindow(window);
+    //window->show();
+    //return retval;
+    return NULL;
 }
 
 Backend &MainWindow::backend()
@@ -132,7 +128,7 @@ void MainWindow::stopAndClearMeasurement()
 
 bool MainWindow::loadWorkspaceWindow(QDomElement el)
 {
-    MdiWindow *window;
+/*    MdiWindow *window;
     QString type = el.attribute("type");
     if (type=="LogWindow") {
         window = new LogWindow(ui->mdiArea, backend());
@@ -153,7 +149,7 @@ bool MainWindow::loadWorkspaceWindow(QDomElement el)
         el.attribute("width", "100").toInt(),
         el.attribute("height", "100").toInt()
     );
-
+*/
     return true;
 }
 
@@ -186,7 +182,7 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
     file.close();
 
     stopAndClearMeasurement();
-    ui->mdiArea->closeAllSubWindows();
+    //ui->mdiArea->closeAllSubWindows();
 
     QDomElement windowsRoot = doc.firstChild().firstChildElement("windows");
     QDomNodeList windows = windowsRoot.elementsByTagName("window");
@@ -214,7 +210,7 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
 
     QDomElement windowsRoot = doc.createElement("windows");
     root.appendChild(windowsRoot);
-
+/*
     foreach (QMdiSubWindow *window, ui->mdiArea->subWindowList()) {
         QDomElement wnode = doc.createElement("window");
         wnode.setAttribute("left", window->geometry().left());
@@ -230,7 +226,7 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
 
         windowsRoot.appendChild(wnode);
     }
-
+*/
     QDomElement setupRoot = doc.createElement("setup");
     if (!backend().getSetup().saveXML(backend(), doc, setupRoot)) {
         backend().logMessage(log_level_error, QString("Cannot save measurement setup to file: %1").arg(filename));
@@ -260,10 +256,13 @@ void MainWindow::newWorkspace()
         stopAndClearMeasurement();
         _workspaceFileName.clear();
         setWorkspaceModified(false);
-        ui->mdiArea->closeAllSubWindows();
-        createLogWindow()->setGeometry(0, 400, 1200, 150);
-        createCanStatusWindow()->setGeometry(0, 550, 1200, 150);
-        createTraceWindow()->setGeometry(0, 0, 1200, 400);
+        //ui->mdiArea->closeAllSubWindows();
+        //createLogWindow()->setGeometry(0, 400, 1200, 150);
+        //createCanStatusWindow()->setGeometry(0, 550, 1200, 150);
+        createTraceWindow();
+
+
+
         backend().setDefaultSetup();
     }
 }
@@ -336,23 +335,35 @@ int MainWindow::askSaveBecauseWorkspaceModified()
     }
 }
 
-QMdiSubWindow *MainWindow::createTraceWindow() {
-    return createSubWindow(new TraceWindow(ui->mdiArea, backend()));
+QMainWindow *MainWindow::createTraceWindow() {
+    QMainWindow *mm = new QMainWindow(this);
+    ui->mainTabs->addTab(mm, "Trace");
+
+    QDockWidget *dock = new QDockWidget("Log", mm);
+    dock->setWidget(new LogWindow(dock, backend()));
+    mm->addDockWidget(Qt::BottomDockWidgetArea, dock);
+    mm->setCentralWidget(new TraceWindow(mm, backend()));
+
+    return mm;
 }
 
 QMdiSubWindow *MainWindow::createLogWindow()
 {
-    return createSubWindow(new LogWindow(ui->mdiArea, backend()));
+    //return createSubWindow(new LogWindow(ui->mdiArea, backend()));
+    return NULL;
 }
 
 QMdiSubWindow *MainWindow::createGraphWindow()
 {
-    return createSubWindow(new GraphWindow(ui->mdiArea, backend()));
+    //return createSubWindow(new GraphWindow(ui->mdiArea, backend()));
+    return NULL;
+
 }
 
 QMdiSubWindow *MainWindow::createCanStatusWindow()
 {
-    return createSubWindow(new CanStatusWindow(ui->mdiArea, backend()));
+    //return createSubWindow(new CanStatusWindow(ui->mdiArea, backend()));
+    return NULL;
 }
 
 void MainWindow::on_actionCan_Status_View_triggered()
@@ -362,7 +373,7 @@ void MainWindow::on_actionCan_Status_View_triggered()
 
 void MainWindow::setActiveSubWindow(QWidget *window) {
     if (window) {
-        ui->mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
+        //ui->mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
     }
 }
 

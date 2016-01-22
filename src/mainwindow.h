@@ -55,7 +55,7 @@ protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
-    QMdiSubWindow *createTraceWindow();
+    QMainWindow *createTraceWindow();
     QMdiSubWindow *createLogWindow();
     QMdiSubWindow *createGraphWindow();
     QMdiSubWindow *createCanStatusWindow();
