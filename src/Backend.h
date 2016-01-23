@@ -35,6 +35,7 @@ class CanTrace;
 class CanListener;
 class CanDbMessage;
 class SetupDialog;
+class LogModel;
 
 typedef enum log_level {
     log_level_debug,
@@ -89,6 +90,8 @@ public:
 
     pCanDb loadDbc(QString filename);
 
+    LogModel &getLogModel() const;
+
 signals:
     void beginMeasurement();
     void endMeasurement();
@@ -110,6 +113,8 @@ private:
     MeasurementSetup _setup;
     CanTrace *_trace;
     QList<CanListener*> _listeners;
+
+    LogModel *_logModel;
 };
 
 #endif // BACKEND_H

@@ -12,6 +12,7 @@ written by Hubert Denkmair <hubert@denkmair.de>
 * do not try to extract signals from messages when DLC too short
 * fix windows build
 * windows PCAN-basic driver
+* show timestamps, log level etc. in log window
 
 ### v0.1.3 released 2016-01-16
 * new can interface configuration GUI (missing a suid binary to actually set the config)
@@ -56,8 +57,8 @@ initial release \o/
 ### general ui
 * maybe switch to docking window system
 
-### logging subsystem
-* show timestamps, log level etc. in log window
+### log window
+* filter log messages by level
 
 ### can status window
 * display #warnings, #passive, #busoff, #restarts of socketcan devices

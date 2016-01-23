@@ -48,7 +48,6 @@ private slots:
     void rowsInserted(const QModelIndex & parent, int first, int last);
 
 private:
-    LogModel *model;
     Ui::LogWindow *ui;
 };
 

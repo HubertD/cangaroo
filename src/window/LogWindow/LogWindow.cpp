@@ -24,23 +24,21 @@
 
 #include <QDomDocument>
 #include <Backend.h>
-#include "LogModel.h"
+#include <LogModel.h>
 
 LogWindow::LogWindow(QWidget *parent, Backend &backend) :
     MdiWindow(parent),
     ui(new Ui::LogWindow)
 {
-    model = new LogModel(backend);
-    connect(model, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
+    connect(&backend.getLogModel(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
 
     ui->setupUi(this);
-    ui->treeView->setModel(model);
+    ui->treeView->setModel(&backend.getLogModel());
 }
 
 LogWindow::~LogWindow()
 {
     delete ui;
-    delete model;
 }
 
 bool LogWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
@@ -57,5 +55,8 @@ bool LogWindow::loadXML(Backend &backend, QDomElement &el)
 
 void LogWindow::rowsInserted(const QModelIndex &parent, int first, int last)
 {
+    (void) parent;
+    (void) first;
+    (void) last;
     ui->treeView->scrollToBottom();
 }

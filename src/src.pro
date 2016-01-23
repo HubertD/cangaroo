@@ -21,10 +21,12 @@ macx:OBJECTS_DIR = ../build/o/mac
 SOURCES += main.cpp\
         mainwindow.cpp \
     Backend.cpp \
+    LogModel.cpp \
     MdiWindow.cpp
 
 HEADERS  += mainwindow.h \
     Backend.h \
+    LogModel.h \
     MdiWindow.h \
     portable_endian.h
 
