@@ -6,12 +6,13 @@ written by Hubert Denkmair <hubert@denkmair.de>
 ## changelog
 
 ### v0.1.4 unreleased
+* docking windows system instead of MDI interface
+* windows build
+* windows PCAN-basic driver
 * handle muxed signals in backend and trace window
+* do not try to extract signals from messages when DLC too short
 * can status window
 * bugfixes in setup dialog
-* do not try to extract signals from messages when DLC too short
-* fix windows build
-* windows PCAN-basic driver
 * show timestamps, log level etc. in log window
 
 ### v0.1.3 released 2016-01-16
@@ -55,7 +56,8 @@ initial release \o/
 * import CAN-Traces
 
 ### general ui
-* maybe switch to docking window system
+* give some style to dock windows
+* load/save docks from/to config
 
 ### log window
 * filter log messages by level
