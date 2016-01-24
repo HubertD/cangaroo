@@ -5,6 +5,10 @@ written by Hubert Denkmair <hubert@denkmair.de>
 
 ## changelog
 
+### v0.2.1 unreleased
+* make logging easier
+* refactorings
+
 ### v0.2.0 released 2016-01-24
 * docking windows system instead of MDI interface
 * windows build
