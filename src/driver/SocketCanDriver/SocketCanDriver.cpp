@@ -50,8 +50,6 @@ SocketCanDriver::~SocketCanDriver() {
 
 bool SocketCanDriver::update() {
 
-    Backend &backend = Backend::instance();
-
     struct nl_sock *sock = nl_socket_alloc();
     struct nl_cache *cache;
 
@@ -59,7 +57,7 @@ bool SocketCanDriver::update() {
     int result = rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache);
 
     if (result < 0) {
-        backend.logMessage(log_level_error, QString("Could not access netlink device list: %1").arg(result));
+        log_error(QString("Could not access netlink device list: %1").arg(result));
     } else {
 
         for (struct nl_object *obj = nl_cache_get_first(cache); obj!=0; obj=nl_cache_get_next(obj)) {

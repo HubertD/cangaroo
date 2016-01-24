@@ -68,16 +68,16 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
     Backend &backend = Backend::instance();
 
     if (!mi.doConfigure()) {
-        backend.logMessage(log_level_info, QString("interface %1 not managed by cangaroo, not touching configuration").arg(getName()));
+        log_info(QString("interface %1 not managed by cangaroo, not touching configuration").arg(getName()));
         return;
     }
 
     if (getBitrate() == mi.bitrate()) { // TODO carefully compare active configuration with the desired one
 
-        backend.logMessage(log_level_info, QString("interface %1 already configured correctly, not touching configuration").arg(getName()));
+        log_info(QString("interface %1 already configured correctly, not touching configuration").arg(getName()));
 
     } else {
-        backend.logMessage(log_level_info, QString("taking down interface %1 for configuration").arg(getName()));
+        log_info(QString("taking down interface %1 for configuration").arg(getName()));
 
         QStringList cmd;
         cmd.append("ip");
@@ -143,7 +143,7 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
             cmd.append("0");
         }
 
-        backend.logMessage(log_level_info, cmd.join(' '));
+        log_info(cmd.join(' '));
     }
 }
 

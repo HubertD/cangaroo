@@ -175,14 +175,14 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
 
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        backend().logMessage(log_level_error, QString("Cannot open workspace settings file: %1").arg(filename));
+        log_error(QString("Cannot open workspace settings file: %1").arg(filename));
         return;
     }
 
     QDomDocument doc;
     if (!doc.setContent(&file)) {
         file.close();
-        backend().logMessage(log_level_error, QString("Cannot load settings from file: %1").arg(filename));
+        log_error(QString("Cannot load settings from file: %1").arg(filename));
         return;
     }
     file.close();
@@ -194,7 +194,7 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
     QDomNodeList tabs = tabsRoot.elementsByTagName("tab");
     for (int i=0; i<tabs.length(); i++) {
         if (!loadWorkspaceTab(tabs.item(i).toElement())) {
-            backend().logMessage(log_level_warning, QString("Could not read window %1 from file: %2").arg(QString::number(i), filename));
+            log_warning(QString("Could not read window %1 from file: %2").arg(QString::number(i), filename));
             continue;
         }
     }
@@ -204,7 +204,7 @@ void MainWindow::loadWorkspaceFromFile(QString filename)
         _workspaceFileName = filename;
         setWorkspaceModified(false);
     } else {
-        backend().logMessage(log_level_error, QString("Unable to read measurement setup from workspace config file: %1").arg(filename));
+        log_error(QString("Unable to read measurement setup from workspace config file: %1").arg(filename));
     }
 }
 
@@ -225,7 +225,7 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
 
         ConfigurableWidget *mdi = dynamic_cast<ConfigurableWidget*>(w->centralWidget());
         if (!mdi->saveXML(backend(), doc, tabEl)) {
-            backend().logMessage(log_level_error, QString("Cannot save window settings to file: %1").arg(filename));
+            log_error(QString("Cannot save window settings to file: %1").arg(filename));
             return false;
         }
 
@@ -234,7 +234,7 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
 
     QDomElement setupRoot = doc.createElement("setup");
     if (!backend().getSetup().saveXML(backend(), doc, setupRoot)) {
-        backend().logMessage(log_level_error, QString("Cannot save measurement setup to file: %1").arg(filename));
+        log_error(QString("Cannot save measurement setup to file: %1").arg(filename));
         return false;
     }
     root.appendChild(setupRoot);
@@ -246,10 +246,10 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
         outFile.close();
         _workspaceFileName = filename;
         setWorkspaceModified(false);
-        backend().logMessage(log_level_info, QString("Saved workspace settings to file: %1").arg(filename));
+        log_info(QString("Saved workspace settings to file: %1").arg(filename));
         return true;
     } else {
-        backend().logMessage(log_level_error, QString("Cannot open workspace file for writing: %1").arg(filename));
+        log_error(QString("Cannot open workspace file for writing: %1").arg(filename));
         return false;
     }
 

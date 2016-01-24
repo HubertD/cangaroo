@@ -70,7 +70,7 @@ void Backend::addCanDriver(CanDriver &driver)
 
 bool Backend::startMeasurement()
 {
-    logMessage(log_level_info, "Starting measurement");
+    log_info("Starting measurement");
 
     _measurementStartTime = currentTimeStamp();
 
@@ -83,7 +83,7 @@ bool Backend::startMeasurement()
             if (intf) {
                 intf->applyConfig(*mi);
 
-                logMessage(log_level_info, QString("Listening on interface: %1").arg(intf->getName()));
+                log_info(QString("Listening on interface: %1").arg(intf->getName()));
                 intf->open();
 
                 CanListener *listener = new CanListener(0, *this, *intf);
@@ -107,14 +107,14 @@ bool Backend::stopMeasurement()
 
         foreach (CanListener *listener, _listeners) {
             listener->waitFinish();
-            logMessage(log_level_info, QString("Closing interface: %1").arg(getInterfaceName(listener->getInterfaceId())));
+            log_info(QString("Closing interface: %1").arg(getInterfaceName(listener->getInterfaceId())));
             listener->getInterface().close();
         }
 
         qDeleteAll(_listeners);
         _listeners.clear();
 
-        logMessage(log_level_info, "Measurement stopped");
+        log_info("Measurement stopped");
 
         _measurementRunning = false;
 
@@ -202,7 +202,7 @@ CanDriver *Backend::getDriverById(CanInterfaceId id)
 {
     CanDriver *driver = _drivers.value((id>>8) & 0xFF);
     if (!driver) {
-        logMessage(log_level_critical, QString("Unable to get driver for interface id: %1. This should never happen.").arg(QString().number(id)));
+        log_critical(QString("Unable to get driver for interface id: %1. This should never happen.").arg(QString().number(id)));
     }
     return driver;
 }
@@ -219,7 +219,7 @@ QString Backend::getInterfaceName(CanInterfaceId id)
     if (intf) {
         return intf->getName();
     } else {
-        logMessage(log_level_critical, QString("Trying to get name from unknown interface id: %1. This should never happen.").arg(QString().number(id)));
+        log_critical(QString("Trying to get name from unknown interface id: %1. This should never happen.").arg(QString().number(id)));
         return "";
     }
 }
@@ -278,7 +278,7 @@ double Backend::getMeasurementStartTime() const
     return _measurementStartTime;
 }
 
-void Backend::logMessage(const log_level_t level, const QString msg)
+void Backend::logMessage(const QDateTime dt, const log_level_t level, const QString msg)
 {
-    emit onLogMessage(QDateTime::currentDateTime(), level, msg);
+    emit onLogMessage(dt, level, msg);
 }

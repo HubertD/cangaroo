@@ -11,6 +11,7 @@ SOURCES += \
     $$PWD/MeasurementInterface.cpp \
     $$PWD/LogModel.cpp \
     $$PWD/ConfigurableWidget.cpp \
+    $$PWD/Log.cpp
 
 HEADERS += \
     $$PWD/portable_endian.h \
@@ -26,3 +27,4 @@ HEADERS += \
     $$PWD/MeasurementInterface.h \
     $$PWD/LogModel.h \
     $$PWD/ConfigurableWidget.h \
+    $$PWD/Log.h

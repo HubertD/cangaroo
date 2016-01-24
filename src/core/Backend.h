@@ -28,6 +28,7 @@
 #include <driver/CanDriver.h>
 #include <core/CanDb.h>
 #include <core/MeasurementSetup.h>
+#include <core/Log.h>
 
 class MeasurementNetwork;
 class CanTrace;
@@ -35,15 +36,6 @@ class CanListener;
 class CanDbMessage;
 class SetupDialog;
 class LogModel;
-
-typedef enum log_level {
-    log_level_debug,
-    log_level_info,
-    log_level_warning,
-    log_level_error,
-    log_level_critical,
-    log_level_fatal
-} log_level_t;
 
 class Backend : public QObject
 {
@@ -62,8 +54,6 @@ public:
     double getMeasurementStartTime() const;
 
     void logMessage(const QDateTime dt, const log_level_t level, const QString msg);
-    void logMessage(const log_level_t level, const QString msg);
-
 
     MeasurementSetup &getSetup();
     void loadDefaultSetup(MeasurementSetup &setup);

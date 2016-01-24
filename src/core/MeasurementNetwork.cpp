@@ -129,7 +129,7 @@ bool MeasurementNetwork::loadXML(Backend &backend, QDomElement el)
             MeasurementInterface *mi = addCanInterface(intf->getId());
             mi->loadXML(backend, elIntf);
         } else {
-            backend.logMessage(log_level_error, QString("Could not find interface %1/%2, which is referenced in the workspace config file.").arg(driverName, deviceName));
+            log_error(QString("Could not find interface %1/%2, which is referenced in the workspace config file.").arg(driverName, deviceName));
         }
     }
 
@@ -141,7 +141,7 @@ bool MeasurementNetwork::loadXML(Backend &backend, QDomElement el)
         if (!filename.isEmpty()) {
             addCanDb(backend.loadDbc(filename));
         } else {
-            backend.logMessage(log_level_error, QString("Unable to load CanDB: %1").arg(filename));
+            log_error(QString("Unable to load CanDB: %1").arg(filename));
         }
     }
 

@@ -41,7 +41,7 @@ bool DbcParser::parseFile(QFile *file, CanDb &candb)
         if (_errorLine) {
             msg += QString(" at line %1, column %2").arg(_errorLine).arg(_errorColumn);
         }
-        Backend::instance().logMessage(log_level_error, msg);
+        log_error(msg);
         return false;
     }
 
@@ -412,7 +412,7 @@ bool DbcParser::parseSection(CanDb &candb, DbcTokenList &tokens) {
     }
 
     if (!retval) {
-        Backend::instance().logMessage(log_level_error, "dbc parse error");
+        log_error("dbc parse error");
     }
     return retval;
 
