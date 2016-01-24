@@ -50,14 +50,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QIcon icon(":/assets/cangaroo.png");
     setWindowIcon(icon);
-/*
-    QImage bgimg(":/assets/mdibg.png");
-    ui->mdiArea->setBackground(bgimg);
-    ui->mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    ui->mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-*/
+
     connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createTraceWindow()));
-    connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(createLogWindow()));
+    connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(addLogWidget()));
     connect(ui->actionGraph_View, SIGNAL(triggered()), this, SLOT(createGraphWindow()));
     connect(ui->actionSetup, SIGNAL(triggered()), this, SLOT(showSetupDialog()));
 
@@ -106,17 +101,25 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 }
 
-QMdiSubWindow *MainWindow::createSubWindow(MdiWindow *window)
-{
-    //QMdiSubWindow *retval = ui->mdiArea->addSubWindow(window);
-    //window->show();
-    //return retval;
-    return NULL;
-}
-
 Backend &MainWindow::backend()
 {
     return Backend::instance();
+}
+
+QMainWindow *MainWindow::createTab(QString title)
+{
+    QMainWindow *mm = new QMainWindow(this);
+    QPalette pal(palette());
+    pal.setColor(QPalette::Background, QColor(0xeb, 0xeb, 0xeb));
+    mm->setAutoFillBackground(true);
+    mm->setPalette(pal);
+    ui->mainTabs->addTab(mm, title);
+    return mm;
+}
+
+QMainWindow *MainWindow::currentTab()
+{
+    return (QMainWindow*)ui->mainTabs->currentWidget();
 }
 
 void MainWindow::stopAndClearMeasurement()
@@ -256,13 +259,7 @@ void MainWindow::newWorkspace()
         stopAndClearMeasurement();
         _workspaceFileName.clear();
         setWorkspaceModified(false);
-        //ui->mdiArea->closeAllSubWindows();
-        //createLogWindow()->setGeometry(0, 400, 1200, 150);
-        //createCanStatusWindow()->setGeometry(0, 550, 1200, 150);
         createTraceWindow();
-
-
-
         backend().setDefaultSetup();
     }
 }
@@ -335,46 +332,49 @@ int MainWindow::askSaveBecauseWorkspaceModified()
     }
 }
 
-QMainWindow *MainWindow::createTraceWindow() {
-    QMainWindow *mm = new QMainWindow(this);
-    ui->mainTabs->addTab(mm, "Trace");
-
-    QDockWidget *dock = new QDockWidget("Log", mm);
-    dock->setWidget(new LogWindow(dock, backend()));
-    mm->addDockWidget(Qt::BottomDockWidgetArea, dock);
+QMainWindow *MainWindow::createTraceWindow()
+{
+    QMainWindow *mm = createTab("Trace");
     mm->setCentralWidget(new TraceWindow(mm, backend()));
+    addLogWidget(mm);
+
+    ui->mainTabs->setCurrentWidget(mm);
+    return mm;
+}
+
+QMainWindow *MainWindow::createGraphWindow()
+{
+    QMainWindow *mm = createTab("Graph");
+    mm->setCentralWidget(new GraphWindow(mm, backend()));
+    addLogWidget(mm);
 
     return mm;
 }
 
-QMdiSubWindow *MainWindow::createLogWindow()
+void MainWindow::addLogWidget(QMainWindow *parent)
 {
-    //return createSubWindow(new LogWindow(ui->mdiArea, backend()));
-    return NULL;
+    if (!parent) {
+        parent = currentTab();
+    }
+    QDockWidget *dock = new QDockWidget("Log", parent);
+    dock->setWidget(new LogWindow(dock, backend()));
+    parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
 }
 
-QMdiSubWindow *MainWindow::createGraphWindow()
+void MainWindow::addStatusWidget(QMainWindow *parent)
 {
-    //return createSubWindow(new GraphWindow(ui->mdiArea, backend()));
-    return NULL;
+    if (!parent) {
+        parent = currentTab();
+    }
 
-}
-
-QMdiSubWindow *MainWindow::createCanStatusWindow()
-{
-    //return createSubWindow(new CanStatusWindow(ui->mdiArea, backend()));
-    return NULL;
+    QDockWidget *dock = new QDockWidget("CAN Status", parent);
+    dock->setWidget(new CanStatusWindow(dock, backend()));
+    parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
 }
 
 void MainWindow::on_actionCan_Status_View_triggered()
 {
-    createCanStatusWindow();
-}
-
-void MainWindow::setActiveSubWindow(QWidget *window) {
-    if (window) {
-        //ui->mdiArea->setActiveSubWindow(qobject_cast<QMdiSubWindow *>(window));
-    }
+    addStatusWidget();
 }
 
 bool MainWindow::showSetupDialog()
@@ -398,7 +398,7 @@ void MainWindow::showAboutDialog()
        "cangaroo\n"
        "open source can bus analyzer\n"
        "\n"
-       "version 0.1.3\n"
+       "version 0.1.4\n"
        "\n"
        "(c)2015-2016 Hubert Denkmair"
     );

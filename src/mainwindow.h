@@ -56,10 +56,11 @@ protected:
 
 public slots:
     QMainWindow *createTraceWindow();
-    QMdiSubWindow *createLogWindow();
-    QMdiSubWindow *createGraphWindow();
-    QMdiSubWindow *createCanStatusWindow();
-    void setActiveSubWindow(QWidget *window);
+    QMainWindow *createGraphWindow();
+
+    void addLogWidget(QMainWindow *parent=0);
+    void addStatusWidget(QMainWindow *parent=0);
+
     bool showSetupDialog();
     void showAboutDialog();
 
@@ -84,14 +85,13 @@ private:
 
     bool _workspaceModified;
     QString _workspaceFileName;
-
     QString _baseWindowTitle;
 
-    QSignalMapper *windowMapper;
-
-    QMdiSubWindow *createSubWindow(MdiWindow *window);
-
     Backend &backend();
+
+    QMainWindow *createTab(QString title);
+    QMainWindow *currentTab();
+
     void stopAndClearMeasurement();
 
     bool loadWorkspaceWindow(QDomElement el);
