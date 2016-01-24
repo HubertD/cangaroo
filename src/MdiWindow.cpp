@@ -33,13 +33,13 @@ bool MdiWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
 {
     (void) backend;
     (void) xml;
-    root.setAttribute("title", windowTitle());
+    (void) root;
     return true;
 }
 
 bool MdiWindow::loadXML(Backend &backend, QDomElement &el)
 {
     (void) backend;
-    setWindowTitle(el.attribute("title", ""));
+    (void) el;
     return true;
 }

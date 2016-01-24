@@ -55,8 +55,8 @@ protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
-    QMainWindow *createTraceWindow();
-    QMainWindow *createGraphWindow();
+    QMainWindow *createTraceWindow(QString title=QString());
+    QMainWindow *createGraphWindow(QString title=QString());
 
     void addLogWidget(QMainWindow *parent=0);
     void addStatusWidget(QMainWindow *parent=0);
@@ -94,7 +94,8 @@ private:
 
     void stopAndClearMeasurement();
 
-    bool loadWorkspaceWindow(QDomElement el);
+    void clearWorkspace();
+    bool loadWorkspaceTab(QDomElement el);
     bool loadWorkspaceSetup(QDomElement el);
     void loadWorkspaceFromFile(QString filename);
     bool saveWorkspaceToFile(QString filename);
