@@ -33,6 +33,13 @@ LogModel::~LogModel()
     _items.clear();
 }
 
+void LogModel::clear()
+{
+    beginResetModel();
+    _items.clear();
+    endResetModel();
+}
+
 QModelIndex LogModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (parent.isValid()) {

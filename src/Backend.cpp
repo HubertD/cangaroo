@@ -263,6 +263,11 @@ pCanDb Backend::loadDbc(QString filename)
     return candb;
 }
 
+void Backend::clearLog()
+{
+    _logModel->clear();
+}
+
 LogModel &Backend::getLogModel() const
 {
     return *_logModel;

@@ -127,6 +127,7 @@ void MainWindow::stopAndClearMeasurement()
     backend().stopMeasurement();
     QCoreApplication::processEvents();
     backend().clearTrace();
+    backend().clearLog();
 }
 
 void MainWindow::clearWorkspace()
@@ -434,6 +435,7 @@ void MainWindow::saveTraceToFile()
 void MainWindow::on_action_TraceClear_triggered()
 {
     backend().clearTrace();
+    backend().clearLog();
 }
 
 void MainWindow::on_action_WorkspaceSave_triggered()

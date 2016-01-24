@@ -51,6 +51,8 @@ public:
     LogModel(Backend &backend);
     virtual ~LogModel();
 
+    void clear();
+
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
     virtual QModelIndex parent(const QModelIndex &child) const;
 

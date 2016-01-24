@@ -90,6 +90,7 @@ public:
 
     pCanDb loadDbc(QString filename);
 
+    void clearLog();
     LogModel &getLogModel() const;
 
 signals:
