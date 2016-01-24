@@ -19,8 +19,7 @@
 
 */
 
-#ifndef CANTRACE_H
-#define CANTRACE_H
+#pragma once
 
 #include <QObject>
 #include <QMutex>
@@ -84,5 +83,3 @@ private:
 
 
 };
-
-#endif // CANTRACE_H

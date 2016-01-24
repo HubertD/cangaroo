@@ -19,8 +19,7 @@
 
 */
 
-#ifndef GRAPHWINDOW_H
-#define GRAPHWINDOW_H
+#pragma once
 
 #include <MdiWindow.h>
 #include <core/Backend.h>
@@ -47,5 +46,3 @@ private:
     Ui::GraphWindow *ui;
     Backend &_backend;
 };
-
-#endif // GRAPHWINDOW_H

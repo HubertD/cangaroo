@@ -19,9 +19,7 @@
 
 */
 
-
-#ifndef LOGMODEL_H
-#define LOGMODEL_H
+#pragma once
 
 #include <QAbstractItemModel>
 #include <QDateTime>
@@ -71,5 +69,3 @@ private:
 
     static QString logLevelText(log_level_t level);
 };
-
-#endif // LOGMODEL_H

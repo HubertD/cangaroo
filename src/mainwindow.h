@@ -19,8 +19,7 @@
 
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <QList>
@@ -109,5 +108,3 @@ private:
     int askSaveBecauseWorkspaceModified();
 
 };
-
-#endif // MAINWINDOW_H

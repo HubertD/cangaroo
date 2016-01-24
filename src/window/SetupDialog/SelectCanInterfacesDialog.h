@@ -19,8 +19,7 @@
 
 */
 
-#ifndef SELECTCANINTERFACESDIALOG_H
-#define SELECTCANINTERFACESDIALOG_H
+#pragma once
 
 #include <QDialog>
 #include <QList>
@@ -46,5 +45,3 @@ public:
 private:
     Ui::SelectCanInterfacesDialog *ui;
 };
-
-#endif // SELECTCANINTERFACESDIALOG_H

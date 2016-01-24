@@ -19,8 +19,8 @@
 
 */
 
-#ifndef BASE_CANMESSAGE_H_
-#define BASE_CANMESSAGE_H_
+#pragma once
+
 #include <stdint.h>
 #include <sys/time.h>
 
@@ -92,5 +92,3 @@ private:
     struct timeval _timestamp;
 
 };
-
-#endif /* BASE_CANMESSAGE_H_ */

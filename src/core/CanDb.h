@@ -19,8 +19,7 @@
 
 */
 
-#ifndef CANDB_H
-#define CANDB_H
+#pragma once
 
 #include <QString>
 #include <QList>
@@ -72,5 +71,3 @@ private:
         CanDbMessageList _messages;
 
 };
-
-#endif // CANDB_H

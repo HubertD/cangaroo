@@ -19,8 +19,7 @@
 
 */
 
-#ifndef TRACEWINDOW_H
-#define TRACEWINDOW_H
+#pragma once
 
 #include <MdiWindow.h>
 #include "TraceViewTypes.h"
@@ -77,5 +76,3 @@ private:
     QSortFilterProxyModel *_aggregatedProxyModel;
     QSortFilterProxyModel *_linearProxyModel;
 };
-
-#endif // TRACEWINDOW_H

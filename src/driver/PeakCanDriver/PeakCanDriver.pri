@@ -8,6 +8,7 @@ win32:INCLUDEPATH += $$PWD/pcan-basic-api/Win32/VC_LIB
 win32:DEPENDPATH += $$PWD/pcan-basic-api/Win32/VC_LIB
 
 HEADERS += \
+    $$PWD/PeakCanDriver.h \
     $$PWD/PeakCanInterface.h \
     $$PWD/PeakCanSetupPage.h
 

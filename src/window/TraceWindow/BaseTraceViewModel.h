@@ -19,8 +19,7 @@
 
 */
 
-#ifndef BASETRACEVIEWMODEL_H
-#define BASETRACEVIEWMODEL_H
+#pragma once
 
 #include <QAbstractItemModel>
 #include "TraceViewTypes.h"
@@ -74,5 +73,3 @@ private:
     timestamp_mode_t _timestampMode;
 
 };
-
-#endif // BASETRACEVIEWMODEL_H

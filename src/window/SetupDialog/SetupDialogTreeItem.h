@@ -19,8 +19,7 @@
 
 */
 
-#ifndef SETUPDIALOGTREEITEM_H
-#define SETUPDIALOGTREEITEM_H
+#pragma once
 
 #include <QList>
 #include <QVariant>
@@ -73,5 +72,3 @@ private:
     QVariant dataInterface(const QModelIndex &index) const;
     QVariant dataCanDb(const QModelIndex &index) const;
 };
-
-#endif // SETUPDIALOGTREEITEM_H

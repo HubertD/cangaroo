@@ -19,8 +19,7 @@
 
 */
 
-#ifndef BASE_CANINTERFACE_H_
-#define BASE_CANINTERFACE_H_
+#pragma once
 
 #include <QString>
 #include <stdint.h>
@@ -77,5 +76,3 @@ private:
     uint8_t _id;
     CanDriver *_driver;
 };
-
-#endif /* BASE_CANINTERFACE_H_ */

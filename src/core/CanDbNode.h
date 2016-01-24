@@ -19,8 +19,7 @@
 
 */
 
-#ifndef CANDBNODE_H
-#define CANDBNODE_H
+#pragma once
 
 #include <QString>
 
@@ -42,5 +41,3 @@ private:
     QString _name;
     QString _comment;
 };
-
-#endif // CANDBNODE_H

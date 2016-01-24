@@ -1,5 +1,4 @@
-#ifndef PEAKCANINTERFACE_H
-#define PEAKCANINTERFACE_H
+#pragma once
 
 #include <driver/CanInterface.h>
 
@@ -52,5 +51,3 @@ private:
     QString getErrorText(uint32_t status_code);
 
 };
-
-#endif // PEAKCANINTERFACE_H

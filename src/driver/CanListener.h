@@ -19,8 +19,7 @@
 
 */
 
-#ifndef CANLISTENER_H
-#define CANLISTENER_H
+#pragma once
 
 #include <QObject>
 #include <driver/CanDriver.h>
@@ -58,5 +57,3 @@ private:
     QThread *_thread;
 
 };
-
-#endif // CANLISTENER_H

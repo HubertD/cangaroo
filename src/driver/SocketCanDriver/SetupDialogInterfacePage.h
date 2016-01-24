@@ -19,9 +19,7 @@
 
 */
 
-
-#ifndef SETUPDIALOGINTERFACEPAGE_H
-#define SETUPDIALOGINTERFACEPAGE_H
+#pragma once
 
 #include <QWidget>
 
@@ -56,5 +54,3 @@ private:
 
     Backend &backend();
 };
-
-#endif // SETUPDIALOGINTERFACEPAGE_H

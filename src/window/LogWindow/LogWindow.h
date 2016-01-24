@@ -19,8 +19,7 @@
 
 */
 
-#ifndef LOGWINDOW_H
-#define LOGWINDOW_H
+#pragma once
 
 #include <MdiWindow.h>
 #include <core/Backend.h>
@@ -50,5 +49,3 @@ private slots:
 private:
     Ui::LogWindow *ui;
 };
-
-#endif // LOGWINDOW_H

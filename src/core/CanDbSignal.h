@@ -19,8 +19,7 @@
 
 */
 
-#ifndef CANDBSIGNAL_H
-#define CANDBSIGNAL_H
+#pragma once
 
 #include "CanMessage.h"
 #include "CanDbMessage.h"
@@ -101,5 +100,3 @@ private:
     QString _comment;
     CanDbValueTable _valueTable;
 };
-
-#endif // CANDBSIGNAL_H

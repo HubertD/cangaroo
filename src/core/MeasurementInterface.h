@@ -19,8 +19,7 @@
 
 */
 
-#ifndef MEASUREMENTINTERFACE_H
-#define MEASUREMENTINTERFACE_H
+#pragma once
 
 #include <QDomDocument>
 #include <driver/CanDriver.h>
@@ -140,5 +139,3 @@ private:
     bool _doAutoRestart;
     int _autoRestartMs;
 };
-
-#endif // MEASUREMENTINTERFACE_H

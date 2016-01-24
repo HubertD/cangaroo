@@ -19,8 +19,7 @@
 
 */
 
-#ifndef LINEARTRACEVIEWMODEL_H
-#define LINEARTRACEVIEWMODEL_H
+#pragma once
 
 #include <QAbstractItemModel>
 #include <core/CanDb.h>
@@ -52,5 +51,3 @@ private:
     virtual QVariant data_DisplayRole(const QModelIndex &index, int role) const;
     virtual QVariant data_TextColorRole(const QModelIndex &index, int role) const;
 };
-
-#endif // LINEARTRACEVIEWMODEL_H

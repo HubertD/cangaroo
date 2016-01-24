@@ -19,9 +19,7 @@
 
 */
 
-
-#ifndef CANSTATUSWINDOW_H
-#define CANSTATUSWINDOW_H
+#pragma once
 
 #include <MdiWindow.h>
 
@@ -70,5 +68,3 @@ private:
     Backend &backend();
     QTimer *_timer;
 };
-
-#endif // CANSTATUSWINDOW_H

@@ -19,8 +19,7 @@
 
 */
 
-#ifndef CANDBMESSAGE_H
-#define CANDBMESSAGE_H
+#pragma once
 
 #include <stdint.h>
 #include <QString>
@@ -72,5 +71,3 @@ private:
         CanDbSignal *_muxer;
 
 };
-
-#endif // CANDBMESSAGE_H

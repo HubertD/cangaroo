@@ -19,8 +19,7 @@
 
 */
 
-#ifndef SETUPDIALOG_H
-#define SETUPDIALOG_H
+#pragma once
 
 #include <QDialog>
 #include <QAction>
@@ -95,5 +94,3 @@ private:
     void addInterface(const QModelIndex &parent);
 
 };
-
-#endif // SETUPDIALOG_H

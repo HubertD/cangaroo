@@ -19,8 +19,7 @@
 
 */
 
-#ifndef AGGREGATEDTRACEVIEWMODEL_H
-#define AGGREGATEDTRACEVIEWMODEL_H
+#pragma once
 
 #include <QAbstractItemModel>
 #include <QMap>
@@ -75,5 +74,3 @@ private slots:
     void beforeClear();
     void afterClear();
 };
-
-#endif // AGGREGATEDTRACEVIEWMODEL_H

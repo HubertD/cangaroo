@@ -19,8 +19,7 @@
 
 */
 
-#ifndef SOCKETCAN_SOCKETCANINTERFACE_H_
-#define SOCKETCAN_SOCKETCANINTERFACE_H_
+#pragma once
 
 #include "../CanInterface.h"
 #include <linux/can/netlink.h>
@@ -105,5 +104,3 @@ private:
     const char *cname();
     bool updateStatus();
 };
-
-#endif /* SOCKETCAN_SOCKETCANINTERFACE_H_ */

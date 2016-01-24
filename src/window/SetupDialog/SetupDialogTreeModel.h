@@ -19,8 +19,7 @@
 
 */
 
-#ifndef SETUPDIALOGTREEMODEL_H
-#define SETUPDIALOGTREEMODEL_H
+#pragma once
 
 #include "SetupDialogTreeItem.h"
 
@@ -75,5 +74,3 @@ private:
     SetupDialogTreeItem *loadMeasurementInterface(SetupDialogTreeItem &parent, MeasurementInterface *intf);
     SetupDialogTreeItem *loadCanDb(SetupDialogTreeItem &parent, pCanDb &db);
 };
-
-#endif // SETUPDIALOGTREEMODEL_H

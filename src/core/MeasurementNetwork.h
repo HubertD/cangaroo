@@ -19,8 +19,7 @@
 
 */
 
-#ifndef MEASUREMENTNETWORK_H
-#define MEASUREMENTNETWORK_H
+#pragma once
 
 #include <QString>
 #include <QList>
@@ -59,5 +58,3 @@ private:
     QString _name;
     QList<MeasurementInterface*> _interfaces;
 };
-
-#endif // MEASUREMENTNETWORK_H

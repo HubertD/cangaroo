@@ -19,9 +19,7 @@
 
 */
 
-#ifndef AGGREGATEDTRACEVIEWITEM_H
-#define AGGREGATEDTRACEVIEWITEM_H
-
+#pragma once
 
 #include <sys/time.h>
 #include <core/CanMessage.h>
@@ -48,6 +46,3 @@ private:
     QList<AggregatedTraceViewItem *> _children;
 
 };
-
-
-#endif // AGGREGATEDTRACEVIEWITEM_H

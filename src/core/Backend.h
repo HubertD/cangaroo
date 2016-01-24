@@ -19,8 +19,7 @@
 
 */
 
-#ifndef BACKEND_H
-#define BACKEND_H
+#pragma once
 
 #include <QObject>
 #include <QList>
@@ -117,5 +116,3 @@ private:
 
     LogModel *_logModel;
 };
-
-#endif // BACKEND_H

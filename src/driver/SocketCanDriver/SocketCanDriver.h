@@ -19,8 +19,7 @@
 
 */
 
-#ifndef SOCKETCAN_SOCKETCANDRIVER_H_
-#define SOCKETCAN_SOCKETCANDRIVER_H_
+#pragma once
 
 #include <QString>
 #include <core/Backend.h>
@@ -41,5 +40,3 @@ private:
     SocketCanInterface *createOrUpdateInterface(int index, QString name);
     SetupDialogInterfacePage *setupPage;
 };
-
-#endif /* SOCKETCAN_SOCKETCANDRIVER_H_ */

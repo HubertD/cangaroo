@@ -1,7 +1,6 @@
-#ifndef PEAKCANDRIVER_H
-#define PEAKCANDRIVER_H
+#pragma once
 
-#include <Backend.h>
+#include <core/Backend.h>
 #include <driver/CanDriver.h>
 
 class PeakCanInterface;
@@ -20,5 +19,3 @@ private:
     PeakCanSetupPage *setupPage;
 
 };
-
-#endif // PEAKCANDRIVER_H

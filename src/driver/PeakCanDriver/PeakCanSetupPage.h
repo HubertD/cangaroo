@@ -1,5 +1,4 @@
-#ifndef PEAKCANSETUPPAGE_H
-#define PEAKCANSETUPPAGE_H
+#pragma once
 
 #include <QWidget>
 
@@ -33,5 +32,3 @@ private:
 
     Backend &backend();
 };
-
-#endif // PEAKCANSETUPPAGE_H

@@ -19,8 +19,7 @@
 
 */
 
-#ifndef BASE_CANDRIVER_H_
-#define BASE_CANDRIVER_H_
+#pragma once
 
 #include <stdint.h>
 #include <QList>
@@ -60,5 +59,3 @@ private:
 
     void setId(int id);
 };
-
-#endif /* BASE_CANDRIVER_H_ */

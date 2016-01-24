@@ -19,8 +19,7 @@
 
 */
 
-#ifndef DBCTOKENS_H
-#define DBCTOKENS_H
+#pragma once
 
 #include <QFile>
 #include <QChar>
@@ -101,5 +100,3 @@ public:
 private:
     QChar _ch;
 };
-
-#endif // DBCTOKENS_H

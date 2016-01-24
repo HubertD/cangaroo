@@ -19,8 +19,7 @@
 
 */
 
-#ifndef MEASUREMENTSETUP_H
-#define MEASUREMENTSETUP_H
+#pragma once
 
 #include <QObject>
 #include <QList>
@@ -62,5 +61,3 @@ signals:
 private:
     QList<MeasurementNetwork*> _networks;
 };
-
-#endif // MEASUREMENTSETUP_H

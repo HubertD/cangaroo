@@ -19,8 +19,7 @@
 
 */
 
-#ifndef DBCPARSER_H
-#define DBCPARSER_H
+#pragma once
 
 #include <QFile>
 #include <QRegExp>
@@ -91,5 +90,3 @@ private:
     bool parseSectionVal(CanDb &candb, DbcTokenList &tokens);
 
 };
-
-#endif // DBCPARSER_H
