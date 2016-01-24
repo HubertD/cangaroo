@@ -1,3 +1,14 @@
+cangaroo (0.2.0-1) experimental; urgency=low
+  * handle muxed signals in backend and trace window
+  * can status window
+  * bugfixes in setup dialog
+  * do not try to extract signals from messages when DLC too short
+  * fix windows build
+  * windows PCAN-basic driver
+  * show timestamps, log level etc. in log window
+
+ -- Hubert Denkmair <hubert@denkmair.de>  Tue, 12 Jan 2016 21:35:00 +0200
+
 cangaroo (0.1.3-1) experimental; urgency=low
   * new can interface configuration GUI (missing a suid binary to actually set the config)
   * use libnl-route-3 for socketcan device config read
@@ -7,7 +18,6 @@ cangaroo (0.1.3-1) experimental; urgency=low
   * bugfixs with time-delta view
 
  -- Hubert Denkmair <hubert@denkmair.de>  Tue, 12 Jan 2016 21:35:00 +0200
-
 
 cangaroo (0.1.2-1) experimental; urgency=low
   * fix device re-scan ("could not bind" console message)

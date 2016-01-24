@@ -405,7 +405,7 @@ void MainWindow::showAboutDialog()
        "cangaroo\n"
        "open source can bus analyzer\n"
        "\n"
-       "version 0.1.4\n"
+       "version 0.2.0\n"
        "\n"
        "(c)2015-2016 Hubert Denkmair"
     );
