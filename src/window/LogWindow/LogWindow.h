@@ -31,6 +31,7 @@ class LogWindow;
 
 class QDomDocument;
 class QDomElement;
+class LogModel;
 
 class LogWindow : public MdiWindow
 {
@@ -43,8 +44,8 @@ public:
     virtual bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
     virtual bool loadXML(Backend &backend, QDomElement &el);
 
-public slots:
-    void onLogMessage(const QDateTime dt, const log_level_t level, const QString msg);
+private slots:
+    void rowsInserted(const QModelIndex & parent, int first, int last);
 
 private:
     Ui::LogWindow *ui;

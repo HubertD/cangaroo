@@ -20,6 +20,7 @@
 */
 
 #include "Backend.h"
+#include "LogModel.h"
 
 #include <QDateTime>
 
@@ -40,7 +41,7 @@ Backend::Backend()
     _measurementStartTime(0),
     _setup(this)
 {
-    qRegisterMetaType<CanMessage>("CanMessage");
+    _logModel = new LogModel(*this);
 
     setDefaultSetup();
     _trace = new CanTrace(*this, this, 100);
@@ -99,24 +100,26 @@ bool Backend::startMeasurement()
 
 bool Backend::stopMeasurement()
 {
-    foreach (CanListener *listener, _listeners) {
-        listener->requestStop();
+    if (_measurementRunning) {
+        foreach (CanListener *listener, _listeners) {
+            listener->requestStop();
+        }
+
+        foreach (CanListener *listener, _listeners) {
+            listener->waitFinish();
+            logMessage(log_level_info, QString("Closing interface: %1").arg(getInterfaceName(listener->getInterfaceId())));
+            listener->getInterface().close();
+        }
+
+        qDeleteAll(_listeners);
+        _listeners.clear();
+
+        logMessage(log_level_info, "Measurement stopped");
+
+        _measurementRunning = false;
+
+        emit endMeasurement();
     }
-
-    foreach (CanListener *listener, _listeners) {
-        listener->waitFinish();
-        logMessage(log_level_info, QString("Closing interface: %1").arg(getInterfaceName(listener->getInterfaceId())));
-        listener->getInterface().close();
-    }
-
-    qDeleteAll(_listeners);
-    _listeners.clear();
-
-    logMessage(log_level_info, "Measurement stopped");
-
-    _measurementRunning = false;
-
-    emit endMeasurement();
     return true;
 }
 
@@ -258,6 +261,11 @@ pCanDb Backend::loadDbc(QString filename)
     delete dbc;
 
     return candb;
+}
+
+LogModel &Backend::getLogModel() const
+{
+    return *_logModel;
 }
 
 double Backend::getMeasurementStartTime() const

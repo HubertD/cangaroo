@@ -24,13 +24,16 @@
 
 #include <QDomDocument>
 #include <Backend.h>
+#include <LogModel.h>
 
 LogWindow::LogWindow(QWidget *parent, Backend &backend) :
     MdiWindow(parent),
     ui(new Ui::LogWindow)
 {
+    connect(&backend.getLogModel(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
+
     ui->setupUi(this);
-    connect(&backend, SIGNAL(onLogMessage(QDateTime,log_level_t,QString)), this, SLOT(onLogMessage(QDateTime,log_level_t,QString)));
+    ui->treeView->setModel(&backend.getLogModel());
 }
 
 LogWindow::~LogWindow()
@@ -50,10 +53,10 @@ bool LogWindow::loadXML(Backend &backend, QDomElement &el)
     return MdiWindow::loadXML(backend, el);
 }
 
-void LogWindow::onLogMessage(const QDateTime dt, const log_level_t level, const QString msg)
+void LogWindow::rowsInserted(const QModelIndex &parent, int first, int last)
 {
-    (void) dt;
-    (void) level;
-    ui->loglist->addItem(msg);
-    ui->loglist->scrollToBottom();
+    (void) parent;
+    (void) first;
+    (void) last;
+    ui->treeView->scrollToBottom();
 }

@@ -42,6 +42,14 @@ private:
     int64_t _timestampOffset;
     void *_autoResetEvent;
 
+    struct {
+        bool autoRestart;
+        bool listenOnly;
+        int bitrate;
+    } _config;
+
+    uint16_t calcBitrateMode(int bitrate);
+    QString getErrorText(uint32_t status_code);
 
 };
 
