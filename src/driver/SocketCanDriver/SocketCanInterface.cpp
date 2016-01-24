@@ -65,8 +65,6 @@ void SocketCanInterface::setName(QString name) {
 
 void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
 {
-    Backend &backend = Backend::instance();
-
     if (!mi.doConfigure()) {
         log_info(QString("interface %1 not managed by cangaroo, not touching configuration").arg(getName()));
         return;
