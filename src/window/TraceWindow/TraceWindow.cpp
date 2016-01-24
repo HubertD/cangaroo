@@ -27,12 +27,18 @@
 #include "LinearTraceViewModel.h"
 #include "AggregatedTraceViewModel.h"
 
+#include "FilterItemModel.h"
+
 TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ConfigurableWidget(parent),
     ui(new Ui::TraceWindow),
     _backend(&backend)
 {
     ui->setupUi(this);
+
+    FilterItemModel *filterModel = new FilterItemModel();
+
+    ui->filterTree->setModel(filterModel);
 
     _linearTraceViewModel = new LinearTraceViewModel(backend);
     _linearProxyModel = new QSortFilterProxyModel(this);
