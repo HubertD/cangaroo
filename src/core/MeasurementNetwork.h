@@ -28,7 +28,7 @@
 
 #include <driver/CanDriver.h>
 #include <driver/CanInterface.h>
-#include <model/CanDb.h>
+#include <core/CanDb.h>
 
 class Backend;
 class MeasurementInterface;

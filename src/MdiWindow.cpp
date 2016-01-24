@@ -22,7 +22,7 @@
 #include "MdiWindow.h"
 
 #include <QDomDocument>
-#include "Backend.h"
+#include <core/Backend.h>
 
 MdiWindow::MdiWindow(QWidget *parent) : QWidget(parent)
 {

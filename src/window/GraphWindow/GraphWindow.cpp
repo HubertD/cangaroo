@@ -24,7 +24,7 @@
 
 #include <QDomDocument>
 
-#include <Backend.h>
+#include <core/Backend.h>
 
 GraphWindow::GraphWindow(QWidget *parent, Backend &backend) :
     MdiWindow(parent),

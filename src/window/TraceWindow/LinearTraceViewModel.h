@@ -23,8 +23,8 @@
 #define LINEARTRACEVIEWMODEL_H
 
 #include <QAbstractItemModel>
-#include <model/CanDb.h>
-#include <model/CanTrace.h>
+#include <core/CanDb.h>
+#include <core/CanTrace.h>
 #include "BaseTraceViewModel.h"
 
 class Backend;

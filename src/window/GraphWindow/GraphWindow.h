@@ -23,8 +23,8 @@
 #define GRAPHWINDOW_H
 
 #include <MdiWindow.h>
-#include <model/MeasurementSetup.h>
-#include <Backend.h>
+#include <core/Backend.h>
+#include <core/MeasurementSetup.h>
 
 namespace Ui {
 class GraphWindow;

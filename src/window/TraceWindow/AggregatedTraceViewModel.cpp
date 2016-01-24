@@ -22,9 +22,9 @@
 #include "AggregatedTraceViewModel.h"
 #include <QColor>
 
-#include <Backend.h>
-#include <model/CanTrace.h>
-#include <model/CanDbMessage.h>
+#include <core/Backend.h>
+#include <core/CanTrace.h>
+#include <core/CanDbMessage.h>
 
 AggregatedTraceViewModel::AggregatedTraceViewModel(Backend &backend)
   : BaseTraceViewModel(backend)

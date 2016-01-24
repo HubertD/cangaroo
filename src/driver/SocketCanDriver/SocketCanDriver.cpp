@@ -22,7 +22,7 @@
 
 #include "SocketCanDriver.h"
 #include "SocketCanInterface.h"
-#include <Backend.h>
+#include <core/Backend.h>
 
 #include <sys/socket.h>
 #include <linux/if.h>

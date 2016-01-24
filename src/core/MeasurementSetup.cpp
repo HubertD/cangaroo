@@ -24,9 +24,9 @@
 #include <QThread>
 #include <QMetaType>
 
-#include <model/CanTrace.h>
-#include <model/CanMessage.h>
-#include <model/MeasurementNetwork.h>
+#include <core/CanTrace.h>
+#include <core/CanMessage.h>
+#include <core/MeasurementNetwork.h>
 
 MeasurementSetup::MeasurementSetup(QObject *parent)
   : QObject(parent)

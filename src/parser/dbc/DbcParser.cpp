@@ -21,10 +21,10 @@
 
 #include "DbcParser.h"
 #include <QTextStream>
-#include "model/CanDb.h"
 #include <stdint.h>
 #include <iostream>
-#include <Backend.h>
+#include <core/Backend.h>
+#include <core/CanDb.h>
 
 #include "DbcTokens.h"
 

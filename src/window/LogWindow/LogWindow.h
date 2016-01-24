@@ -23,7 +23,7 @@
 #define LOGWINDOW_H
 
 #include <MdiWindow.h>
-#include <Backend.h>
+#include <core/Backend.h>
 
 namespace Ui {
 class LogWindow;

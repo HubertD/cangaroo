@@ -22,7 +22,7 @@
 #include "LinearTraceViewModel.h"
 #include <iostream>
 #include <stddef.h>
-#include <Backend.h>
+#include <core/Backend.h>
 
 LinearTraceViewModel::LinearTraceViewModel(Backend &backend)
   : BaseTraceViewModel(backend)

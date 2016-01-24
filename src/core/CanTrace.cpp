@@ -24,10 +24,10 @@
 #include <QFile>
 #include <QTextStream>
 
-#include <Backend.h>
-#include <model/CanMessage.h>
-#include <model/CanDbMessage.h>
-#include <model/CanDbSignal.h>
+#include <core/Backend.h>
+#include <core/CanMessage.h>
+#include <core/CanDbMessage.h>
+#include <core/CanDbSignal.h>
 #include <driver/CanInterface.h>
 
 CanTrace::CanTrace(Backend &backend, QObject *parent, int flushInterval)

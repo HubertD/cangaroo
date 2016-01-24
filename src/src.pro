@@ -19,22 +19,17 @@ macx:OBJECTS_DIR = ../build/o/mac
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
-    Backend.cpp \
-    LogModel.cpp \
-    MdiWindow.cpp
+    mainwindow.cpp \
+    MdiWindow.cpp \
 
 HEADERS  += mainwindow.h \
-    Backend.h \
-    LogModel.h \
     MdiWindow.h \
-    portable_endian.h
 
 FORMS    += mainwindow.ui
 
 RESOURCES = cangaroo.qrc
 
-include($$PWD/model/model.pri)
+include($$PWD/core/core.pri)
 include($$PWD/driver/driver.pri)
 include($$PWD/parser/dbc/dbc.pri)
 include($$PWD/window/TraceWindow/TraceWindow.pri)

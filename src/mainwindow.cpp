@@ -28,7 +28,7 @@
 #include <QCloseEvent>
 #include <QDomDocument>
 
-#include <model/MeasurementSetup.h>
+#include <core/MeasurementSetup.h>
 #include <window/TraceWindow/TraceWindow.h>
 #include <window/SetupDialog/SetupDialog.h>
 #include <window/LogWindow/LogWindow.h>

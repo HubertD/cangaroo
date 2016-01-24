@@ -27,8 +27,8 @@
 #include <QMutex>
 #include <QDateTime>
 #include <driver/CanDriver.h>
-#include <model/CanDb.h>
-#include <model/MeasurementSetup.h>
+#include <core/CanDb.h>
+#include <core/MeasurementSetup.h>
 
 class MeasurementNetwork;
 class CanTrace;

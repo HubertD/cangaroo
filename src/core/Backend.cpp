@@ -24,10 +24,10 @@
 
 #include <QDateTime>
 
-#include <model/CanTrace.h>
-#include <model/MeasurementSetup.h>
-#include <model/MeasurementNetwork.h>
-#include <model/MeasurementInterface.h>
+#include <core/CanTrace.h>
+#include <core/MeasurementSetup.h>
+#include <core/MeasurementNetwork.h>
+#include <core/MeasurementInterface.h>
 #include <driver/CanDriver.h>
 #include <driver/CanInterface.h>
 #include <driver/CanListener.h>

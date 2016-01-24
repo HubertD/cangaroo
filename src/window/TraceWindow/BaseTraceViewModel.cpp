@@ -24,10 +24,10 @@
 #include <QDateTime>
 #include <QColor>
 
-#include <Backend.h>
-#include <model/CanTrace.h>
-#include <model/CanMessage.h>
-#include <model/CanDbMessage.h>
+#include <core/Backend.h>
+#include <core/CanTrace.h>
+#include <core/CanMessage.h>
+#include <core/CanDbMessage.h>
 
 BaseTraceViewModel::BaseTraceViewModel(Backend &backend)
 {

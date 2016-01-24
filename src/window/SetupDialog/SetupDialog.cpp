@@ -26,8 +26,8 @@
 #include <QFileDialog>
 #include <QTreeWidget>
 
-#include <Backend.h>
-#include <model/MeasurementSetup.h>
+#include <core/Backend.h>
+#include <core/MeasurementSetup.h>
 #include <driver/CanInterface.h>
 #include <driver/CanDriver.h>
 

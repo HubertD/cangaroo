@@ -25,11 +25,11 @@
 #include <QList>
 #include <QVariant>
 
-#include <Backend.h>
-#include <model/MeasurementSetup.h>
-#include <model/MeasurementNetwork.h>
-#include <model/MeasurementInterface.h>
-#include <model/CanDb.h>
+#include <core/Backend.h>
+#include <core/MeasurementSetup.h>
+#include <core/MeasurementNetwork.h>
+#include <core/MeasurementInterface.h>
+#include <core/CanDb.h>
 
 class SetupDialogTreeItem
 {

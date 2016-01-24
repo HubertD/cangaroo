@@ -23,8 +23,8 @@
 #include "ui_LogWindow.h"
 
 #include <QDomDocument>
-#include <Backend.h>
-#include <LogModel.h>
+#include <core/Backend.h>
+#include <core/LogModel.h>
 
 LogWindow::LogWindow(QWidget *parent, Backend &backend) :
     MdiWindow(parent),

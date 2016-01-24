@@ -21,7 +21,7 @@
 
 #include "SelectCanInterfacesDialog.h"
 #include "ui_SelectCanInterfacesDialog.h"
-#include <Backend.h>
+#include <core/Backend.h>
 
 SelectCanInterfacesDialog::SelectCanInterfacesDialog(QWidget *parent) :
     QDialog(parent),

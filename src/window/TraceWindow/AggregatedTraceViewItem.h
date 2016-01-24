@@ -24,7 +24,7 @@
 
 
 #include <sys/time.h>
-#include <model/CanMessage.h>
+#include <core/CanMessage.h>
 #include <QList>
 
 class AggregatedTraceViewItem

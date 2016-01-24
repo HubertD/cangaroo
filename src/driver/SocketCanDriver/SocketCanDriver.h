@@ -22,8 +22,8 @@
 #ifndef SOCKETCAN_SOCKETCANDRIVER_H_
 #define SOCKETCAN_SOCKETCANDRIVER_H_
 
-#include <Backend.h>
 #include <QString>
+#include <core/Backend.h>
 #include <driver/CanDriver.h>
 
 class SocketCanInterface;

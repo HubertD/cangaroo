@@ -23,8 +23,8 @@
 #include "SetupDialogInterfacePage.h"
 #include "ui_SetupDialogInterfacePage.h"
 
-#include <Backend.h>
-#include <model/MeasurementInterface.h>
+#include <core/Backend.h>
+#include <core/MeasurementInterface.h>
 #include <window/SetupDialog/SetupDialog.h>
 #include "SocketCanInterface.h"
 

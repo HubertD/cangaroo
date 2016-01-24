@@ -25,10 +25,10 @@
 
 #include <QStringList>
 #include <QTimer>
-#include <Backend.h>
-#include <model/MeasurementSetup.h>
-#include <model/MeasurementNetwork.h>
-#include <model/MeasurementInterface.h>
+#include <core/Backend.h>
+#include <core/MeasurementSetup.h>
+#include <core/MeasurementNetwork.h>
+#include <core/MeasurementInterface.h>
 
 CanStatusWindow::CanStatusWindow(QWidget *parent, Backend &backend) :
     MdiWindow(parent),
