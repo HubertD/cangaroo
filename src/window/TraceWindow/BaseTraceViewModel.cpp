@@ -84,6 +84,15 @@ QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
     }
 }
 
+Qt::ItemFlags BaseTraceViewModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags flags = QAbstractItemModel::flags(index);
+    if (isMessageRow(index)) {
+        flags |= Qt::ItemIsDragEnabled;
+    }
+    return flags;
+}
+
 Backend *BaseTraceViewModel::backend() const
 {
     return _backend;

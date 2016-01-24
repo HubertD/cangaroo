@@ -184,6 +184,12 @@ int AggregatedTraceViewModel::rowCount(const QModelIndex &parent) const
     return parentItem->childCount();
 }
 
+bool AggregatedTraceViewModel::isMessageRow(const QModelIndex &index) const
+{
+    AggregatedTraceViewItem *item = static_cast<AggregatedTraceViewItem *>(index.internalPointer());
+    return index.isValid() && item && (item->parent() == _rootItem);
+}
+
 QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
     AggregatedTraceViewItem *item = (AggregatedTraceViewItem *)index.internalPointer();

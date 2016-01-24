@@ -40,6 +40,7 @@ public:
     virtual int rowCount(const QModelIndex &parent) const;
     virtual int columnCount(const QModelIndex &parent) const;
     virtual bool hasChildren(const QModelIndex &parent) const;
+    virtual bool isMessageRow(const QModelIndex &index) const;
 
 private slots:
     void beforeAppend(int num_messages);

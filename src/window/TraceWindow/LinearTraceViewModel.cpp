@@ -72,6 +72,11 @@ int LinearTraceViewModel::rowCount(const QModelIndex &parent) const
     }
 }
 
+bool LinearTraceViewModel::isMessageRow(const QModelIndex &index) const
+{
+    return index.isValid() && ((index.internalId() & 0x80000000)==0);
+}
+
 int LinearTraceViewModel::columnCount(const QModelIndex &parent) const
 {
     (void) parent;
