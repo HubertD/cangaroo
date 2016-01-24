@@ -20,10 +20,8 @@ macx:OBJECTS_DIR = ../build/o/mac
 
 SOURCES += main.cpp\
     mainwindow.cpp \
-    MdiWindow.cpp \
 
 HEADERS  += mainwindow.h \
-    MdiWindow.h \
 
 FORMS    += mainwindow.ui
 

@@ -28,16 +28,16 @@ class Backend;
 class QDomDocument;
 class QDomElement;
 
-class MdiWindow : public QWidget
+class ConfigurableWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MdiWindow(QWidget *parent = 0);
+    explicit ConfigurableWidget(QWidget *parent = 0);
     virtual bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
     virtual bool loadXML(Backend &backend, QDomElement &el);
 
 signals:
-    void settingsChanged(MdiWindow *sender);
+    void settingsChanged(ConfigurableWidget *sender);
 
 public slots:
 };

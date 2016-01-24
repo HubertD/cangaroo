@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <MdiWindow.h>
+#include <core/ConfigurableWidget.h>
 
 namespace Ui {
 class CanStatusWindow;
@@ -30,7 +30,7 @@ class CanStatusWindow;
 class Backend;
 class QTimer;
 
-class CanStatusWindow : public MdiWindow
+class CanStatusWindow : public ConfigurableWidget
 {
     Q_OBJECT
 

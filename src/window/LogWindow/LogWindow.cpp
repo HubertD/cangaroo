@@ -27,7 +27,7 @@
 #include <core/LogModel.h>
 
 LogWindow::LogWindow(QWidget *parent, Backend &backend) :
-    MdiWindow(parent),
+    ConfigurableWidget(parent),
     ui(new Ui::LogWindow)
 {
     connect(&backend.getLogModel(), SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
@@ -43,14 +43,14 @@ LogWindow::~LogWindow()
 
 bool LogWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
 {
-    if (!MdiWindow::saveXML(backend, xml, root)) { return false; }
+    if (!ConfigurableWidget::saveXML(backend, xml, root)) { return false; }
     root.setAttribute("type", "LogWindow");
     return true;
 }
 
 bool LogWindow::loadXML(Backend &backend, QDomElement &el)
 {
-    return MdiWindow::loadXML(backend, el);
+    return ConfigurableWidget::loadXML(backend, el);
 }
 
 void LogWindow::rowsInserted(const QModelIndex &parent, int first, int last)

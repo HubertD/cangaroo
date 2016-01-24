@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <MdiWindow.h>
+#include <core/ConfigurableWidget.h>
 #include <core/Backend.h>
 
 namespace Ui {
@@ -32,7 +32,7 @@ class QDomDocument;
 class QDomElement;
 class LogModel;
 
-class LogWindow : public MdiWindow
+class LogWindow : public ConfigurableWidget
 {
     Q_OBJECT
 

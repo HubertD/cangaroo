@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <MdiWindow.h>
+#include <core/ConfigurableWidget.h>
 #include "TraceViewTypes.h"
 
 namespace Ui {
@@ -35,7 +35,7 @@ class LinearTraceViewModel;
 class AggregatedTraceViewModel;
 class Backend;
 
-class TraceWindow : public MdiWindow
+class TraceWindow : public ConfigurableWidget
 {
     Q_OBJECT
 

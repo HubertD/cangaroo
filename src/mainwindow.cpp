@@ -150,7 +150,7 @@ bool MainWindow::loadWorkspaceTab(QDomElement el)
     }
 
     if (mw) {
-        MdiWindow *mdi = dynamic_cast<MdiWindow*>(mw->centralWidget());
+        ConfigurableWidget *mdi = dynamic_cast<ConfigurableWidget*>(mw->centralWidget());
         if (mdi) {
             mdi->loadXML(backend(), el);
         }
@@ -223,7 +223,7 @@ bool MainWindow::saveWorkspaceToFile(QString filename)
         QDomElement tabEl = doc.createElement("tab");
         tabEl.setAttribute("title", ui->mainTabs->tabText(i));
 
-        MdiWindow *mdi = dynamic_cast<MdiWindow*>(w->centralWidget());
+        ConfigurableWidget *mdi = dynamic_cast<ConfigurableWidget*>(w->centralWidget());
         if (!mdi->saveXML(backend(), doc, tabEl)) {
             backend().logMessage(log_level_error, QString("Cannot save window settings to file: %1").arg(filename));
             return false;

@@ -31,7 +31,7 @@
 #include <core/MeasurementInterface.h>
 
 CanStatusWindow::CanStatusWindow(QWidget *parent, Backend &backend) :
-    MdiWindow(parent),
+    ConfigurableWidget(parent),
     ui(new Ui::CanStatusWindow),
     _backend(backend),
     _timer(new QTimer(this))

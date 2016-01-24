@@ -27,7 +27,7 @@
 #include <core/Backend.h>
 
 GraphWindow::GraphWindow(QWidget *parent, Backend &backend) :
-    MdiWindow(parent),
+    ConfigurableWidget(parent),
     ui(new Ui::GraphWindow),
     _backend(backend)
 {
@@ -41,13 +41,13 @@ GraphWindow::~GraphWindow()
 
 bool GraphWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
 {
-    if (!MdiWindow::saveXML(backend, xml, root)) { return false; }
+    if (!ConfigurableWidget::saveXML(backend, xml, root)) { return false; }
     root.setAttribute("type", "GraphWindow");
     return true;
 }
 
 bool GraphWindow::loadXML(Backend &backend, QDomElement &el)
 {
-    if (!MdiWindow::loadXML(backend, el)) { return false; }
+    if (!ConfigurableWidget::loadXML(backend, el)) { return false; }
     return true;
 }

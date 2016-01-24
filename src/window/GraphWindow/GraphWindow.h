@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include <MdiWindow.h>
 #include <core/Backend.h>
+#include <core/ConfigurableWidget.h>
 #include <core/MeasurementSetup.h>
 
 namespace Ui {
@@ -32,7 +32,7 @@ class GraphWindow;
 class QDomDocument;
 class QDomElement;
 
-class GraphWindow : public MdiWindow
+class GraphWindow : public ConfigurableWidget
 {
     Q_OBJECT
 

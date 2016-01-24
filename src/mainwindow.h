@@ -39,7 +39,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class MdiWindow;
+class ConfigurableWidget;
 class SetupDialog;
 
 class MainWindow : public QMainWindow

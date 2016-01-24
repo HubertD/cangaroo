@@ -28,7 +28,7 @@
 #include "AggregatedTraceViewModel.h"
 
 TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
-    MdiWindow(parent),
+    ConfigurableWidget(parent),
     ui(new Ui::TraceWindow),
     _backend(&backend)
 {
@@ -128,7 +128,7 @@ void TraceWindow::setTimestampMode(int mode)
 
 bool TraceWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
 {
-    if (!MdiWindow::saveXML(backend, xml, root)) {
+    if (!ConfigurableWidget::saveXML(backend, xml, root)) {
         return false;
     }
 
@@ -149,7 +149,7 @@ bool TraceWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root
 
 bool TraceWindow::loadXML(Backend &backend, QDomElement &el)
 {
-    if (!MdiWindow::loadXML(backend, el)) {
+    if (!ConfigurableWidget::loadXML(backend, el)) {
         return false;
     }
 

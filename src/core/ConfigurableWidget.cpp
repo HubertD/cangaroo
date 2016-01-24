@@ -19,17 +19,16 @@
 
 */
 
-#include "MdiWindow.h"
-
+#include "ConfigurableWidget.h"
 #include <QDomDocument>
 #include <core/Backend.h>
 
-MdiWindow::MdiWindow(QWidget *parent) : QWidget(parent)
+ConfigurableWidget::ConfigurableWidget(QWidget *parent) : QWidget(parent)
 {
 
 }
 
-bool MdiWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
+bool ConfigurableWidget::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
 {
     (void) backend;
     (void) xml;
@@ -37,7 +36,7 @@ bool MdiWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
     return true;
 }
 
-bool MdiWindow::loadXML(Backend &backend, QDomElement &el)
+bool ConfigurableWidget::loadXML(Backend &backend, QDomElement &el)
 {
     (void) backend;
     (void) el;
