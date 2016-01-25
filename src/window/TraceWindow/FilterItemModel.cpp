@@ -21,6 +21,13 @@
 
 
 #include "FilterItemModel.h"
+
+#include <QMimeData>
+#include <QDataStream>
+#include <QIODevice>
+
+#include <core/Log.h>
+
 #include "FilterSet.h"
 #include "FilterItem.h"
 
@@ -137,19 +144,69 @@ QVariant FilterItemModel::data(const QModelIndex &index, int role) const
             case node_root:
                 return "root";
             case node_filter_set:
+            case node_filter_item:
                 return obj->property("title");
             case node_accept_list:
                 return "accept";
             case node_drop_list:
                 return "drop";
-            case node_filter_item:
-                return "condition";
             default:
                 return "unknown";
         }
     } else {
         return QVariant();
     }
+}
+
+QStringList FilterItemModel::mimeTypes() const
+{
+    QStringList types;
+    types << "application/org.cangaroo.can.message";
+    return types;
+}
+
+bool FilterItemModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+    Q_UNUSED(action);
+    Q_UNUSED(row);
+    Q_UNUSED(column);
+    Q_UNUSED(parent);
+
+    if (data->hasFormat("application/org.cangaroo.can.message")) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool FilterItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+{
+    if (!canDropMimeData(data, action, row, column, parent)) {
+        return false;
+    }
+
+    if (action == Qt::IgnoreAction) {
+        return true;
+    }
+
+    QObject *p = (QObject*) parent.internalPointer();
+    if (!p) { return false; }
+
+    if ((getNodeType(p)==node_accept_list) || (getNodeType(p)==node_drop_list)) {
+
+        QByteArray encodedData = data->data("application/org.cangaroo.can.message");
+        QDataStream stream(&encodedData, QIODevice::ReadOnly);
+        while (!stream.atEnd()) {
+            QString text;
+            stream >> text;
+
+            beginInsertRows(parent, p->children().count(), p->children().count());
+            QObject *item = createObjectNode(p, node_filter_item);
+            item->setProperty("title", text);
+            endInsertRows();
+        }
+    }
+    return true;
 }
 
 QObject *FilterItemModel::addFilterSet(QString title)

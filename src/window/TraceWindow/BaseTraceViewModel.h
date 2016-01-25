@@ -22,6 +22,8 @@
 #pragma once
 
 #include <QAbstractItemModel>
+#include <QMimeData>
+#include <QStringList>
 #include "TraceViewTypes.h"
 
 class Backend;
@@ -52,6 +54,8 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
     virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+    virtual QStringList mimeTypes() const;
+    virtual QMimeData *mimeData(const QModelIndexList &indexes) const;
 
     Backend *backend() const;
     CanTrace *trace() const;

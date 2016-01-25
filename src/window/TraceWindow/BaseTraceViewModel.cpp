@@ -21,6 +21,8 @@
 
 #include "BaseTraceViewModel.h"
 
+#include <QDataStream>
+#include <QIODevice>
 #include <QDateTime>
 #include <QColor>
 
@@ -91,6 +93,28 @@ Qt::ItemFlags BaseTraceViewModel::flags(const QModelIndex &index) const
         flags |= Qt::ItemIsDragEnabled;
     }
     return flags;
+}
+
+QStringList BaseTraceViewModel::mimeTypes() const
+{
+    QStringList types;
+    types << "application/org.cangaroo.can.message";
+    return types;
+}
+
+QMimeData *BaseTraceViewModel::mimeData(const QModelIndexList &indexes) const
+{
+    QMimeData *mimeData = new QMimeData();
+    QByteArray encodedData;
+    QDataStream stream(&encodedData, QIODevice::WriteOnly);
+    foreach (const QModelIndex &index, indexes) {
+        if (index.isValid() && (index.column()==3)) {
+            QString text = data(index, Qt::DisplayRole).toString();
+            stream << text;
+        }
+    }
+    mimeData->setData("application/org.cangaroo.can.message", encodedData);
+    return mimeData;
 }
 
 Backend *BaseTraceViewModel::backend() const

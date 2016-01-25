@@ -23,6 +23,7 @@
 #pragma once
 
 #include <QObject>
+#include <QStringList>
 #include <QAbstractItemModel>
 #include "FilterSetup.h"
 
@@ -43,6 +44,10 @@ public:
 
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
+
+    virtual QStringList mimeTypes() const;
+    virtual bool canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+    virtual bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
 
     QObject *addFilterSet(QString title);
 
