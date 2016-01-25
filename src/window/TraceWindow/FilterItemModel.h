@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <QObject>
 #include <QAbstractItemModel>
 #include "FilterSetup.h"
 
@@ -32,8 +33,10 @@ class FilterItemModel : public QAbstractItemModel
 public:
     FilterItemModel();
 
+    QModelIndex rootIndex();
     virtual QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    virtual QModelIndex parent(const QModelIndex &child) const;
+    virtual QModelIndex parent(const QModelIndex &index) const;
+    Qt::ItemFlags flags(const QModelIndex &index) const;
 
     virtual int rowCount(const QModelIndex &parent) const;
     virtual int columnCount(const QModelIndex &parent) const;
@@ -41,7 +44,22 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
 
+    QObject *addFilterSet(QString title);
+
 private:
-    FilterSetup _setup;
+
+    typedef enum {
+        node_unknown,
+        node_root,
+        node_filter_set,
+        node_accept_list,
+        node_drop_list,
+        node_filter_item
+    } node_type_t;
+
+    QObject *createObjectNode(QObject *parent, node_type_t type);
+    node_type_t getNodeType(const QObject *obj) const;
+
+    QObject *root;
 
 };

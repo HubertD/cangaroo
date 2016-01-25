@@ -37,8 +37,9 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ui->setupUi(this);
 
     FilterItemModel *filterModel = new FilterItemModel();
-
     ui->filterTree->setModel(filterModel);
+    ui->filterTree->setRootIndex(filterModel->rootIndex());
+    ui->filterTree->expandAll();
 
     _linearTraceViewModel = new LinearTraceViewModel(backend);
     _linearProxyModel = new QSortFilterProxyModel(this);

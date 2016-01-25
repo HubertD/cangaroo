@@ -24,20 +24,48 @@
 #include "FilterSet.h"
 #include "FilterItem.h"
 
-enum {
-    node_root,
-    node_filter_set,
-    node_accept_list,
-    node_drop_list,
-    node_filter_item
-};
-
 FilterItemModel::FilterItemModel()
 {
-    FilterSet *set = new FilterSet(&_setup);
-    set->setProperty("type", node_filter_set);
-    set->acceptList().setProperty("type", node_accept_list);
-    set->dropList().setProperty("type", node_drop_list);
+    root = createObjectNode(0, node_root);
+    addFilterSet("Filterset 1");
+    addFilterSet("Filterset 2");
+}
+
+QModelIndex FilterItemModel::rootIndex()
+{
+    return createIndex(0, 0, root);
+}
+
+QObject *FilterItemModel::createObjectNode(QObject *parent, FilterItemModel::node_type_t type)
+{
+    QObject *retval = new QObject(parent);
+    retval->setProperty("type", type);
+    return retval;
+}
+
+FilterItemModel::node_type_t FilterItemModel::getNodeType(const QObject *obj) const
+{
+    if (obj) {
+        return (node_type_t)obj->property("type").toInt();
+    } else {
+        return node_unknown;
+    }
+}
+
+int FilterItemModel::columnCount(const QModelIndex &parent) const
+{
+    (void) parent;
+    return 1;
+}
+
+int FilterItemModel::rowCount(const QModelIndex &parent) const
+{
+    if (parent.isValid()) {
+        QObject *obj = (QObject*) parent.internalPointer();
+        return obj->children().size();
+    } else {
+        return 1;
+    }
 }
 
 QModelIndex FilterItemModel::index(int row, int column, const QModelIndex &parent) const
@@ -50,22 +78,45 @@ QModelIndex FilterItemModel::index(int row, int column, const QModelIndex &paren
             return QModelIndex();
         }
     } else {
-        return createIndex(row, column, _setup.children().at(row));
+        return createIndex(row, column, root);
     }
 }
 
-QModelIndex FilterItemModel::parent(const QModelIndex &child) const
+QModelIndex FilterItemModel::parent(const QModelIndex &index) const
 {
-    if (child.isValid()) {
-        QObject *obj = (QObject*) child.internalPointer();
-        QObject *p = obj ? obj->parent() : 0;
-
-        if (p && p->parent()) {
-            return createIndex(p->parent()->children().indexOf(p), 0, p);
-        }
+    QObject *obj = (QObject*) index.internalPointer();
+    if (!index.isValid() || (obj==root) || (!obj)) {
+        return QModelIndex();
     }
 
-    return QModelIndex();
+    QObject *p = obj->parent();
+    if (!p) {
+        return QModelIndex();
+    } else if (p==root) {
+        return createIndex(0, 0, p);
+    } else {
+        return createIndex(p->parent()->children().indexOf(p), 0, p);
+    }
+}
+
+Qt::ItemFlags FilterItemModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags flags = QAbstractItemModel::flags(index);
+    QObject *obj = (QObject*) index.internalPointer();
+
+    switch (getNodeType(obj)) {
+        case node_accept_list:
+        case node_drop_list:
+            flags |= Qt::ItemIsDropEnabled;
+            break;
+        case node_filter_item:
+            flags |= Qt::ItemIsDragEnabled;
+            break;
+        default:
+            break;
+    }
+
+    return flags;
 }
 
 QVariant FilterItemModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -82,9 +133,11 @@ QVariant FilterItemModel::data(const QModelIndex &index, int role) const
 
         QObject *obj = (QObject*) index.internalPointer();
 
-        switch (obj->property("type").toInt()) {
+        switch (getNodeType(obj)) {
+            case node_root:
+                return "root";
             case node_filter_set:
-                return "Filterset";
+                return obj->property("title");
             case node_accept_list:
                 return "accept";
             case node_drop_list:
@@ -99,18 +152,12 @@ QVariant FilterItemModel::data(const QModelIndex &index, int role) const
     }
 }
 
-int FilterItemModel::columnCount(const QModelIndex &parent) const
+QObject *FilterItemModel::addFilterSet(QString title)
 {
-    (void) parent;
-    return 1;
+    QObject *fs = createObjectNode(root, node_filter_set);
+    fs->setProperty("title", title);
+    createObjectNode(fs, node_accept_list);
+    createObjectNode(fs, node_drop_list);
+    return fs;
 }
 
-int FilterItemModel::rowCount(const QModelIndex &parent) const
-{
-    if (parent.isValid()) {
-        QObject *obj = (QObject*) parent.internalPointer();
-        return obj->children().size();
-    } else {
-        return _setup.children().count();
-    }
-}

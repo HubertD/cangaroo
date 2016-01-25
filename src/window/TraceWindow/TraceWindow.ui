@@ -32,7 +32,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QTabWidget" name="leftStack">
-      <widget class="QWidget" name="leftStackPage1" native="true">
+      <widget class="QWidget" name="leftStackPage1">
        <attribute name="title">
         <string>Filters</string>
        </attribute>
@@ -56,6 +56,9 @@
           </property>
           <property name="lineWidth">
            <number>0</number>
+          </property>
+          <property name="dragDropMode">
+           <enum>QAbstractItemView::DragDrop</enum>
           </property>
          </widget>
         </item>
@@ -138,7 +141,20 @@
         </widget>
        </item>
        <item>
-        <widget class="QTreeView" name="tree"/>
+        <widget class="QTreeView" name="tree">
+         <property name="dragEnabled">
+          <bool>true</bool>
+         </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::DragOnly</enum>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
