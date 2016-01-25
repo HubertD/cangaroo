@@ -1,7 +1,7 @@
 #include "PeakCanInterface.h"
 #include "PeakCanDriver.h"
 
-#include <model/MeasurementInterface.h>
+#include <core/MeasurementInterface.h>
 #include <windows.h>
 #include "pcan-basic-api/Include/PCANBasic.h"
 
@@ -130,43 +130,43 @@ void PeakCanInterface::open()
 
     result = CAN_SetValue(_handle, PCAN_BITRATE_ADAPTING, &bitrate_adapt, sizeof(bitrate_adapt));
     if (result!=PCAN_ERROR_OK) {
-        Backend::instance().logMessage(log_level_error, QString("could not set bitrate adapt parameter for CAN channel %1: %2").arg(getName()).arg(getErrorText(result)));
+        log_error(QString("could not set bitrate adapt parameter for CAN channel %1: %2").arg(getName()).arg(getErrorText(result)));
     }
 
     uint32_t listen_only = _config.listenOnly ? PCAN_PARAMETER_ON : PCAN_PARAMETER_OFF;
     result = CAN_SetValue(_handle, PCAN_LISTEN_ONLY, &listen_only, sizeof(listen_only));
     if (result!=PCAN_ERROR_OK) {
-        Backend::instance().logMessage(log_level_error, QString("could not set listen only mode=%3 for CAN channel %1: %2").arg(getName()).arg(getErrorText(result)).arg(_config.listenOnly ? "on" : "off"));
+        log_error(QString("could not set listen only mode=%3 for CAN channel %1: %2").arg(getName()).arg(getErrorText(result)).arg(_config.listenOnly ? "on" : "off"));
     }
 
     uint16_t bitrate_mode = calcBitrateMode(_config.bitrate);
     if (bitrate_mode==0) {
-        Backend::instance().logMessage(log_level_error, QString("CAN channel %1: cannot find bitrate settings for baud rate: %2").arg(getName()).arg(bitrate_mode));
+        log_error(QString("CAN channel %1: cannot find bitrate settings for baud rate: %2").arg(getName()).arg(bitrate_mode));
         return;
     }
 
     result = CAN_Initialize(_handle, bitrate_mode);
 
     if ( (result!=PCAN_ERROR_OK) && (result != PCAN_ERROR_CAUTION) ) {
-        Backend::instance().logMessage(log_level_error, QString("could not initialize CAN channel %1: %2").arg(getName()).arg(getErrorText(result)));
+        log_error(QString("could not initialize CAN channel %1: %2").arg(getName()).arg(getErrorText(result)));
         return;
     }
 
-    Backend::instance().logMessage(log_level_info, QString("CAN channel %1 initialized").arg(getName()));
+    log_info(QString("CAN channel %1 initialized").arg(getName()));
     if (getBitrate() == _config.bitrate) {
-        Backend::instance().logMessage(log_level_info, QString("setting bitrate of CAN channel %1 to %2").arg(getName()).arg(getBitrate()));
+        log_info(QString("setting bitrate of CAN channel %1 to %2").arg(getName()).arg(getBitrate()));
     } else {
-        Backend::instance().logMessage(log_level_warning, QString("could not set correct bitrate for CAN channel %1: bitrate is now %2 instead of configured %3").arg(getName()).arg(getBitrate()).arg(_config.bitrate));
+        log_warning(QString("could not set correct bitrate for CAN channel %1: bitrate is now %2 instead of configured %3").arg(getName()).arg(getBitrate()).arg(_config.bitrate));
     }
 
     if (CAN_SetValue(_handle, PCAN_RECEIVE_EVENT, &_autoResetEvent, sizeof(_autoResetEvent))!=PCAN_ERROR_OK) {
-        Backend::instance().logMessage(log_level_error, QString("could not set read event for CAN channel: %1").arg(getName()));
+        log_error(QString("could not set read event for CAN channel: %1").arg(getName()));
     }
 
     uint32_t autoreset = _config.autoRestart ? PCAN_PARAMETER_ON : PCAN_PARAMETER_OFF;
     result = CAN_SetValue(_handle, PCAN_BUSOFF_AUTORESET, &autoreset, sizeof(autoreset));
     if (result!=PCAN_ERROR_OK) {
-        Backend::instance().logMessage(log_level_error, QString("could not set busoff auto reset mode=%3 for CAN channel %1: %2").arg(getName()).arg(getErrorText(result)).arg(_config.autoRestart ? "on" : "off"));
+        log_error(QString("could not set busoff auto reset mode=%3 for CAN channel %1: %2").arg(getName()).arg(getErrorText(result)).arg(_config.autoRestart ? "on" : "off"));
     }
 
 }
@@ -174,7 +174,7 @@ void PeakCanInterface::open()
 void PeakCanInterface::close()
 {
     CAN_Uninitialize(_handle);
-    Backend::instance().logMessage(log_level_info, QString("CAN channel %1 uninitialized").arg(getName()));
+    log_info(QString("CAN channel %1 uninitialized").arg(getName()));
 }
 
 uint32_t PeakCanInterface::getState()

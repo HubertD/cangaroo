@@ -1,8 +1,8 @@
 #include "PeakCanSetupPage.h"
 #include "ui_PeakCanSetupPage.h"
 
-#include <Backend.h>
-#include <model/MeasurementInterface.h>
+#include <core/Backend.h>
+#include <core/MeasurementInterface.h>
 #include <window/SetupDialog/SetupDialog.h>
 #include "PeakCanInterface.h"
 
