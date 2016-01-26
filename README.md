@@ -8,6 +8,7 @@ written by Hubert Denkmair <hubert@denkmair.de>
 ### v0.2.1 unreleased
 * make logging easier
 * refactorings
+* scroll trace view per pixel, not per item (always show last message when autoscroll is on)
 
 ### v0.2.0 released 2016-01-24
 * docking windows system instead of MDI interface
