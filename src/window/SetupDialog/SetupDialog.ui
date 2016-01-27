@@ -112,7 +112,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="emptyPage"/>
          <widget class="QWidget" name="networkPage">
@@ -229,14 +229,14 @@
               <item>
                <widget class="QPushButton" name="btAddDatabase">
                 <property name="text">
-                 <string>add &amp;database...</string>
+                 <string>Add &amp;Database...</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="btRemoveDatabase">
                 <property name="text">
-                 <string>&amp;remove database</string>
+                 <string>&amp;Remove Database</string>
                 </property>
                </widget>
               </item>
