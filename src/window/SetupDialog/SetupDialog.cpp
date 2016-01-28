@@ -109,6 +109,10 @@ bool SetupDialog::showSetupDialog(MeasurementSetup &setup)
 {
     model->load(setup);
     ui->treeView->expandAll();
+
+    QModelIndex first = model->index(0, 0, QModelIndex());
+    ui->treeView->setCurrentIndex(first);
+
     updateButtons();
     return exec()==QDialog::Accepted;
 }
