@@ -86,6 +86,12 @@ QVariant BaseTraceViewModel::data(const QModelIndex &index, int role) const
     }
 }
 
+const CanMessage *BaseTraceViewModel::canMessageAtIndex(const QModelIndex &index) const
+{
+    (void) index;
+    return 0;
+}
+
 Qt::ItemFlags BaseTraceViewModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = QAbstractItemModel::flags(index);
@@ -108,9 +114,11 @@ QMimeData *BaseTraceViewModel::mimeData(const QModelIndexList &indexes) const
     QByteArray encodedData;
     QDataStream stream(&encodedData, QIODevice::WriteOnly);
     foreach (const QModelIndex &index, indexes) {
-        if (index.isValid() && (index.column()==3)) {
-            QString text = data(index, Qt::DisplayRole).toString();
-            stream << text;
+        if (index.isValid() && (index.column()==0)) {
+            const CanMessage *msg = canMessageAtIndex(index);
+            if (msg) {
+                stream << *msg;
+            }
         }
     }
     mimeData->setData("application/org.cangaroo.can.message", encodedData);

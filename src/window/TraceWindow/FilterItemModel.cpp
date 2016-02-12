@@ -27,6 +27,7 @@
 #include <QIODevice>
 
 #include <core/Log.h>
+#include <core/CanMessage.h>
 
 #include "FilterSet.h"
 #include "FilterItem.h"
@@ -197,12 +198,12 @@ bool FilterItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
         QByteArray encodedData = data->data("application/org.cangaroo.can.message");
         QDataStream stream(&encodedData, QIODevice::ReadOnly);
         while (!stream.atEnd()) {
-            QString text;
-            stream >> text;
+            CanMessage msg;
+            stream >> msg;
 
             beginInsertRows(parent, p->children().count(), p->children().count());
             QObject *item = createObjectNode(p, node_filter_item);
-            item->setProperty("title", text);
+            item->setProperty("title", msg.getIdString());
             endInsertRows();
         }
     }

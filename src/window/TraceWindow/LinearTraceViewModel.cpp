@@ -77,6 +77,16 @@ bool LinearTraceViewModel::isMessageRow(const QModelIndex &index) const
     return index.isValid() && ((index.internalId() & 0x80000000)==0);
 }
 
+const CanMessage *LinearTraceViewModel::canMessageAtIndex(const QModelIndex &index) const
+{
+    if (isMessageRow(index)) {
+        quintptr id = index.internalId();
+        return trace()->getMessage(id-1);;
+    } else {
+        return 0;
+    }
+}
+
 int LinearTraceViewModel::columnCount(const QModelIndex &parent) const
 {
     (void) parent;

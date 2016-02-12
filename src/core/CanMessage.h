@@ -91,4 +91,10 @@ private:
 	};
     struct timeval _timestamp;
 
+    friend QDataStream &operator<<(QDataStream &stream, const CanMessage &msg);
+    friend QDataStream &operator>>(QDataStream &stream, CanMessage &msg);
+
 };
+
+QDataStream &operator<<(QDataStream &stream, const CanMessage &msg);
+QDataStream &operator>>(QDataStream &stream, CanMessage &msg);

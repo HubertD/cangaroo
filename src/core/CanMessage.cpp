@@ -20,9 +20,10 @@
 */
 
 
-
 #include "CanMessage.h"
+#include <QDataStream>
 #include <core/portable_endian.h>
+
 
 enum {
 	id_flag_extended = 0x80000000,
@@ -308,4 +309,31 @@ QString CanMessage::getDataHexString() const
         default: return QString();
     }
 
+}
+
+QDataStream &operator<<(QDataStream &stream, const CanMessage &msg)
+{
+    stream << msg._raw_id;
+    stream << msg._dlc;
+    stream << msg._interface;
+    stream << msg._u32[0];
+    stream << msg._u32[1];
+    stream << (uint32_t)msg._timestamp.tv_sec;
+    stream << (uint32_t)msg._timestamp.tv_usec;
+    return stream;
+}
+
+QDataStream &operator>>(QDataStream &stream, CanMessage &msg)
+{
+    uint32_t u32;
+    stream >> msg._raw_id;
+    stream >> msg._dlc;
+    stream >> msg._interface;
+    stream >> msg._u32[0];
+    stream >> msg._u32[1];
+    stream >> u32;
+    msg._timestamp.tv_sec = u32;
+    stream >> u32;
+    msg._timestamp.tv_usec = u32;
+    return stream;
 }
