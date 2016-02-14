@@ -250,9 +250,11 @@ bool FilterItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
 
             QModelIndex index = dragIndex.toModelIndex();
             QObject *obj = (QObject*) data->property("dragObject").value<void*>();
-            beginMoveRows(index.parent(), index.row(), index.row(), parent, p->children().count());
-            obj->setParent(p);
-            endMoveRows();
+            if (obj->parent() != p) {
+                beginMoveRows(index.parent(), index.row(), index.row(), parent, p->children().count());
+                obj->setParent(p);
+                endMoveRows();
+            }
 
         } else {
 
