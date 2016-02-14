@@ -1,6 +1,6 @@
 /*
 
-  Copyright (c) 2015, 2016 Hubert Denkmair <hubert@denkmair.de>
+  Copyright (c) 2016 Hubert Denkmair <hubert@denkmair.de>
 
   This file is part of cangaroo.
 
@@ -19,18 +19,24 @@
 
 */
 
+
 #pragma once
 
-typedef enum timestamp_mode {
-    timestamp_mode_absolute,
-    timestamp_mode_relative,
-    timestamp_mode_delta,
-    timestamp_modes_count
-} timestamp_mode_t;
+#include <QList>
+#include "TraceViewTypes.h"
+#include "FilterACLRule.h"
+#include <core/CanMessage.h>
 
-typedef enum {
-    acl_action_continue,
-    acl_action_drop,
-    acl_action_pass
-} acl_action_t;
+class FilterACL
+{
+public:
+    FilterACL();
+    void clear();
+    void setDefaultAction(acl_action_t action);
+    void addRule(const FilterACLRule &rule);
 
+    acl_action_t test(const CanMessage &msg);
+private:
+    acl_action_t _defaultAction;
+    QList<FilterACLRule> _rules;
+};

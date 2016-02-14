@@ -4,7 +4,9 @@ SOURCES += \
     $$PWD/BaseTraceViewModel.cpp \
     $$PWD/AggregatedTraceViewItem.cpp \
     $$PWD/TraceWindow.cpp \
-    $$PWD/FilterItemModel.cpp
+    $$PWD/FilterItemModel.cpp \
+    $$PWD/FilterACL.cpp \
+    $$PWD/FilterACLRule.cpp
 
 HEADERS  += \
     $$PWD/LinearTraceViewModel.h \
@@ -13,7 +15,9 @@ HEADERS  += \
     $$PWD/AggregatedTraceViewItem.h \
     $$PWD/TraceWindow.h \
     $$PWD/TraceViewTypes.h \
-    $$PWD/FilterItemModel.h
+    $$PWD/FilterItemModel.h \
+    $$PWD/FilterACL.h \
+    $$PWD/FilterACLRule.h
 
 FORMS    += \
     $$PWD/TraceWindow.ui

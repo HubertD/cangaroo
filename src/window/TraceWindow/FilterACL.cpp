@@ -1,6 +1,6 @@
 /*
 
-  Copyright (c) 2015, 2016 Hubert Denkmair <hubert@denkmair.de>
+  Copyright (c) 2016 Hubert Denkmair <hubert@denkmair.de>
 
   This file is part of cangaroo.
 
@@ -19,18 +19,37 @@
 
 */
 
-#pragma once
 
-typedef enum timestamp_mode {
-    timestamp_mode_absolute,
-    timestamp_mode_relative,
-    timestamp_mode_delta,
-    timestamp_modes_count
-} timestamp_mode_t;
+#include "FilterACL.h"
 
-typedef enum {
-    acl_action_continue,
-    acl_action_drop,
-    acl_action_pass
-} acl_action_t;
+FilterACL::FilterACL()
+{
+    clear();
+}
 
+void FilterACL::clear()
+{
+    setDefaultAction(acl_action_continue);
+    _rules.clear();
+}
+
+void FilterACL::setDefaultAction(acl_action_t action)
+{
+    _defaultAction = action;
+}
+
+void FilterACL::addRule(const FilterACLRule &rule)
+{
+    _rules.append(rule);
+}
+
+acl_action_t FilterACL::test(const CanMessage &msg)
+{
+    foreach (FilterACLRule rule, _rules) {
+        acl_action_t action = rule.test(msg);
+        if (action != acl_action_continue) {
+            return action;
+        }
+    }
+    return _defaultAction;
+}

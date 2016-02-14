@@ -1,6 +1,6 @@
 /*
 
-  Copyright (c) 2015, 2016 Hubert Denkmair <hubert@denkmair.de>
+  Copyright (c) 2016 Hubert Denkmair <hubert@denkmair.de>
 
   This file is part of cangaroo.
 
@@ -19,18 +19,20 @@
 
 */
 
-#pragma once
 
-typedef enum timestamp_mode {
-    timestamp_mode_absolute,
-    timestamp_mode_relative,
-    timestamp_mode_delta,
-    timestamp_modes_count
-} timestamp_mode_t;
+#include "FilterACLRule.h"
 
-typedef enum {
-    acl_action_continue,
-    acl_action_drop,
-    acl_action_pass
-} acl_action_t;
+FilterACLRule::FilterACLRule(uint32_t can_id, acl_action_t action)
+  : _can_id(can_id), _action(action)
+{
 
+}
+
+acl_action_t FilterACLRule::test(const CanMessage &msg)
+{
+    if (msg.getId() == _can_id) {
+        return _action;
+    } else {
+        return acl_action_continue;
+    }
+}
