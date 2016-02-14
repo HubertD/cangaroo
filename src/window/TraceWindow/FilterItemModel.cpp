@@ -29,9 +29,6 @@
 #include <core/Log.h>
 #include <core/CanMessage.h>
 
-#include "FilterSet.h"
-#include "FilterItem.h"
-
 FilterItemModel::FilterItemModel()
 {
     root = createObjectNode(0, node_root);
@@ -164,6 +161,27 @@ QStringList FilterItemModel::mimeTypes() const
     QStringList types;
     types << "application/org.cangaroo.can.message";
     return types;
+}
+
+QMimeData *FilterItemModel::mimeData(const QModelIndexList &indexes) const
+{
+    QMimeData *mimeData = new QMimeData();
+    QByteArray encodedData;
+    QDataStream stream(&encodedData, QIODevice::WriteOnly);
+    foreach (const QModelIndex &index, indexes) {
+        if (index.isValid() && (index.column()==0)) {
+            QObject *obj = (QObject*) index.internalPointer();
+
+            if (getNodeType(obj) == node_filter_item) {
+                CanMessage msg;
+                msg.setId(obj->property("title").toInt());
+                msg.setId(0x123);
+                stream << msg;
+            }
+        }
+    }
+    mimeData->setData("application/org.cangaroo.can.message", encodedData);
+    return mimeData;
 }
 
 bool FilterItemModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
