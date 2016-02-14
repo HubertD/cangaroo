@@ -45,6 +45,9 @@ QObject *FilterItemModel::createObjectNode(QObject *parent, FilterItemModel::nod
 {
     QObject *retval = new QObject(parent);
     retval->setProperty("type", type);
+    if (type==node_filter_set) {
+        retval->setProperty("checked", true);
+    }
     return retval;
 }
 
@@ -110,6 +113,9 @@ Qt::ItemFlags FilterItemModel::flags(const QModelIndex &index) const
     QObject *obj = (QObject*) index.internalPointer();
 
     switch (getNodeType(obj)) {
+        case node_filter_set:
+            flags |= Qt::ItemIsUserCheckable;
+            break;
         case node_accept_list:
         case node_drop_list:
             flags |= Qt::ItemIsDropEnabled;
@@ -151,8 +157,32 @@ QVariant FilterItemModel::data(const QModelIndex &index, int role) const
             default:
                 return "unknown";
         }
+
+    } else if (role == Qt::CheckStateRole) {
+
+        QObject *obj = (QObject*) index.internalPointer();
+        switch (getNodeType(obj)) {
+            case node_filter_set:
+                return obj->property("checked").toBool() ? Qt::Checked : Qt::Unchecked;
+            default:
+                return QVariant();
+        }
+
+
     } else {
         return QVariant();
+    }
+}
+
+bool FilterItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (role == Qt::CheckStateRole) {
+        QObject *obj = (QObject*) index.internalPointer();
+        bool wasChecked = obj->property("checked").toBool();
+        obj->setProperty("checked", !wasChecked);
+        return true;
+    } else {
+        return QAbstractItemModel::setData(index, value, role);
     }
 }
 
