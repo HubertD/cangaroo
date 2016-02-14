@@ -190,6 +190,7 @@ QStringList FilterItemModel::mimeTypes() const
 {
     QStringList types;
     types << "application/org.cangaroo.can.message";
+    types << "application/org.cangaroo.can.message_filter";
     return types;
 }
 
@@ -204,10 +205,11 @@ QMimeData *FilterItemModel::mimeData(const QModelIndexList &indexes) const
 
             if (getNodeType(obj) == node_filter_item) {
                 CanMessage msg;
-                msg.setId(obj->property("title").toInt());
-                msg.setId(0x123);
+                msg.setId(obj->property("can_id").toInt());
                 stream << msg;
             }
+            mimeData->setProperty("dragIndex", index);
+            mimeData->setProperty("dragObject", QVariant::fromValue((void*)obj));
         }
     }
     mimeData->setData("application/org.cangaroo.can.message", encodedData);
@@ -223,9 +225,9 @@ bool FilterItemModel::canDropMimeData(const QMimeData *data, Qt::DropAction acti
 
     if (data->hasFormat("application/org.cangaroo.can.message")) {
         return true;
-    } else {
-        return false;
     }
+
+    return false;
 }
 
 bool FilterItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
@@ -243,16 +245,30 @@ bool FilterItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
 
     if ((getNodeType(p)==node_accept_list) || (getNodeType(p)==node_drop_list)) {
 
-        QByteArray encodedData = data->data("application/org.cangaroo.can.message");
-        QDataStream stream(&encodedData, QIODevice::ReadOnly);
-        while (!stream.atEnd()) {
-            CanMessage msg;
-            stream >> msg;
+        QVariant dragIndex = data->property("dragIndex");
+        if (dragIndex.isValid()) {
 
-            beginInsertRows(parent, p->children().count(), p->children().count());
-            QObject *item = createObjectNode(p, node_filter_item);
-            item->setProperty("title", msg.getIdString());
-            endInsertRows();
+            QModelIndex index = dragIndex.toModelIndex();
+            QObject *obj = (QObject*) data->property("dragObject").value<void*>();
+            beginMoveRows(index.parent(), index.row(), index.row(), parent, p->children().count());
+            obj->setParent(p);
+            endMoveRows();
+
+        } else {
+
+            QByteArray encodedData = data->data("application/org.cangaroo.can.message");
+            QDataStream stream(&encodedData, QIODevice::ReadOnly);
+            while (!stream.atEnd()) {
+                CanMessage msg;
+                stream >> msg;
+
+                beginInsertRows(parent, p->children().count(), p->children().count());
+                QObject *item = createObjectNode(p, node_filter_item);
+                item->setProperty("title", msg.getIdString());
+                item->setProperty("can_id", msg.getId());
+                endInsertRows();
+            }
+
         }
     }
     return true;
