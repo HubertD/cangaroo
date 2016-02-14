@@ -26,6 +26,8 @@
 #include <QStringList>
 #include <QAbstractItemModel>
 
+#include "FilterACL.h"
+
 class FilterItemModel : public QAbstractItemModel
 {
     Q_OBJECT
@@ -51,6 +53,10 @@ public:
     virtual bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
 
     QObject *addFilterSet(QString title);
+    FilterACL const &acl() const;
+
+signals:
+    void aclChanged(FilterACL &acl);
 
 private:
 
@@ -63,9 +69,15 @@ private:
         node_filter_item
     } node_type_t;
 
+    QObject *root;
+    FilterACL _acl;
+
     QObject *createObjectNode(QObject *parent, node_type_t type);
     node_type_t getNodeType(const QObject *obj) const;
+    bool isNodeChecked(const QObject *obj) const;
+    void setNodeChecked(QObject &obj, bool isChecked);
 
-    QObject *root;
+    void addFiltersToACL(FilterACL &acl, const QObject &fs, acl_action_t action);
+    void updateACL();
 
 };

@@ -30,6 +30,7 @@
 #include <core/CanMessage.h>
 
 FilterItemModel::FilterItemModel()
+  : root(0)
 {
     root = createObjectNode(0, node_root);
     addFilterSet("Filterset 1");
@@ -46,8 +47,9 @@ QObject *FilterItemModel::createObjectNode(QObject *parent, FilterItemModel::nod
     QObject *retval = new QObject(parent);
     retval->setProperty("type", type);
     if (type==node_filter_set) {
-        retval->setProperty("checked", true);
+        setNodeChecked(*retval, true);
     }
+    updateACL();
     return retval;
 }
 
@@ -58,6 +60,56 @@ FilterItemModel::node_type_t FilterItemModel::getNodeType(const QObject *obj) co
     } else {
         return node_unknown;
     }
+}
+
+bool FilterItemModel::isNodeChecked(const QObject *obj) const
+{
+    if (obj) {
+        return obj->property("checked").toBool();
+    } else {
+        return false;
+    }
+}
+
+void FilterItemModel::setNodeChecked(QObject &obj, bool isChecked)
+{
+    obj.setProperty("checked", isChecked);
+    updateACL();
+}
+
+void FilterItemModel::addFiltersToACL(FilterACL &acl, const QObject &fs, acl_action_t action)
+{
+    foreach (const QObject *obj, fs.children()) {
+        switch (getNodeType(obj)) {
+            case node_filter_set:
+                addFiltersToACL(acl, *obj, acl_action_continue);
+                break;
+            case node_accept_list:
+                addFiltersToACL(acl, *obj, acl_action_pass);
+                break;
+            case node_drop_list:
+                addFiltersToACL(acl, *obj, acl_action_drop);
+                break;
+            case node_filter_item:
+                // as soon as at least one "pass" action exists, drop everything else
+                if (action==acl_action_pass) {
+                    acl.setDefaultAction(acl_action_drop);
+                }
+                acl.addRule(FilterACLRule(obj->property("can_id").toInt(), action));
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+void FilterItemModel::updateACL()
+{
+    _acl.clear();
+    if (root) {
+        addFiltersToACL(_acl, *root, acl_action_continue);
+    }
+    emit aclChanged(_acl);
 }
 
 int FilterItemModel::columnCount(const QModelIndex &parent) const
@@ -163,7 +215,7 @@ QVariant FilterItemModel::data(const QModelIndex &index, int role) const
         QObject *obj = (QObject*) index.internalPointer();
         switch (getNodeType(obj)) {
             case node_filter_set:
-                return obj->property("checked").toBool() ? Qt::Checked : Qt::Unchecked;
+                return isNodeChecked(obj) ? Qt::Checked : Qt::Unchecked;
             default:
                 return QVariant();
         }
@@ -176,10 +228,9 @@ QVariant FilterItemModel::data(const QModelIndex &index, int role) const
 
 bool FilterItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (role == Qt::CheckStateRole) {
-        QObject *obj = (QObject*) index.internalPointer();
-        bool wasChecked = obj->property("checked").toBool();
-        obj->setProperty("checked", !wasChecked);
+    QObject *obj = (QObject*) index.internalPointer();
+    if (obj && (role == Qt::CheckStateRole)) {
+        setNodeChecked(*obj, !isNodeChecked(obj));
         return true;
     } else {
         return QAbstractItemModel::setData(index, value, role);
@@ -190,7 +241,6 @@ QStringList FilterItemModel::mimeTypes() const
 {
     QStringList types;
     types << "application/org.cangaroo.can.message";
-    types << "application/org.cangaroo.can.message_filter";
     return types;
 }
 
@@ -254,6 +304,7 @@ bool FilterItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
                 beginMoveRows(index.parent(), index.row(), index.row(), parent, p->children().count());
                 obj->setParent(p);
                 endMoveRows();
+                updateACL();
             }
 
         } else {
@@ -269,6 +320,7 @@ bool FilterItemModel::dropMimeData(const QMimeData *data, Qt::DropAction action,
                 item->setProperty("title", msg.getIdString());
                 item->setProperty("can_id", msg.getId());
                 endInsertRows();
+                updateACL();
             }
 
         }
@@ -282,6 +334,13 @@ QObject *FilterItemModel::addFilterSet(QString title)
     fs->setProperty("title", title);
     createObjectNode(fs, node_accept_list);
     createObjectNode(fs, node_drop_list);
+
+    updateACL();
     return fs;
+}
+
+const FilterACL &FilterItemModel::acl() const
+{
+    return _acl;
 }
 

@@ -33,6 +33,7 @@ public:
     FilterACL();
     void clear();
     void setDefaultAction(acl_action_t action);
+    acl_action_t defaultAction() const { return _defaultAction; }
     void addRule(const FilterACLRule &rule);
 
     acl_action_t test(const CanMessage &msg);
