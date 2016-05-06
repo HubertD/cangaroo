@@ -6,14 +6,14 @@ written by Hubert Denkmair <hubert@denkmair.de>
 
 ## building on windows
 * Qt Creator (Community Version is okay) brings everything you need
-* except for the PCAN Libraries. 
-  Get them from http://www.peak-system.com/fileadmin/media/files/pcan-basic.zip
-  Extract to .zip to src/driver/PeakCanDriver/pcan-basic-api
-  Make sure PCANBasic.dll (the one from pcan-basic-api/Win32 on a "normal" 32bit Windows build)
-  is found when running cangaroo, e.g. by putting it in the same folder as the .exe file.
+* except for the PCAN libraries. 
+  * Get them from http://www.peak-system.com/fileadmin/media/files/pcan-basic.zip
+  * Extract to .zip to src/driver/PeakCanDriver/pcan-basic-api
+  * Make sure PCANBasic.dll (the one from pcan-basic-api/Win32 on a "normal" 32bit Windows build)
+    is found when running cangaroo, e.g. by putting it in the same folder as the .exe file.
 * if you don't want Peak support, you can just disable the driver:
   remove the line "win32:include($$PWD/driver/PeakCanDriver/PeakCanDriver.pri)"
-  from src/driver/driver.pri
+  from src/src.pro
 * if you want to deploy the cangaroo app, make sure to also include the needed Qt Libraries.
   for a normal release build, these are: Qt5Core.dll Qt5Gui.dll Qt5Widgets.dll Qt5Xml.dll
 
