@@ -23,8 +23,8 @@
 
 #include <QString>
 #include <stdint.h>
+#include "CanDriver.h"
 
-class CanDriver;
 class CanMessage;
 class MeasurementInterface;
 
@@ -69,10 +69,10 @@ public:
 
     QString getStateText();
 
-    uint8_t getId();
-    void setId(uint8_t id);
+    CanInterfaceId getId();
+    void setId(CanInterfaceId id);
 
 private:
-    uint8_t _id;
+    CanInterfaceId _id;
     CanDriver *_driver;
 };

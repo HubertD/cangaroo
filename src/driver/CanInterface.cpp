@@ -73,12 +73,12 @@ QString CanInterface::getStateText()
     }
 }
 
-uint8_t CanInterface::getId()
+CanInterfaceId CanInterface::getId()
 {
     return _id;
 }
 
-void CanInterface::setId(uint8_t id)
+void CanInterface::setId(CanInterfaceId id)
 {
     _id = id;
 }
