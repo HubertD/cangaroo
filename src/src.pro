@@ -41,4 +41,4 @@ unix:PKGCONFIG += libnl-route-3.0
 unix:include($$PWD/driver/SocketCanDriver/SocketCanDriver.pri)
 
 win32:include($$PWD/driver/PeakCanDriver/PeakCanDriver.pri)
-
+win32:include($$PWD/driver/CandleApiDriver/CandleApiDriver.pri)
