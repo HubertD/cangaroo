@@ -43,8 +43,8 @@ public:
 private:
     candle_handle _handle;
     uint32_t _bitrate;
-    uint32_t _start_ts_us;
-    uint64_t _t_start_ms;
+    uint64_t _start_devtime_us;
+    uint64_t _start_systime_us;
 
 };
 

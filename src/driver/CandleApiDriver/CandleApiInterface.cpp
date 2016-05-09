@@ -6,8 +6,8 @@ CandleApiInterface::CandleApiInterface(CandleApiDriver *driver, candle_handle ha
   : CanInterface(driver),
    _handle(handle),
    _bitrate(500000),
-   _start_ts_us(0),
-   _t_start_ms(0)
+   _start_devtime_us(0),
+   _start_systime_us(0)
 {
 
 }
@@ -50,8 +50,10 @@ void CandleApiInterface::open()
         return;
     }
 
-    candle_dev_get_timestamp_us(_handle, &_start_ts_us);
-    _t_start_ms = QDateTime::currentMSecsSinceEpoch();
+    uint32_t t_dev;
+    candle_dev_get_timestamp_us(_handle, &t_dev);
+    _start_devtime_us = t_dev;
+    _start_systime_us = 1000 * QDateTime::currentMSecsSinceEpoch();
 
     candle_channel_set_bitrate(_handle, 0, _bitrate);
     candle_channel_start(_handle, 0, 0);
@@ -88,9 +90,11 @@ bool CandleApiInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
                 msg.setByte(i, data[i]);
             }
 
-            int64_t ts_us = candle_frame_timestamp_us(&frame) - _start_ts_us; // TODO overflows...
-            uint64_t ms = _t_start_ms + (ts_us/1000);
-            msg.setTimestamp(ms/1000, ts_us % 1000000);
+            uint32_t t_frame_us = candle_frame_timestamp_us(&frame);
+
+            int64_t ts_us = _start_systime_us + t_frame_us - _start_devtime_us; // TODO overflows...
+
+            msg.setTimestamp(ts_us/1000000, ts_us % 1000000);
 
             return true;
         }
