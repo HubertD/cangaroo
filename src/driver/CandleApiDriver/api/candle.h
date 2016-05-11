@@ -81,6 +81,7 @@ typedef enum {
     CANDLE_ERR_SET_TIMESTAMP_MODE  = 26,
     CANDLE_ERR_DEV_OUT_OF_RANGE    = 27,
 	CANDLE_ERR_GET_TIMESTAMP       = 28,
+    CANDLE_ERR_SET_PIPE_RAW_IO     = 29
 } candle_err_t;
 
 #pragma pack(push,1)
@@ -119,12 +120,7 @@ typedef struct {
 
 #pragma pack(pop)
 
-
-#ifdef CANDLE_API_LIBRARY
-#define DLL __declspec(dllexport)
-#else
-#define DLL __declspec(dllimport)
-#endif
+#define DLL
 
 bool __stdcall DLL candle_list_scan(candle_list_handle *list);
 bool __stdcall DLL candle_list_free(candle_list_handle list);
