@@ -13,6 +13,142 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>24</y>
+     <width>57</width>
+     <height>10</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Interface:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="laInterfaceName">
+   <property name="geometry">
+    <rect>
+     <x>65</x>
+     <y>24</y>
+     <width>230</width>
+     <height>10</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>3</y>
+     <width>40</width>
+     <height>10</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Driver:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="laDriver">
+   <property name="geometry">
+    <rect>
+     <x>65</x>
+     <y>3</y>
+     <width>230</width>
+     <height>10</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="laOptions">
+   <property name="geometry">
+    <rect>
+     <x>1</x>
+     <y>50</y>
+     <width>59</width>
+     <height>15</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Options:</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="wOptions" native="true">
+   <property name="geometry">
+    <rect>
+     <x>57</x>
+     <y>40</y>
+     <width>141</width>
+     <height>90</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_9">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>9</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QCheckBox" name="cbListenOnly">
+      <property name="text">
+       <string>Listen only</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbTripleSampling">
+      <property name="text">
+       <string>Triple Sampling</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbOneShotMode">
+      <property name="text">
+       <string>One Shot Mode</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QComboBox" name="cbBitrate">
+   <property name="geometry">
+    <rect>
+     <x>67</x>
+     <y>135</y>
+     <width>170</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_26">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>140</y>
+     <width>59</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Bitrate:</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
