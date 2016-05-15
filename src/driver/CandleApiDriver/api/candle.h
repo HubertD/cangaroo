@@ -48,7 +48,8 @@ typedef enum {
     CANDLE_MODE_LISTEN_ONLY   = 0x01,
     CANDLE_MODE_LOOP_BACK     = 0x02,
     CANDLE_MODE_TRIPLE_SAMPLE = 0x04,
-    CANDLE_MODE_ONE_SHOT      = 0x08
+    CANDLE_MODE_ONE_SHOT      = 0x08,
+    CANDLE_MODE_HW_TIMESTAMP  = 0x10,
 } candle_mode_t;
 
 typedef enum {

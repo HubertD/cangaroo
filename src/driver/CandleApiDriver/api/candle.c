@@ -267,10 +267,6 @@ static bool candle_dev_interal_open(candle_handle hdev)
         goto winusb_free;
     }
 
-    if (!candle_ctrl_set_timestamp_mode(dev, true)) {
-        goto winusb_free;
-    }
-
     if (!candle_ctrl_get_config(dev, &dev->dconf)) {
         goto winusb_free;
     }
@@ -531,10 +527,14 @@ bool __stdcall DLL candle_frame_read(candle_handle hdev, candle_frame_t *frame, 
         return false;
     }
 
-    if (bytes_transfered != sizeof(*frame)) {
+    if (bytes_transfered < sizeof(*frame)-4) {
         candle_prepare_read(dev, urb_num);
         dev->last_error = CANDLE_ERR_READ_SIZE;
         return false;
+    }
+
+    if (bytes_transfered < sizeof(*frame)) {
+        frame->timestamp_us = 0;
     }
 
     memcpy(frame, dev->rxurbs[urb_num].buf, sizeof(*frame));

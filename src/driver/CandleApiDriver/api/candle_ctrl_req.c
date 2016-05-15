@@ -29,10 +29,8 @@ enum {
     CANDLE_BREQ_BERR,
     CANDLE_BREQ_BT_CONST,
     CANDLE_BREQ_DEVICE_CONFIG,
-    CANDLE_TIMESTAMP_GET = 0x40,
-    CANDLE_TIMESTAMP_ENABLE = 0x41,
+    CANDLE_TIMESTAMP_GET,
 };
-
 
 static bool usb_control_msg(WINUSB_INTERFACE_HANDLE hnd, uint8_t request, uint8_t requesttype, uint16_t value, uint16_t index, void *data, uint16_t size)
 {
