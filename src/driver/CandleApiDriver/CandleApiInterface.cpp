@@ -7,7 +7,10 @@ CandleApiInterface::CandleApiInterface(CandleApiDriver *driver, candle_handle ha
     _deviceTicksLastSync(0),
     _tLastSync_us(0),
     _handle(handle),
-    _bitrate(500000)
+    _bitrate(500000),
+    _numRx(0),
+    _numTx(0),
+    _numTxErr(0)
 {
     LARGE_INTEGER tps;
     QueryPerformanceFrequency(&tps);
@@ -121,6 +124,9 @@ void CandleApiInterface::open()
     QueryPerformanceCounter(&pc);
     _perfCountStart = pc.QuadPart;
     syncTimestamp();
+    _numRx = 0;
+    _numTx = 0;
+    _numTxErr = 0;
     candle_channel_start(_handle, 0, 0);
 }
 
@@ -147,7 +153,11 @@ void CandleApiInterface::sendMessage(const CanMessage &msg)
         frame.data[i] = msg.getByte(i);
     }
 
-    candle_frame_send(_handle, 0, &frame);
+    if (candle_frame_send(_handle, 0, &frame)) {
+        _numTx++;
+    } else {
+        _numTxErr++;
+    }
 }
 
 bool CandleApiInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
@@ -157,6 +167,7 @@ bool CandleApiInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
     if (candle_frame_read(_handle, &frame, timeout_ms)) {
 
         if (candle_frame_type(&frame)==CANDLE_FRAMETYPE_RECEIVE) {
+            _numRx++;
 
             msg.setInterfaceId(getId());
             msg.setErrorFrame(false);
@@ -199,7 +210,7 @@ uint32_t CandleApiInterface::getState()
 
 int CandleApiInterface::getNumRxFrames()
 {
-    return 0;
+    return _numRx;
 }
 
 int CandleApiInterface::getNumRxErrors()
@@ -209,12 +220,12 @@ int CandleApiInterface::getNumRxErrors()
 
 int CandleApiInterface::getNumTxFrames()
 {
-    return 0;
+    return _numTx;
 }
 
 int CandleApiInterface::getNumTxErrors()
 {
-    return 0;
+    return _numTxErr;
 }
 
 int CandleApiInterface::getNumRxOverruns()

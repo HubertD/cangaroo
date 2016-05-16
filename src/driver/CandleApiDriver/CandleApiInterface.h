@@ -51,6 +51,10 @@ private:
     candle_handle _handle;
     uint32_t _bitrate;
 
+    uint64_t _numRx;
+    uint64_t _numTx;
+    uint64_t _numTxErr;
+
     void syncTimestamp();
     void checkSyncTimestamp();
 };
