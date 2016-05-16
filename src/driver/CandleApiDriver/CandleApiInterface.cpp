@@ -33,6 +33,33 @@ int CandleApiInterface::getBitrate()
     return _bitrate;
 }
 
+uint32_t CandleApiInterface::getCapabilities()
+{
+    candle_capability_t caps;
+
+    if (candle_channel_get_capabilities(_handle, 0, &caps)) {
+
+        uint32_t retval = 0;
+
+        if (caps.feature & CANDLE_MODE_LISTEN_ONLY) {
+            retval |= CanInterface::capability_listen_only;
+        }
+
+        if (caps.feature & CANDLE_MODE_ONE_SHOT) {
+            retval |= CanInterface::capability_one_shot;
+        }
+
+        if (caps.feature & CANDLE_MODE_TRIPLE_SAMPLE) {
+            retval |= CanInterface::capability_triple_sampling;
+        }
+
+        return retval;
+
+    } else {
+        return 0;
+    }
+}
+
 QList<CanTiming> CandleApiInterface::getAvailableBitrates()
 {
     return CanInterface::getAvailableBitrates();

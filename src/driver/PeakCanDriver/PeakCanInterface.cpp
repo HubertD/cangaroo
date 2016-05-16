@@ -68,6 +68,11 @@ void PeakCanInterface::applyConfig(const MeasurementInterface &mi)
 
 }
 
+uint32_t PeakCanInterface::getCapabilities()
+{
+    return CanInterface::capability_listen_only | CanInterface::capability_auto_restart;
+}
+
 int PeakCanInterface::getBitrate()
 {
     uint32_t speed = 0;

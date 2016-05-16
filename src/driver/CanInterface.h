@@ -40,6 +40,14 @@ public:
         state_unknown
     };
 
+    enum {
+        capability_canfd           = 0x01,
+        capability_listen_only     = 0x02,
+        capability_triple_sampling = 0x04,
+        capability_one_shot        = 0x08,
+        capability_auto_restart    = 0x10
+    };
+
 public:
     CanInterface(CanDriver *driver);
 	virtual ~CanInterface();
@@ -50,6 +58,7 @@ public:
 
     virtual int getBitrate() = 0;
 
+    virtual uint32_t getCapabilities();
     virtual QList<CanTiming> getAvailableBitrates();
 
 	virtual void open();

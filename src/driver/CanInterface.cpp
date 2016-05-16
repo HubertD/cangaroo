@@ -35,6 +35,11 @@ CanDriver* CanInterface::getDriver() {
     return _driver;
 }
 
+uint32_t CanInterface::getCapabilities()
+{
+    return 0;
+}
+
 QList<CanTiming> CanInterface::getAvailableBitrates()
 {
     QList<CanTiming> retval;

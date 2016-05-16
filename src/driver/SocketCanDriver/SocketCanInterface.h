@@ -65,7 +65,10 @@ public:
     bool supportsTimingConfiguration();
     bool supportsCanFD();
     bool supportsTripleSampling();
+
     virtual int getBitrate();
+    virtual uint32_t getCapabilities();
+
 
 	virtual void open();
 	virtual void close();

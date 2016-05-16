@@ -260,6 +260,21 @@ int SocketCanInterface::getBitrate() {
     }
 }
 
+uint32_t SocketCanInterface::getCapabilities()
+{
+    uint32_t retval = CanInterface::capability_auto_restart;
+
+    if (supportsCanFD()) {
+        retval |= CanInterface::capability_canfd;
+    }
+
+    if (supportsTripleSampling()) {
+        retval |= CanInterface::capability_triple_sampling;
+    }
+
+    return retval;
+}
+
 bool SocketCanInterface::updateStatistics()
 {
     return updateStatus();

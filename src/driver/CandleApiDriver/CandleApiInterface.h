@@ -19,6 +19,7 @@ public:
 
     virtual int getBitrate();
 
+    virtual uint32_t getCapabilities();
     virtual QList<CanTiming> getAvailableBitrates();
 
     virtual void open();
