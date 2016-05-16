@@ -212,9 +212,12 @@ bool PeakCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
             msg.setByte(i, buf.DATA[i]);
         }
 
-        uint64_t ms = (uint64_t)timestamp.millis + 0x100000000 * (uint64_t)timestamp.millis_overflow;
-        ms += _timestampOffset;
-        msg.setTimestamp(ms/1000, (1000*(ms%1000)) + timestamp.micros);
+        // Total Microseconds = micros + 1000 * millis + 0x100000000 * 1000 * millis_overflow
+        uint64_t ts = timestamp.millis;
+        ts += 0x100000000 * (uint64_t)timestamp.millis_overflow;
+        ts *= 1000;
+        ts += timestamp.micros;
+        msg.setTimestamp(ts/1000000, ts % 1000000);
 
         return true;
     } else {
