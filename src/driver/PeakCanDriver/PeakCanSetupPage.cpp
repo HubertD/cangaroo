@@ -49,8 +49,8 @@ void PeakCanSetupPage::onShowInterfacePage(SetupDialog &dlg, MeasurementInterfac
     ui->cbAutoRestart->setChecked(_mi->doAutoRestart());
 
     ui->cbBitrate->clear();
-    foreach (int br, pci->getAvailableBitrates()) {
-        ui->cbBitrate->addItem(QString::number(br));
+    foreach (CanTiming br, pci->getAvailableBitrates()) {
+        ui->cbBitrate->addItem(QString::number(br.getBitrate()));
     }
     ui->cbBitrate->setCurrentText(QString::number(_mi->bitrate()));
 

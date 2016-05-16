@@ -33,17 +33,9 @@ int CandleApiInterface::getBitrate()
     return _bitrate;
 }
 
-QList<int> CandleApiInterface::getAvailableBitrates()
+QList<CanTiming> CandleApiInterface::getAvailableBitrates()
 {
-    QList<int> retval;
-    retval << 10000 << 20000 << 50000 << 83333 << 100000 << 125000 << 250000 << 500000 << 800000 << 1000000;
-    return retval;
-}
-
-QList<int> CandleApiInterface::getAvailableFdBitrates()
-{
-    QList<int> retval;
-    return retval;
+    return CanInterface::getAvailableBitrates();
 }
 
 //! sync device time with host time

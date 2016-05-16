@@ -24,6 +24,7 @@
 #include <QString>
 #include <stdint.h>
 #include "CanDriver.h"
+#include "CanTiming.h"
 
 class CanMessage;
 class MeasurementInterface;
@@ -49,8 +50,7 @@ public:
 
     virtual int getBitrate() = 0;
 
-    virtual QList<int> getAvailableBitrates();
-    virtual QList<int> getAvailableFdBitrates();
+    virtual QList<CanTiming> getAvailableBitrates();
 
 	virtual void open();
 	virtual void close();

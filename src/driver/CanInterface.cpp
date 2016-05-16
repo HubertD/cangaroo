@@ -35,17 +35,19 @@ CanDriver* CanInterface::getDriver() {
     return _driver;
 }
 
-QList<int> CanInterface::getAvailableBitrates()
+QList<CanTiming> CanInterface::getAvailableBitrates()
 {
-    QList<int> retval;
-    retval << 88300 << 100000 << 125000 << 250000 << 500000 << 1000000;
-    return retval;
-}
-
-QList<int> CanInterface::getAvailableFdBitrates()
-{
-    QList<int> retval;
-    retval << 1000000 << 2000000 << 4000000 << 8000000 << 16000000;
+    QList<CanTiming> retval;
+    retval << CanTiming(0,   10000, 0, 0.875) \
+           << CanTiming(1,   20000, 0, 0.875) \
+           << CanTiming(2,   50000, 0, 0.875) \
+           << CanTiming(3,   83333, 0, 0.875) \
+           << CanTiming(4,  100000, 0, 0.875) \
+           << CanTiming(5,  125000, 0, 0.875) \
+           << CanTiming(6,  250000, 0, 0.875) \
+           << CanTiming(7,  500000, 0, 0.875) \
+           << CanTiming(8,  800000, 0, 0.875) \
+           << CanTiming(9, 1000000, 0, 0.875);
     return retval;
 }
 

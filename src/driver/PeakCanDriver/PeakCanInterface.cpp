@@ -110,16 +110,9 @@ QString PeakCanInterface::getErrorText(uint32_t status_code)
     }
 }
 
-QList<int> PeakCanInterface::getAvailableBitrates()
+QList<CanTiming> PeakCanInterface::getAvailableBitrates()
 {
-    QList<int> retval;
-    retval << 5000 << 10000 << 20000 << 33333 << 47619 << 50000 << 83333 << 95238 << 100000 << 125000 << 250000 << 500000 << 800000 << 1000000;
-    return retval;
-}
-
-QList<int> PeakCanInterface::getAvailableFdBitrates()
-{
-    return CanInterface::getAvailableFdBitrates();
+    return CanInterface::getAvailableBitrates();
 }
 
 void PeakCanInterface::open()
