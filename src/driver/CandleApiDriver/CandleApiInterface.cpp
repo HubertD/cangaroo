@@ -1,15 +1,17 @@
 #include "CandleApiDriver.h"
 #include "CandleApiInterface.h"
-#include <windows.h>
 
 CandleApiInterface::CandleApiInterface(CandleApiDriver *driver, candle_handle handle)
   : CanInterface(driver),
-   _handle(handle),
-   _bitrate(500000),
-   _start_devtime_us(0),
-   _start_systime_us(0)
+    _perfCountStart(0),
+    _deviceTicksLastSync(0),
+    _tLastSync_us(0),
+    _handle(handle),
+    _bitrate(500000)
 {
-
+    LARGE_INTEGER tps;
+    QueryPerformanceFrequency(&tps);
+    _perfTicksPerSecond = tps.QuadPart;
 }
 
 CandleApiInterface::~CandleApiInterface()
@@ -43,6 +45,50 @@ QList<int> CandleApiInterface::getAvailableFdBitrates()
     return CanInterface::getAvailableFdBitrates();
 }
 
+//! sync device time with host time
+/*!
+ * fetch the current device timestamp and
+ * save the corresponing host time to be able
+ * to calculate exact receive timestamps.
+ *
+ * should be called regulary to ensure that
+ * host and device time do not run out of sync
+ */
+void CandleApiInterface::syncTimestamp()
+{
+    uint32_t t_dev;
+    uint64_t t;
+    LARGE_INTEGER pc;
+
+    if (candle_dev_get_timestamp_us(_handle, &t_dev)) {
+        QueryPerformanceCounter(&pc);
+
+        t = pc.QuadPart - _perfCountStart;
+        t *= 1000000;
+        t /= _perfTicksPerSecond;
+
+        _tLastSync_us = t;
+        _deviceTicksLastSync = t_dev;
+    }
+}
+
+//! sync device and host timestamps if neccessary
+void CandleApiInterface::checkSyncTimestamp()
+{
+    LARGE_INTEGER pc;
+    QueryPerformanceCounter(&pc);
+
+    uint64_t t = pc.QuadPart - _perfCountStart;
+    t *= 1000000;
+    t /= _perfTicksPerSecond;
+
+    // resync if last sync is older than 10sec
+    if ( (t - _tLastSync_us) > 10000000 ) {
+        syncTimestamp();
+    }
+
+}
+
 void CandleApiInterface::open()
 {
     if (!candle_dev_open(_handle)) {
@@ -50,12 +96,11 @@ void CandleApiInterface::open()
         return;
     }
 
-    uint32_t t_dev;
-    candle_dev_get_timestamp_us(_handle, &t_dev);
-    _start_devtime_us = t_dev;
-    _start_systime_us = 1000 * QDateTime::currentMSecsSinceEpoch();
-
+    LARGE_INTEGER pc;
     candle_channel_set_bitrate(_handle, 0, _bitrate);
+    QueryPerformanceCounter(&pc);
+    _perfCountStart = pc.QuadPart;
+    syncTimestamp();
     candle_channel_start(_handle, 0, 0);
 }
 
@@ -90,10 +135,12 @@ bool CandleApiInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
                 msg.setByte(i, data[i]);
             }
 
-            uint32_t t_frame_us = candle_frame_timestamp_us(&frame);
+            checkSyncTimestamp();
 
-            int64_t ts_us = _start_systime_us + t_frame_us - _start_devtime_us; // TODO overflows...
+            uint32_t dev_ts = candle_frame_timestamp_us(&frame);
+            dev_ts -= _deviceTicksLastSync;
 
+            uint64_t ts_us = _tLastSync_us + dev_ts;
             msg.setTimestamp(ts_us/1000000, ts_us % 1000000);
 
             return true;
@@ -154,3 +201,4 @@ void CandleApiInterface::update(candle_handle dev)
     candle_dev_free(_handle);
     _handle = dev;
 }
+

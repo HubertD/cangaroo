@@ -3,6 +3,7 @@
 
 #include <driver/CanInterface.h>
 #include "api/candle.h"
+#include <windows.h>
 
 class CandleApiDriver;
 
@@ -41,11 +42,17 @@ public:
     void update(candle_handle dev);
 
 private:
+    uint64_t _perfTicksPerSecond;
+    uint64_t _perfCountStart;
+
+    uint32_t _deviceTicksLastSync;
+    uint64_t _tLastSync_us;
+
     candle_handle _handle;
     uint32_t _bitrate;
-    uint64_t _start_devtime_us;
-    uint64_t _start_systime_us;
 
+    void syncTimestamp();
+    void checkSyncTimestamp();
 };
 
 #endif // CANDLEAPIINTERFACE_H
