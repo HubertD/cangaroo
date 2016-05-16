@@ -548,7 +548,7 @@ candle_frametype_t __stdcall DLL candle_frame_type(candle_frame_t *frame)
         return CANDLE_FRAMETYPE_ECHO;
     };
 
-    if (frame->can_id & 0x20000000) {
+    if (frame->can_id & CANDLE_ID_ERR) {
         return CANDLE_FRAMETYPE_ERROR;
     }
 
@@ -562,12 +562,12 @@ uint32_t __stdcall DLL candle_frame_id(candle_frame_t *frame)
 
 bool __stdcall DLL candle_frame_is_extended_id(candle_frame_t *frame)
 {
-    return (frame->can_id & 0x80000000) != 0;
+    return (frame->can_id & CANDLE_ID_EXTENDED) != 0;
 }
 
 bool __stdcall DLL candle_frame_is_rtr(candle_frame_t *frame)
 {
-    return (frame->can_id & 0x40000000) != 0;
+    return (frame->can_id & CANDLE_ID_RTR) != 0;
 }
 
 uint8_t __stdcall DLL candle_frame_dlc(candle_frame_t *frame)
