@@ -7,7 +7,6 @@ CandleApiInterface::CandleApiInterface(CandleApiDriver *driver, candle_handle ha
     _deviceTicksLastSync(0),
     _tLastSync_us(0),
     _handle(handle),
-    _bitrate(500000),
     _numRx(0),
     _numTx(0),
     _numTxErr(0)
@@ -15,6 +14,8 @@ CandleApiInterface::CandleApiInterface(CandleApiDriver *driver, candle_handle ha
     LARGE_INTEGER tps;
     QueryPerformanceFrequency(&tps);
     _perfTicksPerSecond = tps.QuadPart;
+    _settings.setBitrate(500000);
+    _settings.setSamplePoint(0.875);
 }
 
 CandleApiInterface::~CandleApiInterface()
@@ -29,11 +30,12 @@ QString CandleApiInterface::getName() const
 
 void CandleApiInterface::applyConfig(const MeasurementInterface &mi)
 {
+    _settings = mi;
 }
 
 int CandleApiInterface::getBitrate()
 {
-    return _bitrate;
+    return _settings.bitrate();
 }
 
 uint32_t CandleApiInterface::getCapabilities()
@@ -119,15 +121,25 @@ void CandleApiInterface::open()
         return;
     }
 
+    candle_channel_set_bitrate(_handle, 0, _settings.bitrate());
+
+    uint32_t flags = 0;
+    if (_settings.isListenOnlyMode()) {
+        flags |= CANDLE_MODE_LISTEN_ONLY;
+    }
+    if (_settings.isTripleSampling()) {
+        flags |= CANDLE_MODE_TRIPLE_SAMPLE;
+    }
+
     LARGE_INTEGER pc;
-    candle_channel_set_bitrate(_handle, 0, _bitrate);
     QueryPerformanceCounter(&pc);
     _perfCountStart = pc.QuadPart;
     syncTimestamp();
     _numRx = 0;
     _numTx = 0;
     _numTxErr = 0;
-    candle_channel_start(_handle, 0, 0);
+
+    candle_channel_start(_handle, 0, flags);
 }
 
 void CandleApiInterface::close()

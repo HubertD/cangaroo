@@ -2,6 +2,7 @@
 #define CANDLEAPIINTERFACE_H
 
 #include <driver/CanInterface.h>
+#include <core/MeasurementInterface.h>
 #include "api/candle.h"
 #include <windows.h>
 
@@ -49,7 +50,7 @@ private:
     uint64_t _tLastSync_us;
 
     candle_handle _handle;
-    uint32_t _bitrate;
+    MeasurementInterface _settings;
 
     uint64_t _numRx;
     uint64_t _numTx;
