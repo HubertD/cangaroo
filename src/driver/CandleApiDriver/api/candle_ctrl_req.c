@@ -66,24 +66,6 @@ bool candle_ctrl_set_host_format(candle_device_t *dev)
     return rc;
 }
 
-bool candle_ctrl_set_timestamp_mode(candle_device_t *dev, bool enable_timestamps)
-{
-    uint32_t ts_config = enable_timestamps ? 1 : 0;
-
-    bool rc = usb_control_msg(
-        dev->winUSBHandle,
-        CANDLE_TIMESTAMP_ENABLE,
-        USB_DIR_OUT|USB_TYPE_VENDOR|USB_RECIP_INTERFACE,
-        1,
-        ts_config,
-        NULL,
-        0
-    );
-
-    dev->last_error = rc ? CANDLE_ERR_OK : CANDLE_ERR_SET_TIMESTAMP_MODE;
-    return rc;
-}
-
 bool candle_ctrl_set_device_mode(candle_device_t *dev, uint8_t channel, uint32_t mode, uint32_t flags)
 {
     candle_device_mode_t dm;
