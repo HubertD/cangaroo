@@ -113,6 +113,22 @@ void CandleApiInterface::close()
 
 void CandleApiInterface::sendMessage(const CanMessage &msg)
 {
+    candle_frame_t frame;
+
+    frame.can_id = msg.getId();
+    if (msg.isExtended()) {
+        frame.can_id |= CANDLE_ID_EXTENDED;
+    }
+    if (msg.isRTR()) {
+        frame.can_id |= CANDLE_ID_RTR;
+    }
+
+    frame.can_dlc = msg.getLength();
+    for (int i=0; i<8; i++) {
+        frame.data[i] = msg.getByte(i);
+    }
+
+    candle_frame_send(_handle, 0, &frame);
 }
 
 bool CandleApiInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
