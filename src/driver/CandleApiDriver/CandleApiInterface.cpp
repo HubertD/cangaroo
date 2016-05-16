@@ -42,7 +42,8 @@ QList<int> CandleApiInterface::getAvailableBitrates()
 
 QList<int> CandleApiInterface::getAvailableFdBitrates()
 {
-    return CanInterface::getAvailableFdBitrates();
+    QList<int> retval;
+    return retval;
 }
 
 //! sync device time with host time
