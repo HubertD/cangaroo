@@ -38,7 +38,9 @@ public:
 
 private:
     uint32_t _handle;
-    int64_t _timestampOffset;
+    uint64_t _perfTicksPerSecond;
+    uint64_t _hostTimestampStart;
+    uint64_t _peakTimestampStart;
     void *_autoResetEvent;
 
     struct {

@@ -9,9 +9,15 @@
 
 PeakCanInterface::PeakCanInterface(PeakCanDriver *driver, uint32_t handle)
   : CanInterface(driver),
-    _handle(handle)
+    _handle(handle),
+    _hostTimestampStart(0),
+    _peakTimestampStart(0)
 {
-    _timestampOffset = QDateTime::currentMSecsSinceEpoch() - GetTickCount();
+
+    LARGE_INTEGER tps;
+    QueryPerformanceFrequency(&tps);
+    _perfTicksPerSecond = tps.QuadPart;
+
     _autoResetEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     _config.autoRestart = true;
@@ -215,6 +221,15 @@ bool PeakCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
         ts += 0x100000000 * (uint64_t)timestamp.millis_overflow;
         ts *= 1000;
         ts += timestamp.micros;
+
+        if (_peakTimestampStart==0) {
+            _hostTimestampStart = 1000 * QDateTime::currentMSecsSinceEpoch();
+            _peakTimestampStart = ts;
+        }
+
+        ts -=_peakTimestampStart;
+        ts += _hostTimestampStart;
+
         msg.setTimestamp(ts/1000000, ts % 1000000);
 
         return true;
