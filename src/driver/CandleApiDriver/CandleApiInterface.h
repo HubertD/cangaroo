@@ -4,7 +4,9 @@
 #include <driver/CanInterface.h>
 #include <core/MeasurementInterface.h>
 #include "api/candle.h"
+#include "CandleApiTiming.h"
 #include <windows.h>
+#include <QList>
 
 class CandleApiDriver;
 
@@ -43,6 +45,7 @@ public:
     void update(candle_handle dev);
 
 private:
+
     uint64_t _perfTicksPerSecond;
     uint64_t _perfCountStart;
 
@@ -55,6 +58,8 @@ private:
     uint64_t _numRx;
     uint64_t _numTx;
     uint64_t _numTxErr;
+
+    QList<CandleApiTiming> _timings;
 
     void syncTimestamp();
     void checkSyncTimestamp();
