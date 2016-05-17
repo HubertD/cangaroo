@@ -66,6 +66,53 @@ CandleApiInterface::CandleApiInterface(CandleApiDriver *driver, candle_handle ha
         << CandleApiTiming(48000000,  800000, 867,   4, 11, 2)
         << CandleApiTiming(48000000, 1000000, 875,   3, 12, 2);
 
+
+    _timings
+        // sample point: 50.0%
+        << CandleApiTiming(16000000,   10000, 520, 64, 11, 12)
+        << CandleApiTiming(16000000,   20000, 500, 50,  6,  8)
+        << CandleApiTiming(16000000,   50000, 500, 20,  6,  8)
+        << CandleApiTiming(16000000,   83333, 500, 12,  6,  8)
+        << CandleApiTiming(16000000,  100000, 500, 10,  6,  8)
+        << CandleApiTiming(16000000,  125000, 500,  8,  6,  8)
+        << CandleApiTiming(16000000,  250000, 500,  4,  6,  8)
+        << CandleApiTiming(16000000,  500000, 500,  2,  6,  8)
+        << CandleApiTiming(16000000,  800000, 500,  1,  8, 10)
+        << CandleApiTiming(16000000, 1000000, 500,  1,  6,  8)
+
+        // sample point: 62.5%
+        << CandleApiTiming(16000000,   10000, 625, 64, 14,  9)
+        << CandleApiTiming(16000000,   20000, 625, 50,  8,  6)
+        << CandleApiTiming(16000000,   50000, 625, 20,  8,  6)
+        << CandleApiTiming(16000000,   83333, 625, 12,  8,  6)
+        << CandleApiTiming(16000000,  100000, 625, 10,  8,  6)
+        << CandleApiTiming(16000000,  125000, 625,  8,  8,  6)
+        << CandleApiTiming(16000000,  250000, 625,  4,  8,  6)
+        << CandleApiTiming(16000000,  500000, 625,  2,  8,  6)
+        << CandleApiTiming(16000000,  800000, 625,  1, 11,  7)
+        << CandleApiTiming(16000000, 1000000, 625,  1,  8,  6)
+
+        // sample point: 75.0%
+        << CandleApiTiming(16000000,   20000, 750, 50, 10,  4)
+        << CandleApiTiming(16000000,   50000, 750, 20, 10,  4)
+        << CandleApiTiming(16000000,   83333, 750, 12, 10,  4)
+        << CandleApiTiming(16000000,  100000, 750, 10, 10,  4)
+        << CandleApiTiming(16000000,  125000, 750,  8, 10,  4)
+        << CandleApiTiming(16000000,  250000, 750,  4, 10,  4)
+        << CandleApiTiming(16000000,  500000, 750,  2, 10,  4)
+        << CandleApiTiming(16000000,  800000, 750,  1, 13,  5)
+        << CandleApiTiming(16000000, 1000000, 750,  1, 10,  4)
+
+        // sample point: 87.5%
+        << CandleApiTiming(16000000,   20000, 875, 50, 12,  2)
+        << CandleApiTiming(16000000,   50000, 875, 20, 12,  2)
+        << CandleApiTiming(16000000,   83333, 875, 12, 12,  2)
+        << CandleApiTiming(16000000,  100000, 875, 10, 12,  2)
+        << CandleApiTiming(16000000,  125000, 875,  8, 12,  2)
+        << CandleApiTiming(16000000,  250000, 875,  4, 12,  2)
+        << CandleApiTiming(16000000,  500000, 875,  2, 12,  2)
+        << CandleApiTiming(16000000,  800000, 900,  2,  7,  1)
+        << CandleApiTiming(16000000, 1000000, 875,  1, 12,  2);
 }
 
 CandleApiInterface::~CandleApiInterface()
@@ -119,9 +166,14 @@ QList<CanTiming> CandleApiInterface::getAvailableBitrates()
 {
     QList<CanTiming> retval;
 
-    int i = 0;
-    foreach (const CandleApiTiming t, _timings) {
-        retval << CanTiming(i++, t.getBitrate(), 0, t.getSamplePoint());
+    candle_capability_t caps;
+    if (candle_channel_get_capabilities(_handle, 0, &caps)) {
+        int i = 0;
+        foreach (const CandleApiTiming t, _timings) {
+            if (t.getBaseClk() == caps.fclk_can) {
+                retval << CanTiming(i++, t.getBitrate(), 0, t.getSamplePoint());
+            }
+        }
     }
 
     return retval;
