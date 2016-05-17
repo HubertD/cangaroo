@@ -34,6 +34,7 @@ private:
 
     void fillBitratesList(CanInterface *intf, uint32_t selectedBitrate);
     void fillSamplePointsForBitrate(CanInterface *intf, uint32_t selectedBitrate, uint32_t selectedSamplePoint);
+    void disenableUI(bool enabled);
 
     Backend &backend();
 };

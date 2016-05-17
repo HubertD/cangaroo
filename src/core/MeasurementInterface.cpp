@@ -26,7 +26,7 @@
 #include <driver/CanInterface.h>
 
 MeasurementInterface::MeasurementInterface()
-  : _doConfigure(false),
+  : _doConfigure(true),
     _isListenOnlyMode(false),
     _isOneShotMode(false),
     _isTripleSampling(false),

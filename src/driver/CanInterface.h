@@ -45,7 +45,8 @@ public:
         capability_listen_only     = 0x02,
         capability_triple_sampling = 0x04,
         capability_one_shot        = 0x08,
-        capability_auto_restart    = 0x10
+        capability_auto_restart    = 0x10,
+        capability_config_os       = 0x20
     };
 
 public:

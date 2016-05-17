@@ -202,10 +202,17 @@
      <x>120</x>
      <y>220</y>
      <width>186</width>
-     <height>88</height>
+     <height>111</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="vbOptions">
+    <item>
+     <widget class="QCheckBox" name="cbConfigOS">
+      <property name="text">
+       <string>configured by operating system</string>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QCheckBox" name="cbListenOnly">
       <property name="text">

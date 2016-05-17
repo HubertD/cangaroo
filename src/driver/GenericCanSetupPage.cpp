@@ -19,6 +19,7 @@ GenericCanSetupPage::GenericCanSetupPage(QWidget *parent) :
     connect(ui->cbBitrateFD, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUI()));
     connect(ui->cbSamplePointFD, SIGNAL(currentIndexChanged(int)), this, SLOT(updateUI()));
 
+    connect(ui->cbConfigOS, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
     connect(ui->cbListenOnly, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
     connect(ui->cbOneShot, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
     connect(ui->cbTripleSampling, SIGNAL(stateChanged(int)), this, SLOT(updateUI()));
@@ -53,6 +54,9 @@ void GenericCanSetupPage::onShowInterfacePage(SetupDialog &dlg, MeasurementInter
     ui->cbBitrateFD->setEnabled(caps & CanInterface::capability_canfd);
     ui->cbSamplePointFD->setEnabled(caps & CanInterface::capability_canfd);
 
+    ui->cbConfigOS->setEnabled(caps & CanInterface::capability_config_os);
+    ui->cbConfigOS->setChecked(!_mi->doConfigure());
+
     ui->cbListenOnly->setEnabled(caps & CanInterface::capability_listen_only);
     ui->cbListenOnly->setChecked(_mi->isListenOnlyMode());
 
@@ -68,6 +72,7 @@ void GenericCanSetupPage::onShowInterfacePage(SetupDialog &dlg, MeasurementInter
     dlg.displayPage(this);
 
     _enable_ui_updates = true;
+    updateUI();
 }
 
 void GenericCanSetupPage::updateUI()
@@ -75,6 +80,7 @@ void GenericCanSetupPage::updateUI()
     if (_enable_ui_updates && (_mi!=0)) {
         CanInterface *intf = backend().getInterfaceById(_mi->canInterface());
 
+        _mi->setDoConfigure(!ui->cbConfigOS->isChecked());
         _mi->setListenOnlyMode(ui->cbListenOnly->isChecked());
         _mi->setOneShotMode(ui->cbOneShot->isChecked());
         _mi->setTripleSampling(ui->cbTripleSampling->isChecked());
@@ -83,6 +89,8 @@ void GenericCanSetupPage::updateUI()
         _mi->setSamplePoint(ui->cbSamplePoint->currentData().toUInt());
 
         _enable_ui_updates = false;
+
+        disenableUI(_mi->doConfigure());
         fillSamplePointsForBitrate(
             intf,
             ui->cbBitrate->currentData().toUInt(),
@@ -91,6 +99,8 @@ void GenericCanSetupPage::updateUI()
         _enable_ui_updates = true;
 
     }
+
+
 }
 
 void GenericCanSetupPage::fillBitratesList(CanInterface *intf, uint32_t selectedBitrate)
@@ -127,6 +137,19 @@ void GenericCanSetupPage::fillSamplePointsForBitrate(CanInterface *intf, uint32_
         ui->cbSamplePoint->addItem(CanTiming::getSamplePointStr(sp), sp);
     }
     ui->cbSamplePoint->setCurrentText(CanTiming::getSamplePointStr(selectedSamplePoint));
+}
+
+void GenericCanSetupPage::disenableUI(bool enabled)
+{
+    ui->cbBitrate->setEnabled(enabled);
+    ui->cbSamplePoint->setEnabled(enabled);
+    ui->cbBitrateFD->setEnabled(enabled);
+    ui->cbSamplePointFD->setEnabled(enabled);
+
+    ui->cbListenOnly->setEnabled(enabled);
+    ui->cbOneShot->setEnabled(enabled);
+    ui->cbTripleSampling->setEnabled(enabled);
+    ui->cbAutoRestart->setEnabled(enabled);
 }
 
 Backend &GenericCanSetupPage::backend()
