@@ -91,7 +91,7 @@ void GenericCanSetupPage::updateUI()
 
 }
 
-void GenericCanSetupPage::fillBitratesList(CanInterface *intf, uint32_t selectedBitrate)
+void GenericCanSetupPage::fillBitratesList(CanInterface *intf, unsigned selectedBitrate)
 {
     QList<uint32_t> bitrates;
     foreach (CanTiming t, intf->getAvailableBitrates()) {
@@ -108,7 +108,7 @@ void GenericCanSetupPage::fillBitratesList(CanInterface *intf, uint32_t selected
     ui->cbBitrate->setCurrentText(QString::number(selectedBitrate));
 }
 
-void GenericCanSetupPage::fillSamplePointsForBitrate(CanInterface *intf, uint32_t selectedBitrate, uint32_t selectedSamplePoint)
+void GenericCanSetupPage::fillSamplePointsForBitrate(CanInterface *intf, unsigned selectedBitrate, unsigned selectedSamplePoint)
 {
     QList<uint32_t> samplePoints;
     foreach(CanTiming t, intf->getAvailableBitrates()) {

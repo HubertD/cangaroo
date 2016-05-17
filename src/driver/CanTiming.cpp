@@ -1,6 +1,6 @@
 #include "CanTiming.h"
 
-CanTiming::CanTiming(unsigned id, unsigned bitrate, uint32_t bitrate_fd, unsigned samplePoint)
+CanTiming::CanTiming(unsigned id, unsigned bitrate, unsigned bitrate_fd, unsigned samplePoint)
   : _id(id),
     _bitrate(bitrate),
     _bitrate_fd(bitrate_fd),

@@ -13,7 +13,7 @@ public:
      * \param bitrate_fd bitrate for the FD part, or zero this is not a CanFD timing
      * \param samplePoint sample point, e.g. 0.875
      */
-    CanTiming(unsigned id, unsigned bitrate, uint32_t bitrate_fd, unsigned samplePoint);
+    CanTiming(unsigned id, unsigned bitrate, unsigned bitrate_fd, unsigned samplePoint);
     unsigned getId();
     unsigned getBitrate();
     unsigned getBitrateFD();

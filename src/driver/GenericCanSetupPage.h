@@ -32,8 +32,8 @@ private:
     MeasurementInterface *_mi;
     bool _enable_ui_updates;
 
-    void fillBitratesList(CanInterface *intf, uint32_t selectedBitrate);
-    void fillSamplePointsForBitrate(CanInterface *intf, uint32_t selectedBitrate, uint32_t selectedSamplePoint);
+    void fillBitratesList(CanInterface *intf, unsigned selectedBitrate);
+    void fillSamplePointsForBitrate(CanInterface *intf, unsigned selectedBitrate, unsigned selectedSamplePoint);
     void disenableUI(bool enabled);
 
     Backend &backend();

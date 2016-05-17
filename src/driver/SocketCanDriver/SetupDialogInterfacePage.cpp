@@ -103,15 +103,17 @@ void SetupDialogInterfacePage::onShowInterfacePage(SetupDialog &dlg, Measurement
 
     ui->rbTimingSimple->setChecked(_mi->isSimpleTiming());
     ui->cbBitrate->clear();
-    foreach (int br, sci->getAvailableBitrates()) {
-        ui->cbBitrate->addItem(QString::number(br));
+    foreach (CanTiming t, sci->getAvailableBitrates()) {
+        ui->cbBitrate->addItem(QString::number(t.getBitrate()));
     }
     ui->cbBitrate->setCurrentText(QString::number(_mi->bitrate()));
     ui->slSamplePoint->setValue(_mi->samplePoint());
 
     ui->cbFdBitrate->clear();
-    foreach (int br, sci->getAvailableFdBitrates()) {
-        ui->cbFdBitrate->addItem(QString::number(br));
+    foreach (CanTiming t, sci->getAvailableBitrates()) {
+        if (t.getBitrateFD()!=0) {
+            ui->cbFdBitrate->addItem(QString::number(t.getBitrateFD()));
+        }
     }
     ui->cbFdBitrate->setCurrentText(QString::number(_mi->fdBitrate()));
     ui->slFdSamplePoint->setValue(_mi->fdSamplePoint());
