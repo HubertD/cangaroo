@@ -41,7 +41,6 @@ void GenericCanSetupPage::onShowInterfacePage(SetupDialog &dlg, MeasurementInter
 {
     _mi = mi;
     CanInterface *intf = backend().getInterfaceById(_mi->canInterface());
-    uint32_t caps = intf->getCapabilities();
 
     _enable_ui_updates = false;
 
@@ -52,28 +51,16 @@ void GenericCanSetupPage::onShowInterfacePage(SetupDialog &dlg, MeasurementInter
     fillBitratesList(intf, _mi->bitrate());
     fillSamplePointsForBitrate(intf, _mi->bitrate(), _mi->samplePoint());
 
-    ui->cbBitrateFD->setEnabled(caps & CanInterface::capability_canfd);
-    ui->cbSamplePointFD->setEnabled(caps & CanInterface::capability_canfd);
-
-    ui->cbConfigOS->setEnabled(caps & CanInterface::capability_config_os);
     ui->cbConfigOS->setChecked(!_mi->doConfigure());
-
-    ui->cbListenOnly->setEnabled(caps & CanInterface::capability_listen_only);
     ui->cbListenOnly->setChecked(_mi->isListenOnlyMode());
-
-    ui->cbOneShot->setEnabled(caps & CanInterface::capability_one_shot);
     ui->cbOneShot->setChecked(_mi->isOneShotMode());
-
-    ui->cbTripleSampling->setEnabled(caps & CanInterface::capability_triple_sampling);
     ui->cbTripleSampling->setChecked(_mi->isTripleSampling());
-
-    ui->cbAutoRestart->setEnabled(caps & CanInterface::capability_auto_restart);
     ui->cbAutoRestart->setChecked(_mi->doAutoRestart());
 
+    disenableUI(_mi->doConfigure());
     dlg.displayPage(this);
 
     _enable_ui_updates = true;
-    updateUI();
 }
 
 void GenericCanSetupPage::updateUI()
@@ -142,15 +129,20 @@ void GenericCanSetupPage::fillSamplePointsForBitrate(CanInterface *intf, uint32_
 
 void GenericCanSetupPage::disenableUI(bool enabled)
 {
+
+    CanInterface *intf = backend().getInterfaceById(_mi->canInterface());
+    uint32_t caps = intf->getCapabilities();
+
     ui->cbBitrate->setEnabled(enabled);
     ui->cbSamplePoint->setEnabled(enabled);
-    ui->cbBitrateFD->setEnabled(enabled);
-    ui->cbSamplePointFD->setEnabled(enabled);
+    ui->cbConfigOS->setEnabled(caps & CanInterface::capability_config_os);
 
-    ui->cbListenOnly->setEnabled(enabled);
-    ui->cbOneShot->setEnabled(enabled);
-    ui->cbTripleSampling->setEnabled(enabled);
-    ui->cbAutoRestart->setEnabled(enabled);
+    ui->cbBitrateFD->setEnabled(enabled && (caps & CanInterface::capability_canfd));
+    ui->cbSamplePointFD->setEnabled(enabled && (caps & CanInterface::capability_canfd));
+    ui->cbListenOnly->setEnabled(enabled && (caps & CanInterface::capability_listen_only));
+    ui->cbOneShot->setEnabled(enabled && (caps & CanInterface::capability_one_shot));
+    ui->cbTripleSampling->setEnabled(enabled && (caps & CanInterface::capability_triple_sampling));
+    ui->cbAutoRestart->setEnabled(enabled && (caps & CanInterface::capability_auto_restart));
 }
 
 Backend &GenericCanSetupPage::backend()
