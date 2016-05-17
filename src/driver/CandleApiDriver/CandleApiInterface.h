@@ -51,9 +51,10 @@ private:
 
     uint64_t _perfTicksPerSecond;
     uint64_t _perfCountStart;
-
     uint32_t _deviceTicksLastSync;
-    uint64_t _tLastSync_us;
+    uint64_t _hostTicksLastSync;
+    uint64_t _startTime_us;
+
 
     candle_handle _handle;
     MeasurementInterface _settings;

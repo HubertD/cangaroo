@@ -5,7 +5,8 @@ CandleApiInterface::CandleApiInterface(CandleApiDriver *driver, candle_handle ha
   : CanInterface(driver),
     _perfCountStart(0),
     _deviceTicksLastSync(0),
-    _tLastSync_us(0),
+    _hostTicksLastSync(0),
+    _startTime_us(0),
     _handle(handle),
     _numRx(0),
     _numTx(0),
@@ -206,7 +207,7 @@ void CandleApiInterface::syncTimestamp()
         t *= 1000000;
         t /= _perfTicksPerSecond;
 
-        _tLastSync_us = t;
+        _hostTicksLastSync = t;
         _deviceTicksLastSync = t_dev;
     }
 }
@@ -222,7 +223,7 @@ void CandleApiInterface::checkSyncTimestamp()
     t /= _perfTicksPerSecond;
 
     // resync if last sync is older than 10sec
-    if ( (t - _tLastSync_us) > 10000000 ) {
+    if ( (t - _hostTicksLastSync) > 10000000 ) {
         syncTimestamp();
     }
 
@@ -279,6 +280,8 @@ void CandleApiInterface::open()
     _numRx = 0;
     _numTx = 0;
     _numTxErr = 0;
+
+    _startTime_us = 1000 * QDateTime::currentMSecsSinceEpoch();
 
     candle_channel_start(_handle, 0, flags);
 }
@@ -337,10 +340,13 @@ bool CandleApiInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
 
             checkSyncTimestamp();
 
-            uint32_t dev_ts = candle_frame_timestamp_us(&frame);
+            int64_t dev_ts = candle_frame_timestamp_us(&frame);
             dev_ts -= _deviceTicksLastSync;
+            if (dev_ts<-20000000) {
+                dev_ts += 0x100000000;
+            }
 
-            uint64_t ts_us = _tLastSync_us + dev_ts;
+            uint64_t ts_us = _startTime_us + _hostTicksLastSync + dev_ts;
             msg.setTimestamp(ts_us/1000000, ts_us % 1000000);
 
             return true;

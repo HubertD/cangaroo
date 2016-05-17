@@ -468,6 +468,7 @@ bool __stdcall DLL candle_channel_start(candle_handle hdev, uint8_t ch, uint32_t
 {
     // TODO ensure device is open, check channel count..
     candle_device_t *dev = (candle_device_t*)hdev;
+    flags |= CANDLE_MODE_HW_TIMESTAMP;
     return candle_ctrl_set_device_mode(dev, ch, CANDLE_DEVMODE_START, flags);
 }
 
