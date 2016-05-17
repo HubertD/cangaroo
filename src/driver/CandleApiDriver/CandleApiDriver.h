@@ -26,7 +26,7 @@
 #include "api/candle.h"
 
 class CandleApiInterface;
-class CandleApiSetupPage;
+class GenericCanSetupPage;
 
 class CandleApiDriver : public CanDriver
 {
@@ -37,7 +37,7 @@ public:
     virtual bool update();
 
 private:
-    CandleApiSetupPage *setupPage;
+    GenericCanSetupPage *setupPage;
     CandleApiInterface *findInterface(candle_handle dev);
 
 };

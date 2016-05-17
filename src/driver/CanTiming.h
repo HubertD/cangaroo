@@ -19,6 +19,7 @@ public:
     unsigned getBitrateFD();
     bool isCanFD();
     float getSamplePoint();
+    static QString getSamplePointStr(float samplePoint);
 
     /*!
      * \brief getTitle get a brief one-line description of this timing

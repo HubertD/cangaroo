@@ -127,6 +127,9 @@ void CandleApiInterface::open()
     if (_settings.isListenOnlyMode()) {
         flags |= CANDLE_MODE_LISTEN_ONLY;
     }
+    if (_settings.isOneShotMode()) {
+        flags |= CANDLE_MODE_ONE_SHOT;
+    }
     if (_settings.isTripleSampling()) {
         flags |= CANDLE_MODE_TRIPLE_SAMPLE;
     }

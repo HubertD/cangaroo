@@ -28,6 +28,7 @@
 MeasurementInterface::MeasurementInterface()
   : _doConfigure(false),
     _isListenOnlyMode(false),
+    _isOneShotMode(false),
     _isTripleSampling(false),
     _isCanFD(false),
     _isSimpleTiming(true),
@@ -47,7 +48,7 @@ MeasurementInterface::MeasurementInterface()
     _fdPhaseSeg2(1),
     _doSetFdSJW(false),
     _fdSjw(1),
-    _doAutoRestart(true),
+    _doAutoRestart(false),
     _autoRestartMs(100)
 {
 
@@ -59,6 +60,7 @@ bool MeasurementInterface::loadXML(Backend &backend, QDomElement &el)
 
     _doConfigure = el.attribute("configure", "0").toInt() != 0;
     _isListenOnlyMode = el.attribute("listen-only", "0").toInt() != 0;
+    _isOneShotMode = el.attribute("one-shot", "0").toInt() != 0;
     _isTripleSampling = el.attribute("triple-sampling", "0").toInt() != 0;
     _isCanFD = el.attribute("can-fd", "0").toInt() != 0;
     _isSimpleTiming = el.attribute("timing-mode", "bitrate") == "bitrate";
@@ -101,6 +103,7 @@ bool MeasurementInterface::saveXML(Backend &backend, QDomDocument &xml, QDomElem
 
     root.setAttribute("configure", _doConfigure ? 1 : 0);
     root.setAttribute("listen-only", _isListenOnlyMode ? 1 : 0);
+    root.setAttribute("one-shot", _isOneShotMode ? 1 : 0);
     root.setAttribute("triple-sampling", _isTripleSampling ? 1 : 0);
     root.setAttribute("can-fd", _isCanFD ? 1 : 0);
     root.setAttribute("timing-mode", _isSimpleTiming ? "bitrate" : "registers");
@@ -181,6 +184,16 @@ bool MeasurementInterface::isListenOnlyMode() const
 void MeasurementInterface::setListenOnlyMode(bool isListenOnlyMode)
 {
     _isListenOnlyMode = isListenOnlyMode;
+}
+
+bool MeasurementInterface::isOneShotMode() const
+{
+    return _isOneShotMode;
+}
+
+void MeasurementInterface::setOneShotMode(bool isOneShotMode)
+{
+    _isOneShotMode = isOneShotMode;
 }
 
 bool MeasurementInterface::isTripleSampling() const

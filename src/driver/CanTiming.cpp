@@ -33,6 +33,11 @@ float CanTiming::getSamplePoint()
     return _samplePoint;
 }
 
+QString CanTiming::getSamplePointStr(float samplePoint)
+{
+    return QString::number(100*samplePoint, 'f', 1).append("%");
+}
+
 QString CanTiming::getTitle()
 {
     QString format = isCanFD() ? "%1/%3(FD) kBit/s, sample point %2%" : "%1 kBit/s, sample point %2";

@@ -385,7 +385,7 @@ bool __stdcall DLL candle_channel_get_capabilities(candle_handle hdev, uint8_t c
 {
     // TODO check if info was already read from device; try to do so; throw error...
     candle_device_t *dev = (candle_device_t*)hdev;
-    memcpy(cap, &dev->bt_const, sizeof(candle_capability_t));
+    memcpy(cap, &dev->bt_const.feature, sizeof(candle_capability_t));
     return true;
 }
 

@@ -47,6 +47,9 @@ public:
     bool isListenOnlyMode() const;
     void setListenOnlyMode(bool isListenOnlyMode);
 
+    bool isOneShotMode() const;
+    void setOneShotMode(bool isOneShotMode);
+
     bool isTripleSampling() const;
     void setTripleSampling(bool isTripleSampling);
 
@@ -112,6 +115,7 @@ private:
 
     bool _doConfigure;
     bool _isListenOnlyMode;
+    bool _isOneShotMode;
     bool _isTripleSampling;
     bool _isCanFD;
 

@@ -23,11 +23,11 @@
 #include "api/candle.h"
 
 #include "CandleApiInterface.h"
-#include "CandleApiSetupPage.h"
+#include <driver/GenericCanSetupPage.h>
 
 CandleApiDriver::CandleApiDriver(Backend &backend)
   : CanDriver(backend),
-    setupPage(new CandleApiSetupPage(0))
+    setupPage(new GenericCanSetupPage(0))
 {
     QObject::connect(&backend, SIGNAL(onSetupDialogCreated(SetupDialog&)), setupPage, SLOT(onSetupDialogCreated(SetupDialog&)));
 }
