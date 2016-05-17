@@ -35,6 +35,11 @@ CanDriver* CanInterface::getDriver() {
     return _driver;
 }
 
+QString CanInterface::getDetailsStr() const
+{
+    return "";
+}
+
 uint32_t CanInterface::getCapabilities()
 {
     return 0;
@@ -80,7 +85,7 @@ QString CanInterface::getStateText()
     }
 }
 
-CanInterfaceId CanInterface::getId()
+CanInterfaceId CanInterface::getId() const
 {
     return _id;
 }

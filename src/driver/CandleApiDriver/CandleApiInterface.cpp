@@ -122,7 +122,12 @@ CandleApiInterface::~CandleApiInterface()
 
 QString CandleApiInterface::getName() const
 {
-    return "candle";
+    return "candle" + QString::number(getId() & 0xFF);
+}
+
+QString CandleApiInterface::getDetailsStr() const
+{
+    return QString::fromStdWString(getPath());
 }
 
 void CandleApiInterface::applyConfig(const MeasurementInterface &mi)
@@ -386,7 +391,7 @@ int CandleApiInterface::getNumTxDropped()
     return 0;
 }
 
-wstring CandleApiInterface::getPath()
+wstring CandleApiInterface::getPath() const
 {
     return wstring(candle_dev_get_path(_handle));
 }

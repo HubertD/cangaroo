@@ -47,6 +47,7 @@ void GenericCanSetupPage::onShowInterfacePage(SetupDialog &dlg, MeasurementInter
 
     ui->laDriver->setText(intf->getDriver()->getName());
     ui->laInterface->setText(intf->getName());
+    ui->laInterfaceDetails->setText(intf->getDetailsStr());
 
     fillBitratesList(intf, _mi->bitrate());
     fillSamplePointsForBitrate(intf, _mi->bitrate(), _mi->samplePoint());

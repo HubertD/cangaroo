@@ -54,6 +54,7 @@ public:
 	virtual ~CanInterface();
     virtual CanDriver *getDriver();
     virtual QString getName() const = 0;
+    virtual QString getDetailsStr() const;
 
     virtual void applyConfig(const MeasurementInterface &mi) = 0;
 
@@ -79,7 +80,7 @@ public:
 
     QString getStateText();
 
-    CanInterfaceId getId();
+    CanInterfaceId getId() const;
     void setId(CanInterfaceId id);
 
 private:

@@ -17,7 +17,10 @@ class CandleApiInterface : public CanInterface
 public:
     CandleApiInterface(CandleApiDriver *driver, candle_handle handle);
     virtual ~CandleApiInterface();
+
     virtual QString getName() const;
+    virtual QString getDetailsStr() const;
+
     virtual void applyConfig(const MeasurementInterface &mi);
 
     virtual int getBitrate();
@@ -40,7 +43,7 @@ public:
     virtual int getNumRxOverruns();
     virtual int getNumTxDropped();
 
-    wstring getPath();
+    wstring getPath() const;
 
     void update(candle_handle dev);
 
