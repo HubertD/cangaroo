@@ -63,6 +63,8 @@ private:
 
     void syncTimestamp();
     void checkSyncTimestamp();
+
+    bool setBitTiming(uint32_t bitrate, uint32_t samplePoint);
 };
 
 #endif // CANDLEAPIINTERFACE_H

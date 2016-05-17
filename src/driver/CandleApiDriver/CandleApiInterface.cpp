@@ -223,14 +223,38 @@ void CandleApiInterface::checkSyncTimestamp()
 
 }
 
+bool CandleApiInterface::setBitTiming(uint32_t bitrate, uint32_t samplePoint)
+{
+    candle_capability_t caps;
+    if (!candle_channel_get_capabilities(_handle, 0, &caps)) {
+        return false;
+    }
+
+    foreach (const CandleApiTiming t, _timings) {
+        if ( (t.getBaseClk() == caps.fclk_can)
+          && (t.getBitrate()==bitrate)
+          && (t.getSamplePoint()==samplePoint) )
+        {
+            candle_bittiming_t timing = t.getTiming();
+            return candle_channel_set_timing(_handle, 0, &timing);
+        }
+    }
+
+    // no valid timing found
+    return false;
+}
+
 void CandleApiInterface::open()
 {
     if (!candle_dev_open(_handle)) {
-        // DO what?
+        // TODO what?
         return;
     }
 
-    candle_channel_set_bitrate(_handle, 0, _settings.bitrate());
+    if (!setBitTiming(_settings.bitrate(), _settings.samplePoint())) {
+        // TODO what?
+        return;
+    }
 
     uint32_t flags = 0;
     if (_settings.isListenOnlyMode()) {
