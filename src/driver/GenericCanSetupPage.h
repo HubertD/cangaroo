@@ -25,7 +25,7 @@ public slots:
     void onShowInterfacePage(SetupDialog &dlg, MeasurementInterface *mi);
 
 private slots:
-    void saveUiChanges();
+    void updateUI();
 
 private:
     Ui::GenericCanSetupPage *ui;
@@ -33,7 +33,7 @@ private:
     bool _enable_ui_updates;
 
     void fillBitratesList(CanInterface *intf, uint32_t selectedBitrate);
-    void fillSamplePointsForBitrate(CanInterface *intf, uint32_t selectedBitrate, float selectedSamplePoint);
+    void fillSamplePointsForBitrate(CanInterface *intf, uint32_t selectedBitrate, uint32_t selectedSamplePoint);
 
     Backend &backend();
 };

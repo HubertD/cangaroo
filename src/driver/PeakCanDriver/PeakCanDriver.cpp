@@ -1,13 +1,13 @@
 #include "PeakCanDriver.h"
 #include "PeakCanInterface.h"
-#include "PeakCanSetupPage.h"
+#include <driver/GenericCanSetupPage.h>
 
 #include <windows.h>
 #include "pcan-basic-api/Include/PCANBasic.h"
 
 PeakCanDriver::PeakCanDriver(Backend &backend)
   : CanDriver(backend),
-    setupPage(new PeakCanSetupPage(0))
+    setupPage(new GenericCanSetupPage(0))
 {
     QObject::connect(&backend, SIGNAL(onSetupDialogCreated(SetupDialog&)), setupPage, SLOT(onSetupDialogCreated(SetupDialog&)));
 }

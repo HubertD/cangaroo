@@ -13,13 +13,13 @@ public:
      * \param bitrate_fd bitrate for the FD part, or zero this is not a CanFD timing
      * \param samplePoint sample point, e.g. 0.875
      */
-    CanTiming(unsigned id, unsigned bitrate, uint32_t bitrate_fd, float samplePoint);
+    CanTiming(unsigned id, unsigned bitrate, uint32_t bitrate_fd, unsigned samplePoint);
     unsigned getId();
     unsigned getBitrate();
     unsigned getBitrateFD();
     bool isCanFD();
-    float getSamplePoint();
-    static QString getSamplePointStr(float samplePoint);
+    unsigned getSamplePoint();
+    static QString getSamplePointStr(unsigned samplePoint);
 
     /*!
      * \brief getTitle get a brief one-line description of this timing
@@ -31,7 +31,7 @@ private:
     unsigned _id;
     unsigned _bitrate;
     unsigned _bitrate_fd;
-    float _samplePoint;
+    unsigned _samplePoint;
 };
 
 #endif // CANTIMING_H

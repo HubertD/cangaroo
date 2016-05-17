@@ -67,7 +67,19 @@ uint32_t CandleApiInterface::getCapabilities()
 
 QList<CanTiming> CandleApiInterface::getAvailableBitrates()
 {
-    return CanInterface::getAvailableBitrates();
+    QList<CanTiming> retval;
+
+    QList<unsigned> bitrates = QList<unsigned>() << 10000 << 20000 << 50000 << 100000 << 125000 << 250000 << 500000 << 800000 << 1000000;
+    QList<unsigned> spoints = QList<unsigned>() << 500 << 625 << 750 << 875;
+
+    int i = 0;
+    foreach (unsigned br, bitrates) {
+        foreach (unsigned sp, spoints) {
+            retval << CanTiming(i++, br, 0, sp);
+        }
+    }
+
+    return retval;
 }
 
 //! sync device time with host time
