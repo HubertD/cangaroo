@@ -49,24 +49,18 @@ public:
 
 private:
 
-    uint64_t _perfTicksPerSecond;
-    uint64_t _perfCountStart;
-    uint32_t _deviceTicksLastSync;
-    uint64_t _hostTicksLastSync;
-    uint64_t _startTime_us;
-
+    uint64_t _hostOffsetStart;
+    uint32_t _deviceTicksStart;
 
     candle_handle _handle;
     MeasurementInterface _settings;
+    Backend &_backend;
 
     uint64_t _numRx;
     uint64_t _numTx;
     uint64_t _numTxErr;
 
     QList<CandleApiTiming> _timings;
-
-    void syncTimestamp();
-    void checkSyncTimestamp();
 
     bool setBitTiming(uint32_t bitrate, uint32_t samplePoint);
 };
