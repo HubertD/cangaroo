@@ -31,8 +31,6 @@ class MeasurementInterface
 {
 public:
     MeasurementInterface();
-    int bitrate() const;
-    void setBitrate(int bitrate);
 
     CanInterfaceId canInterface() const;
     void setCanInterface(CanInterfaceId canif);
@@ -59,14 +57,17 @@ public:
     bool isSimpleTiming() const;
     void setSimpleTiming(bool isSimpleTiming);
 
+    unsigned bitrate() const;
+    void setBitrate(unsigned bitrate);
+
     int samplePoint() const;
     void setSamplePoint(int samplePoint);
 
-    int fdBitrate() const;
-    void setFdBitrate(int fdBitrate);
+    unsigned fdBitrate() const;
+    void setFdBitrate(unsigned fdBitrate);
 
-    int fdSamplePoint() const;
-    void setFdSamplePoint(int fdSamplePoint);
+    unsigned fdSamplePoint() const;
+    void setFdSamplePoint(unsigned fdSamplePoint);
 
     int tq() const;
     void setTq(int tq);
@@ -120,11 +121,11 @@ private:
     bool _isCanFD;
 
     bool _isSimpleTiming;
-    int _bitrate;
-    int _samplePoint;
+    unsigned _bitrate;
+    unsigned _samplePoint;
 
-    int _fdBitrate;
-    int _fdSamplePoint;
+    unsigned _fdBitrate;
+    unsigned _fdSamplePoint;
 
     int _tq;
     int _propSeg;

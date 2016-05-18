@@ -268,7 +268,7 @@ bool SocketCanInterface::supportsTripleSampling()
     return false;
 }
 
-int SocketCanInterface::getBitrate() {
+unsigned SocketCanInterface::getBitrate() {
     if (readConfig()) {
         return _config.bit_timing.bitrate;
     } else {

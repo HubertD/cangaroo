@@ -17,7 +17,57 @@ PeakCanInterface::PeakCanInterface(PeakCanDriver *driver, uint32_t handle)
 
     _config.autoRestart = true;
     _config.listenOnly = false;
-    _config.bitrate = 100000;
+    _config.bitrate = 500000;
+    _config.samplePoint = 875;
+
+    // sample point: 50.0%
+    _timings << CanTiming(0x3176,   10000, 0, 500) \
+             << CanTiming(0x1876,   20000, 0, 500) \
+             << CanTiming(0x0976,   50000, 0, 500) \
+             << CanTiming(0x0576,   83333, 0, 500) \
+             << CanTiming(0x0476,  100000, 0, 500) \
+             << CanTiming(0x0376,  125000, 0, 500) \
+             << CanTiming(0x0176,  250000, 0, 500) \
+             << CanTiming(0x0076,  500000, 0, 500) \
+             << CanTiming(0x0043,  800000, 0, 500) \
+             << CanTiming(0x0032, 1000000, 0, 500);
+
+    // sample point: 62.5%
+    _timings << CanTiming(0x3158,   10000, 0, 625) \
+             << CanTiming(0x1858,   20000, 0, 625) \
+             << CanTiming(0x0958,   50000, 0, 625) \
+             << CanTiming(0x0558,   83333, 0, 625) \
+             << CanTiming(0x0458,  100000, 0, 625) \
+             << CanTiming(0x0358,  125000, 0, 625) \
+             << CanTiming(0x0158,  250000, 0, 625) \
+             << CanTiming(0x0058,  500000, 0, 625) \
+             << CanTiming(0x0034,  800000, 0, 600) \
+             << CanTiming(0x0023, 1000000, 0, 625);
+
+    // sample point: 75.0%
+    _timings << CanTiming(0x313A,   10000, 0, 750) \
+             << CanTiming(0x183A,   20000, 0, 750) \
+             << CanTiming(0x093A,   50000, 0, 750) \
+             << CanTiming(0x053A,   83333, 0, 750) \
+             << CanTiming(0x043A,  100000, 0, 750) \
+             << CanTiming(0x033A,  125000, 0, 750) \
+             << CanTiming(0x013A,  250000, 0, 750) \
+             << CanTiming(0x003A,  500000, 0, 750) \
+             << CanTiming(0x0016,  800000, 0, 800) \
+             << CanTiming(0x0014, 1000000, 0, 750);
+
+    // sample point: 87.5%
+    _timings << CanTiming(0x311C,   10000, 0, 875) \
+             << CanTiming(0x181C,   20000, 0, 875) \
+             << CanTiming(0x091C,   50000, 0, 875) \
+             << CanTiming(0x051C,   83333, 0, 875) \
+             << CanTiming(0x041C,  100000, 0, 875) \
+             << CanTiming(0x031C,  125000, 0, 875) \
+             << CanTiming(0x011C,  250000, 0, 875) \
+             << CanTiming(0x001C,  500000, 0, 875) \
+             << CanTiming(0x0007,  800000, 0, 900) \
+             << CanTiming(0x0005, 1000000, 0, 875);
+
 }
 
 PeakCanInterface::~PeakCanInterface()
@@ -66,7 +116,7 @@ void PeakCanInterface::applyConfig(const MeasurementInterface &mi)
     _config.autoRestart = mi.doAutoRestart();
     _config.listenOnly = mi.isListenOnlyMode();
     _config.bitrate = mi.bitrate();
-
+    _config.samplePoint = mi.samplePoint();
 }
 
 uint32_t PeakCanInterface::getCapabilities()
@@ -74,7 +124,7 @@ uint32_t PeakCanInterface::getCapabilities()
     return CanInterface::capability_listen_only | CanInterface::capability_auto_restart;
 }
 
-int PeakCanInterface::getBitrate()
+unsigned PeakCanInterface::getBitrate()
 {
     uint32_t speed = 0;
     if (CAN_GetValue(_handle, PCAN_BUSSPEED_NOMINAL, &speed, sizeof(speed))==PCAN_ERROR_OK) {
@@ -84,25 +134,15 @@ int PeakCanInterface::getBitrate()
     }
 }
 
-uint16_t PeakCanInterface::calcBitrateMode(int bitrate)
+uint16_t PeakCanInterface::calcBitrateMode(unsigned bitrate, unsigned samplePoint)
 {
-    switch (bitrate) {
-        case    5000: return PCAN_BAUD_5K;
-        case   10000: return PCAN_BAUD_10K;
-        case   20000: return PCAN_BAUD_20K;
-        case   33333: return PCAN_BAUD_33K;
-        case   47619: return PCAN_BAUD_47K;
-        case   50000: return PCAN_BAUD_50K;
-        case   83333: return PCAN_BAUD_83K;
-        case   95238: return PCAN_BAUD_95K;
-        case  100000: return PCAN_BAUD_100K;
-        case  125000: return PCAN_BAUD_125K;
-        case  250000: return PCAN_BAUD_250K;
-        case  500000: return PCAN_BAUD_500K;
-        case  800000: return PCAN_BAUD_800K;
-        case 1000000: return PCAN_BAUD_1M;
-        default: return 0;
+    foreach (CanTiming t, _timings) {
+        if ( (t.getBitrate()==bitrate) && (t.getSamplePoint()==samplePoint) ) {
+            return t.getId() & 0xFFFF;
+        }
     }
+
+    return 0;
 }
 
 QString PeakCanInterface::getErrorText(uint32_t status_code)
@@ -118,7 +158,7 @@ QString PeakCanInterface::getErrorText(uint32_t status_code)
 
 QList<CanTiming> PeakCanInterface::getAvailableBitrates()
 {
-    return CanInterface::getAvailableBitrates();
+    return _timings;
 }
 
 void PeakCanInterface::open()
@@ -138,9 +178,14 @@ void PeakCanInterface::open()
         log_error(QString("could not set listen only mode=%3 for CAN channel %1: %2").arg(getName()).arg(getErrorText(result)).arg(_config.listenOnly ? "on" : "off"));
     }
 
-    uint16_t bitrate_mode = calcBitrateMode(_config.bitrate);
+    uint16_t bitrate_mode = calcBitrateMode(_config.bitrate, _config.samplePoint);
     if (bitrate_mode==0) {
-        log_error(QString("CAN channel %1: cannot find bitrate settings for baud rate: %2").arg(getName()).arg(bitrate_mode));
+        log_error(
+            QString("CAN channel %1: cannot find bitrate settings for baud rate %2, sample point %3")
+            .arg(getName())
+            .arg(_config.bitrate)
+            .arg(CanTiming::getSamplePointStr(_config.samplePoint))
+        );
         return;
     }
 

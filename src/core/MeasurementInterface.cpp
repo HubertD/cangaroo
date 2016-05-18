@@ -141,12 +141,12 @@ bool MeasurementInterface::saveXML(Backend &backend, QDomDocument &xml, QDomElem
     return true;
 }
 
-int MeasurementInterface::bitrate() const
+unsigned MeasurementInterface::bitrate() const
 {
     return _bitrate;
 }
 
-void MeasurementInterface::setBitrate(int bitrate)
+void MeasurementInterface::setBitrate(unsigned bitrate)
 {
     _bitrate = bitrate;
 }
@@ -236,22 +236,22 @@ void MeasurementInterface::setSamplePoint(int samplePoint)
     _samplePoint = samplePoint;
 }
 
-int MeasurementInterface::fdBitrate() const
+unsigned MeasurementInterface::fdBitrate() const
 {
     return _fdBitrate;
 }
 
-void MeasurementInterface::setFdBitrate(int fdBitrate)
+void MeasurementInterface::setFdBitrate(unsigned fdBitrate)
 {
     _fdBitrate = fdBitrate;
 }
 
-int MeasurementInterface::fdSamplePoint() const
+unsigned MeasurementInterface::fdSamplePoint() const
 {
     return _fdSamplePoint;
 }
 
-void MeasurementInterface::setFdSamplePoint(int fdSamplePoint)
+void MeasurementInterface::setFdSamplePoint(unsigned fdSamplePoint)
 {
     _fdSamplePoint = fdSamplePoint;
 }

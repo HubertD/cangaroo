@@ -18,7 +18,7 @@ public:
     virtual void applyConfig(const MeasurementInterface &mi);
 
     virtual uint32_t getCapabilities();
-    virtual int getBitrate();
+    virtual unsigned getBitrate();
 
     virtual QList<CanTiming> getAvailableBitrates();
 
@@ -46,10 +46,13 @@ private:
     struct {
         bool autoRestart;
         bool listenOnly;
-        int bitrate;
+        unsigned bitrate;
+        unsigned samplePoint;
     } _config;
 
-    uint16_t calcBitrateMode(int bitrate);
+    QList<CanTiming> _timings;
+
+    uint16_t calcBitrateMode(unsigned bitrate, unsigned samplePoint);
     QString getErrorText(uint32_t status_code);
 
 };

@@ -58,7 +58,7 @@ public:
 
     virtual void applyConfig(const MeasurementInterface &mi) = 0;
 
-    virtual int getBitrate() = 0;
+    virtual unsigned getBitrate() = 0;
 
     virtual uint32_t getCapabilities();
     virtual QList<CanTiming> getAvailableBitrates();

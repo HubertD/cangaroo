@@ -67,7 +67,7 @@ public:
     bool supportsCanFD();
     bool supportsTripleSampling();
 
-    virtual int getBitrate();
+    virtual unsigned getBitrate();
     virtual uint32_t getCapabilities();
 
 

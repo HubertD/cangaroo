@@ -132,7 +132,7 @@ void CandleApiInterface::applyConfig(const MeasurementInterface &mi)
     _settings = mi;
 }
 
-int CandleApiInterface::getBitrate()
+unsigned CandleApiInterface::getBitrate()
 {
     return _settings.bitrate();
 }
