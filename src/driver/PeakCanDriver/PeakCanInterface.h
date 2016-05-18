@@ -1,6 +1,7 @@
 #pragma once
 
 #include <driver/CanInterface.h>
+#include <QElapsedTimer>
 
 class PeakCanDriver;
 
@@ -38,9 +39,8 @@ public:
 
 private:
     uint32_t _handle;
-    uint64_t _perfTicksPerSecond;
-    uint64_t _hostTimestampStart;
-    uint64_t _peakTimestampStart;
+    uint64_t _hostOffsetFirstFrame;
+    uint64_t _peakOffsetFirstFrame;
     void *_autoResetEvent;
 
     struct {

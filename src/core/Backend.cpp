@@ -72,7 +72,8 @@ bool Backend::startMeasurement()
 {
     log_info("Starting measurement");
 
-    _measurementStartTime = currentTimeStamp();
+    _measurementStartTime = QDateTime::currentMSecsSinceEpoch();
+    _timerSinceStart.start();
 
     int i=0;
     foreach (MeasurementNetwork *network, _setup.getNetworks()) {
@@ -273,9 +274,24 @@ LogModel &Backend::getLogModel() const
     return *_logModel;
 }
 
-double Backend::getMeasurementStartTime() const
+double Backend::getTimestampAtMeasurementStart() const
 {
-    return _measurementStartTime;
+    return (double)_measurementStartTime / 1000.0;
+}
+
+uint64_t Backend::getUsecsAtMeasurementStart() const
+{
+    return _measurementStartTime * 1000;
+}
+
+uint64_t Backend::getNsecsSinceMeasurementStart() const
+{
+    return _timerSinceStart.nsecsElapsed();
+}
+
+uint64_t Backend::getUsecsSinceMeasurementStart() const
+{
+    return getNsecsSinceMeasurementStart() / 1000;
 }
 
 void Backend::logMessage(const QDateTime dt, const log_level_t level, const QString msg)

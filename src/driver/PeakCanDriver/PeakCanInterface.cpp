@@ -10,14 +10,9 @@
 PeakCanInterface::PeakCanInterface(PeakCanDriver *driver, uint32_t handle)
   : CanInterface(driver),
     _handle(handle),
-    _hostTimestampStart(0),
-    _peakTimestampStart(0)
+    _hostOffsetFirstFrame(0),
+    _peakOffsetFirstFrame(0)
 {
-
-    LARGE_INTEGER tps;
-    QueryPerformanceFrequency(&tps);
-    _perfTicksPerSecond = tps.QuadPart;
-
     _autoResetEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
     _config.autoRestart = true;
@@ -173,6 +168,9 @@ void PeakCanInterface::open()
         log_error(QString("could not set busoff auto reset mode=%3 for CAN channel %1: %2").arg(getName()).arg(getErrorText(result)).arg(_config.autoRestart ? "on" : "off"));
     }
 
+    _peakOffsetFirstFrame = 0;
+    _hostOffsetFirstFrame = 0;
+
 }
 
 void PeakCanInterface::close()
@@ -222,13 +220,14 @@ bool PeakCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
         ts *= 1000;
         ts += timestamp.micros;
 
-        if (_peakTimestampStart==0) {
-            _hostTimestampStart = 1000 * QDateTime::currentMSecsSinceEpoch();
-            _peakTimestampStart = ts;
+        if ( (_peakOffsetFirstFrame==0) || (_hostOffsetFirstFrame==0) ) {
+            _hostOffsetFirstFrame = getDriver()->backend().getUsecsAtMeasurementStart()
+                                  + getDriver()->backend().getUsecsSinceMeasurementStart();
+            _peakOffsetFirstFrame = ts;
         }
 
-        ts -=_peakTimestampStart;
-        ts += _hostTimestampStart;
+        ts -=_peakOffsetFirstFrame;
+        ts += _hostOffsetFirstFrame;
 
         msg.setTimestamp(ts/1000000, ts % 1000000);
 

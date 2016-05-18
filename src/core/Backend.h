@@ -21,10 +21,12 @@
 
 #pragma once
 
+#include <stdint.h>
 #include <QObject>
 #include <QList>
 #include <QMutex>
 #include <QDateTime>
+#include <QElapsedTimer>
 #include <driver/CanDriver.h>
 #include <core/CanDb.h>
 #include <core/MeasurementSetup.h>
@@ -51,7 +53,11 @@ public:
     bool startMeasurement();
     bool stopMeasurement();
     bool isMeasurementRunning() const;
-    double getMeasurementStartTime() const;
+    double getTimestampAtMeasurementStart() const;
+    uint64_t getUsecsAtMeasurementStart() const;
+    uint64_t getNsecsSinceMeasurementStart() const;
+    uint64_t getUsecsSinceMeasurementStart() const;
+
 
     void logMessage(const QDateTime dt, const log_level_t level, const QString msg);
 
@@ -98,7 +104,8 @@ private:
     static Backend *_instance;
 
     bool _measurementRunning;
-    double _measurementStartTime;
+    uint64_t _measurementStartTime;
+    QElapsedTimer _timerSinceStart;
     QList<CanDriver*> _drivers;
     MeasurementSetup _setup;
     CanTrace *_trace;

@@ -124,7 +124,7 @@ QVariant BaseTraceViewModel::formatTimestamp(timestamp_mode_t mode, const CanMes
 
     } else if (mode==timestamp_mode_relative) {
 
-        return QString().sprintf("%.04lf", t_current - backend()->getMeasurementStartTime());
+        return QString().sprintf("%.04lf", t_current - backend()->getTimestampAtMeasurementStart());
 
     }
 
