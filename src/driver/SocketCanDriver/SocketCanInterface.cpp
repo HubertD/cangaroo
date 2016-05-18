@@ -63,6 +63,22 @@ void SocketCanInterface::setName(QString name) {
     _name = name;
 }
 
+QList<CanTiming> SocketCanInterface::getAvailableBitrates()
+{
+    QList<CanTiming> retval;
+    QList<unsigned> bitrates({10000, 20000, 50000, 83333, 100000, 125000, 250000, 500000, 800000, 1000000});
+    QList<unsigned> samplePoints({500, 625, 750, 875});
+
+    unsigned i=0;
+    foreach (unsigned br, bitrates) {
+        foreach (unsigned sp, samplePoints) {
+            retval << CanTiming(i++, br, 0, sp);
+        }
+    }
+
+    return retval;
+}
+
 void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
 {
     if (!mi.doConfigure()) {
@@ -262,7 +278,10 @@ int SocketCanInterface::getBitrate() {
 
 uint32_t SocketCanInterface::getCapabilities()
 {
-    uint32_t retval = CanInterface::capability_auto_restart;
+    uint32_t retval =
+        CanInterface::capability_config_os |
+        CanInterface::capability_listen_only |
+        CanInterface::capability_auto_restart;
 
     if (supportsCanFD()) {
         retval |= CanInterface::capability_canfd;

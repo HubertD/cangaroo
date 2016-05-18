@@ -57,8 +57,9 @@ public:
     virtual QString getName() const;
     void setName(QString name);
 
-    virtual void applyConfig(const MeasurementInterface &mi);
+    virtual QList<CanTiming> getAvailableBitrates();
 
+    virtual void applyConfig(const MeasurementInterface &mi);
     virtual bool readConfig();
     virtual bool readConfigFromLink(struct rtnl_link *link);
 

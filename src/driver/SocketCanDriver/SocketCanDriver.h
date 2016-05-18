@@ -27,6 +27,7 @@
 
 class SocketCanInterface;
 class SetupDialogInterfacePage;
+class GenericCanSetupPage;
 
 class SocketCanDriver: public CanDriver {
 public:
@@ -38,5 +39,5 @@ public:
 
 private:
     SocketCanInterface *createOrUpdateInterface(int index, QString name);
-    SetupDialogInterfacePage *setupPage;
+    GenericCanSetupPage *setupPage;
 };
