@@ -54,9 +54,6 @@ public:
     bool isCanFD() const;
     void setCanFD(bool isCanFD);
 
-    bool isSimpleTiming() const;
-    void setSimpleTiming(bool isSimpleTiming);
-
     unsigned bitrate() const;
     void setBitrate(unsigned bitrate);
 
@@ -69,42 +66,6 @@ public:
     unsigned fdSamplePoint() const;
     void setFdSamplePoint(unsigned fdSamplePoint);
 
-    int tq() const;
-    void setTq(int tq);
-
-    int propSeg() const;
-    void setPropSeg(int propSeg);
-
-    int phaseSeg1() const;
-    void setPhaseSeg1(int phaseSeg1);
-
-    int phaseSeg2() const;
-    void setPhaseSeg2(int phaseSeg2);
-
-    bool doSetSJW() const;
-    void setDoSetSJW(bool doSetSJW);
-
-    int SJW() const;
-    void setSJW(int SJW);
-
-    int fdTq() const;
-    void setFdTq(int fdTq);
-
-    int fdPropSeg() const;
-    void setFdPropSeg(int fdPropSeg);
-
-    int fdPhaseSeg1() const;
-    void setFdPhaseSeg1(int fdPhaseSeg1);
-
-    int fdPhaseSeg2() const;
-    void setFdPhaseSeg2(int fdPhaseSeg2);
-
-    bool doSetFdSJW() const;
-    void setDoSetFdSJW(bool doSetFdSJW);
-
-    int fdSJW() const;
-    void setFdSJW(int fdSJW);
-
     bool doAutoRestart() const;
     void setAutoRestart(bool doAutoRestart);
 
@@ -115,32 +76,17 @@ private:
     CanInterfaceId _canif;
 
     bool _doConfigure;
-    bool _isListenOnlyMode;
-    bool _isOneShotMode;
-    bool _isTripleSampling;
-    bool _isCanFD;
 
-    bool _isSimpleTiming;
     unsigned _bitrate;
     unsigned _samplePoint;
 
+    bool _isCanFD;
     unsigned _fdBitrate;
     unsigned _fdSamplePoint;
 
-    int _tq;
-    int _propSeg;
-    int _phaseSeg1;
-    int _phaseSeg2;
-    bool _doSetSJW;
-    int _sjw;
-
-    int _fdTq;
-    int _fdPropSeg;
-    int _fdPhaseSeg1;
-    int _fdPhaseSeg2;
-    bool _doSetFdSJW;
-    int _fdSjw;
-
+    bool _isListenOnlyMode;
+    bool _isOneShotMode;
+    bool _isTripleSampling;
     bool _doAutoRestart;
     int _autoRestartMs;
 };
