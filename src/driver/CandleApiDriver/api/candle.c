@@ -26,6 +26,8 @@
 #include "candle_ctrl_req.h"
 #include "ch_9.h"
 
+static bool candle_dev_interal_open(candle_handle hdev);
+
 static bool candle_read_di(HDEVINFO hdi, SP_DEVICE_INTERFACE_DATA interfaceData, candle_device_t *dev)
 {
     /* get required length first (this call always fails with an error) */
@@ -63,7 +65,7 @@ static bool candle_read_di(HDEVINFO hdi, SP_DEVICE_INTERFACE_DATA interfaceData,
     }
 
     /* try to open to read device infos and see if it is avail */
-    if (candle_dev_open(dev)) {
+    if (candle_dev_interal_open(dev)) {
         dev->state = CANDLE_DEVSTATE_AVAIL;
         candle_dev_close(dev);
     } else {
