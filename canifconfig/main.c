@@ -59,7 +59,19 @@ void print_usage(char *program_name)
 {
     fprintf(
         stderr,
-        "Usage: %s\n",
+        "Usage: %s -i <socketcan interface>\n"
+        "  -d          bring interface down before configuration\n"
+        "  -u          bring interface up after configuration\n"
+        "  -b <n>      set bitrate to n bits per second\n"
+        "  -p <n>      set sample point to n/1000, e.g. 875 for 87.5%\n"
+        "  -f <on|off> enable/disable CanFD\n"
+        "  -B <n>      set fd bitrate to n bits per second\n"
+        "  -P <n>      set fd sample point to n/1000, e.g. 875 for 87.5%\n"
+        "  -r <n>      set auto restart time to n milliseconds, 0 for disable\n"
+        "  -l <on|off> enable/disable listen-only mode\n"
+        "  -o <on|off> enable/disable one-shot mode\n"
+        "  -3 <on|off> enable/disable triple-sampling mode\n"
+        "\n",
          program_name
     );
 }
