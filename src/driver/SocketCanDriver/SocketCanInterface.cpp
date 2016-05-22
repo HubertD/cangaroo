@@ -30,6 +30,7 @@
 #include <time.h>
 #include <QString>
 #include <QStringList>
+#include <QProcess>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -79,6 +80,53 @@ QList<CanTiming> SocketCanInterface::getAvailableBitrates()
     return retval;
 }
 
+QString SocketCanInterface::buildIpRouteCmd(const MeasurementInterface &mi)
+{
+    QStringList cmd;
+    cmd.append("ip");
+    cmd.append("link");
+    cmd.append("set");
+    cmd.append(getName());
+    cmd.append("up");
+    cmd.append("type");
+    cmd.append("can");
+
+    cmd.append("bitrate");
+    cmd.append(QString().number(mi.bitrate()));
+    cmd.append("sample-point");
+    cmd.append(QString().number((float)mi.samplePoint()/1000.0, 'f', 3));
+
+    if (mi.isCanFD()) {
+        cmd.append("dbitrate");
+        cmd.append(QString().number(mi.fdBitrate()));
+        cmd.append("dsample-point");
+        cmd.append(QString().number((float)mi.fdSamplePoint()/1000.0, 'f', 3));
+        cmd.append("fd");
+        cmd.append("on");
+    }
+
+    cmd.append("restart-ms");
+    if (mi.doAutoRestart()) {
+        cmd.append(QString().number(mi.autoRestartMs()));
+    } else {
+        cmd.append("0");
+    }
+
+    return cmd.join(' ');
+}
+
+QStringList SocketCanInterface::buildCanIfConfigArgs(const MeasurementInterface &mi)
+{
+    QStringList args;
+    args << "-d";
+    args << "-i" << getName();
+    args << "-b" << QString::number(mi.bitrate());
+    args << "-p" << QString::number(mi.samplePoint());
+    args << "-u";
+    return args;
+}
+
+
 void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
 {
     if (!mi.doConfigure()) {
@@ -86,45 +134,21 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
         return;
     }
 
-    if (getBitrate() == mi.bitrate()) { // TODO carefully compare active configuration with the desired one
+    log_info(QString("calling canifconfig to reconfigure interface %1").arg(getName()));
 
-        log_info(QString("interface %1 already configured correctly, not touching configuration").arg(getName()));
-
-    } else {
-        log_info(QString("taking down interface %1 for configuration").arg(getName()));
-
-        QStringList cmd;
-        cmd.append("ip");
-        cmd.append("link");
-        cmd.append("set");
-        cmd.append(getName());
-        cmd.append("up");
-        cmd.append("type");
-        cmd.append("can");
-
-        cmd.append("bitrate");
-        cmd.append(QString().number(mi.bitrate()));
-        cmd.append("sample-point");
-        cmd.append(QString().number((float)mi.samplePoint()/1000.0, 'f', 3));
-
-        if (mi.isCanFD()) {
-            cmd.append("dbitrate");
-            cmd.append(QString().number(mi.fdBitrate()));
-            cmd.append("dsample-point");
-            cmd.append(QString().number((float)mi.fdSamplePoint()/1000.0, 'f', 3));
-            cmd.append("fd");
-            cmd.append("on");
-        }
-
-        cmd.append("restart-ms");
-        if (mi.doAutoRestart()) {
-            cmd.append(QString().number(mi.autoRestartMs()));
-        } else {
-            cmd.append("0");
-        }
-
-        log_info(cmd.join(' '));
+    QProcess canIfConfig;
+    canIfConfig.start("canifconfig", buildCanIfConfigArgs(mi));
+    if (!canIfConfig.waitForFinished()) {
+        log_error(QString("timeout waiting for canifconfig"));
+        return;
     }
+
+    if (canIfConfig.exitStatus() != 0) {
+        log_error(QString("canifconfig failed:"));
+        log_error(canIfConfig.readAllStandardError());
+        return;
+    }
+
 }
 
 #if (LIBNL_CURRENT<=216)
@@ -176,7 +200,6 @@ bool SocketCanInterface::updateStatus()
 
     return retval;
 }
-
 
 bool SocketCanInterface::readConfig()
 {

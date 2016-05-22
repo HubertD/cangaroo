@@ -107,4 +107,7 @@ private:
 
     const char *cname();
     bool updateStatus();
+
+    QString buildIpRouteCmd(const MeasurementInterface &mi);
+    QStringList buildCanIfConfigArgs(const MeasurementInterface &mi);
 };
