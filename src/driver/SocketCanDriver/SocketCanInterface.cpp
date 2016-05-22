@@ -135,6 +135,9 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
     }
 
     log_info(QString("calling canifconfig to reconfigure interface %1").arg(getName()));
+    QStringList sl = buildCanIfConfigArgs(mi);
+    sl.prepend("canifconfig");
+    log_info(sl.join(" "));
 
     QProcess canIfConfig;
     canIfConfig.start("canifconfig", buildCanIfConfigArgs(mi));
@@ -143,9 +146,13 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
         return;
     }
 
-    if (canIfConfig.exitStatus() != 0) {
-        log_error(QString("canifconfig failed:"));
-        log_error(canIfConfig.readAllStandardError());
+    if (canIfConfig.exitStatus()!=QProcess::NormalExit) {
+        log_error(QString("canifconfig crashed"));
+        return;
+    }
+
+    if (canIfConfig.exitCode() != 0) {
+        log_error(QString("canifconfig failed: ") + QString(canIfConfig.readAllStandardError()).trimmed());
         return;
     }
 
