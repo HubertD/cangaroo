@@ -76,8 +76,15 @@ void print_usage(char *program_name)
     );
 }
 
-bool atobool(char *s) {
-    return strcmp(s, "on")==0;
+bool atobool(char *name, char *arg) {
+    if (strcmp(arg, "on")==0) {
+        return true;
+    } else if (strcmp(arg, "off")==0) {
+        return false;
+    } else {
+        fprintf(stderr, "Error: Argument of %s must be \"on\" or \"off\", not \"%s\"\n", name, arg);
+        exit(EXIT_FAILURE);
+    }
 }
 
 int parse_opts(int argc, char *argv[], struct opts *opts)
@@ -113,7 +120,7 @@ int parse_opts(int argc, char *argv[], struct opts *opts)
 
         case 'f':
             opts->do_set_fd_enable = true;
-            opts->fd_enable = atobool(optarg);
+            opts->fd_enable = atobool("-f", optarg);
             break;
 
         case 'B':
@@ -133,17 +140,17 @@ int parse_opts(int argc, char *argv[], struct opts *opts)
 
         case 'l':
             opts->do_set_mode_listen_only = true;
-            opts->mode_listen_only = atobool(optarg);
+            opts->mode_listen_only = atobool("-l", optarg);
             break;
 
         case 'o':
             opts->do_set_mode_oneshot = true;
-            opts->mode_oneshot = atobool(optarg);
+            opts->mode_oneshot = atobool("-o", optarg);
             break;
 
         case '3':
             opts->do_set_mode_triple_sampling = true;
-            opts->mode_triple_sampling = atobool(optarg);
+            opts->mode_triple_sampling = atobool("-3", optarg);
             break;
 
         case 'h':
@@ -317,9 +324,11 @@ int main(int argc, char *argv[])
 
         if (opts.do_set_mode_listen_only) {
             if (opts.mode_listen_only) {
-                rtnl_link_can_set_ctrlmode(req, CAN_CTRLMODE_LISTENONLY);
+                printf("setting listen-only flag to true\n");
+                rtnl_link_can_set_ctrlmode(nldata.link, CAN_CTRLMODE_LISTENONLY);
             } else {
-                rtnl_link_can_unset_ctrlmode(req, CAN_CTRLMODE_LISTENONLY);
+                printf("setting listen-only flag to false\n");
+                rtnl_link_can_unset_ctrlmode(nldata.link, CAN_CTRLMODE_LISTENONLY);
             }
         }
 
