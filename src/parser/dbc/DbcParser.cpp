@@ -578,6 +578,7 @@ bool DbcParser::parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &
     if (!expectAndSkipToken(tokens, dbc_tok_bracket_close)) { return false; }
 
     if (!expectString(tokens, &unit)) { return false; }
+    signal->setUnit(unit);
 
     if (!expectIdentifier(tokens, &receiver)) { return false; }
     receivers.append(receiver);

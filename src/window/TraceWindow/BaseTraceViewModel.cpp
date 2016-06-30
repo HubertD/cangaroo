@@ -180,6 +180,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, i
     (void) role;
     uint32_t raw_data;
     QString value_name;
+    QString unit;
 
     CanDbMessage *dbmsg = backend()->findDbMessage(msg);
     if (!dbmsg) { return QVariant(); }
@@ -204,7 +205,12 @@ QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, i
 
             value_name = dbsignal->getValueName(raw_data);
             if (value_name.isEmpty()) {
-                return dbsignal->convertRawValueToPhysical(raw_data);
+                unit = dbsignal->getUnit();
+                if (unit.isEmpty()) {
+                    return dbsignal->convertRawValueToPhysical(raw_data);
+                } else {
+                    return QString("%1 %2").arg(dbsignal->convertRawValueToPhysical(raw_data)).arg(unit);
+                }
             } else {
                 return QString("%1 - %2").arg(raw_data).arg(value_name);
             }

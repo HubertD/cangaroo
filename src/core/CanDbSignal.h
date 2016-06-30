@@ -61,6 +61,9 @@ public:
     double getMaximumValue() const;
     void setMaximumValue(double max);
 
+    QString getUnit() const;
+    void setUnit(const QString &unit);
+
     bool isUnsigned() const;
     void setUnsigned(bool isUnsigned);
 
@@ -94,6 +97,7 @@ private:
     double _offset;
     double _min;
     double _max;
+    QString _unit;
     bool _isMuxer;
     bool _isMuxed;
     uint32_t _muxValue;

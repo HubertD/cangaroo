@@ -147,6 +147,16 @@ void CanDbSignal::setMaximumValue(double max)
     _max = max;
 }
 
+QString CanDbSignal::getUnit() const
+{
+    return _unit;
+}
+
+void CanDbSignal::setUnit(const QString &unit)
+{
+    _unit = unit;
+}
+
 bool CanDbSignal::isUnsigned() const
 {
     return _isUnsigned;
