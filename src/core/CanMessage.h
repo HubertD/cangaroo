@@ -25,6 +25,7 @@
 #include <sys/time.h>
 
 #include <QString>
+#include <QDateTime>
 #include <driver/CanDriver.h>
 
 class CanMessage {
@@ -75,6 +76,7 @@ public:
     void setTimestamp(const uint64_t seconds, const uint32_t micro_seconds);
 
     double getFloatTimestamp() const;
+    QDateTime getDateTime() const;
 
     QString getIdString() const;
     QString getDataHexString() const;

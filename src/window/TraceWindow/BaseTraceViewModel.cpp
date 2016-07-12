@@ -106,10 +106,10 @@ void BaseTraceViewModel::setTimestampMode(timestamp_mode_t timestampMode)
 
 QVariant BaseTraceViewModel::formatTimestamp(timestamp_mode_t mode, const CanMessage &currentMsg, const CanMessage &lastMsg) const
 {
-    double t_current = currentMsg.getFloatTimestamp();
 
     if (mode==timestamp_mode_delta) {
 
+        double t_current = currentMsg.getFloatTimestamp();
         double t_last = lastMsg.getFloatTimestamp();
         if (t_last==0) {
             return QVariant();
@@ -119,11 +119,11 @@ QVariant BaseTraceViewModel::formatTimestamp(timestamp_mode_t mode, const CanMes
 
     } else if (mode==timestamp_mode_absolute) {
 
-        QDateTime dt = QDateTime::fromMSecsSinceEpoch((qint64)(1000*t_current));
-        return dt.toString("hh:mm:ss.zzz");
+        return currentMsg.getDateTime().toString("hh:mm:ss.zzz");
 
     } else if (mode==timestamp_mode_relative) {
 
+        double t_current = currentMsg.getFloatTimestamp();
         return QString().sprintf("%.04lf", t_current - backend()->getTimestampAtMeasurementStart());
 
     }

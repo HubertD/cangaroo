@@ -29,6 +29,7 @@
 #include <QDomDocument>
 
 #include <core/MeasurementSetup.h>
+#include <core/CanTrace.h>
 #include <window/TraceWindow/TraceWindow.h>
 #include <window/SetupDialog/SetupDialog.h>
 #include <window/LogWindow/LogWindow.h>
@@ -427,10 +428,33 @@ void MainWindow::stopMeasurement()
 
 void MainWindow::saveTraceToFile()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "Save Trace to file", "", "Candump Files (*.candump)");
-    if (!filename.isNull()) {
-        backend().saveCanDump(filename);
+    QString filters("Vector ASC (*.asc);;Linux candump (*.candump))");
+    QString defaultFilter("Vector ASC (*.asc)");
+
+    QFileDialog fileDialog(0, "Save Trace to file", QDir::currentPath(), filters);
+    fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+    fileDialog.setConfirmOverwrite(true);
+    fileDialog.selectNameFilter(defaultFilter);
+    fileDialog.setDefaultSuffix("asc");
+    if (fileDialog.exec()) {
+        QString filename = fileDialog.selectedFiles()[0];
+        QFile file(filename);
+        if (file.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+
+            if (filename.endsWith(".candump", Qt::CaseInsensitive)) {
+                backend().getTrace()->saveCanDump(file);
+            } else {
+                backend().getTrace()->saveVectorAsc(file);
+            }
+
+            file.close();
+        } else {
+            // TODO error message
+        }
+
+
     }
+
 }
 
 

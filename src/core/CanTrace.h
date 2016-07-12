@@ -26,6 +26,7 @@
 #include <QTimer>
 #include <QVector>
 #include <QMap>
+#include <QFile>
 
 #include "CanMessage.h"
 
@@ -47,7 +48,8 @@ public:
     const CanMessage *getMessage(int idx);
     void enqueueMessage(const CanMessage &msg, bool more_to_follow=false);
 
-    void saveCanDump(QString filename);
+    void saveCanDump(QFile &file);
+    void saveVectorAsc(QFile &file);
 
     bool getMuxedSignalFromCache(const CanDbSignal *signal, uint32_t *raw_value);
 

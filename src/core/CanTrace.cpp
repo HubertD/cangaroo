@@ -130,29 +130,78 @@ void CanTrace::startTimer()
     }
 }
 
-void CanTrace::saveCanDump(QString filename)
+void CanTrace::saveCanDump(QFile &file)
 {
-    QFile file(filename);
-    if (file.open(QIODevice::ReadWrite)) {
-        QMutexLocker locker(&_mutex);
-        QTextStream stream(&file);
-        for (unsigned int i=0; i<size(); i++) {
-            CanMessage *msg = &_data[i];
-            QString line;
-            line.append(QString().sprintf("(%.6f) ", msg->getFloatTimestamp()));
-            line.append(_backend.getInterfaceName(msg->getInterfaceId()));
-            if (msg->isExtended()) {
-                line.append(QString().sprintf(" %08X#", msg->getId()));
-            } else {
-                line.append(QString().sprintf(" %03X#", msg->getId()));
-            }
-            for (int i=0; i<msg->getLength(); i++) {
-                line.append(QString().sprintf("%02X", msg->getByte(i)));
-            }
-            stream << line << endl;
+    QMutexLocker locker(&_mutex);
+    QTextStream stream(&file);
+    for (unsigned int i=0; i<size(); i++) {
+        CanMessage *msg = &_data[i];
+        QString line;
+        line.append(QString().sprintf("(%.6f) ", msg->getFloatTimestamp()));
+        line.append(_backend.getInterfaceName(msg->getInterfaceId()));
+        if (msg->isExtended()) {
+            line.append(QString().sprintf(" %08X#", msg->getId()));
+        } else {
+            line.append(QString().sprintf(" %03X#", msg->getId()));
         }
-        file.close();
+        for (int i=0; i<msg->getLength(); i++) {
+            line.append(QString().sprintf("%02X", msg->getByte(i)));
+        }
+        stream << line << endl;
     }
+}
+
+void CanTrace::saveVectorAsc(QFile &file)
+{
+    QMutexLocker locker(&_mutex);
+    QTextStream stream(&file);
+
+    if (_data.length()<1) {
+        return;
+    }
+
+
+    auto firstMessage = _data.first();
+    double t_start = firstMessage.getFloatTimestamp();
+
+    QLocale locale_c(QLocale::C);
+    QString dt_start = locale_c.toString(firstMessage.getDateTime(), "ddd MMM dd hh:mm:ss.zzz ap yyyy");
+
+    stream << "date " << dt_start << endl;
+    stream << "base hex  timestamps absolute" << endl;
+    stream << "internal events logged" << endl;
+    stream << "// version 8.5.0" << endl;
+    stream << "Begin Triggerblock " << dt_start << endl;
+    stream << "   0.000000 Start of measurement" << endl;
+
+    for (unsigned int i=0; i<size(); i++) {
+        CanMessage &msg = _data[i];
+
+        double t_current = msg.getFloatTimestamp();
+        QString id_hex_str = QString().sprintf("%x", msg.getId());
+        QString id_dec_str = QString().sprintf("%d", msg.getId());
+        if (msg.isExtended()) {
+            id_hex_str.append("x");
+            id_dec_str.append("x");
+        }
+
+        // TODO how to handle RTR flag?
+        QString line = QString().sprintf(
+            "%11.6lf 1  %-15s %s   d %d %s  Length = %d BitCount = %d ID = %s",
+            t_current-t_start,
+            id_hex_str.toStdString().c_str(),
+            "Rx", // TODO handle Rx/Tx
+            msg.getLength(),
+            msg.getDataHexString().toStdString().c_str(),
+            0, // TODO Length (transfer time in ns)
+            0, // TODO BitCount (overall frame length, including stuff bits)
+            id_dec_str.toStdString().c_str()
+        );
+
+        stream << line << endl;
+    }
+
+    stream << "End TriggerBlock" << endl;
 }
 
 bool CanTrace::getMuxedSignalFromCache(const CanDbSignal *signal, uint32_t *raw_value)

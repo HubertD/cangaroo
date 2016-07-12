@@ -65,7 +65,6 @@ public:
     void loadDefaultSetup(MeasurementSetup &setup);
     void setDefaultSetup();
     void setSetup(MeasurementSetup &new_setup);
-    void saveCanDump(QString filename);
 
     double currentTimeStamp() const;
 

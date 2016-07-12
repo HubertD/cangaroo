@@ -163,11 +163,6 @@ void Backend::setSetup(MeasurementSetup &new_setup)
     _setup.cloneFrom(new_setup);
 }
 
-void Backend::saveCanDump(QString filename)
-{
-    _trace->saveCanDump(filename);
-}
-
 double Backend::currentTimeStamp() const
 {
     return ((double)QDateTime::currentMSecsSinceEpoch()) / 1000;

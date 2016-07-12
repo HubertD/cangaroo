@@ -284,6 +284,11 @@ double CanMessage::getFloatTimestamp() const
     return (double)_timestamp.tv_sec + ((double)_timestamp.tv_usec/1000000);
 }
 
+QDateTime CanMessage::getDateTime() const
+{
+    return QDateTime::fromMSecsSinceEpoch((qint64)(1000*getFloatTimestamp()));
+}
+
 QString CanMessage::getIdString() const
 {
     if (isExtended()) {
