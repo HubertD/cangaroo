@@ -3,6 +3,10 @@ open source can bus analyzer
 
 written by Hubert Denkmair <hubert@denkmair.de>
 
+## building on linux
+* qmake -qt=qt5
+* make
+* make install
 
 ## building on windows
 * Qt Creator (Community Version is okay) brings everything you need
