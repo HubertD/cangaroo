@@ -230,57 +230,72 @@ uint32_t PeakCanInterface::getState()
     return state_unknown;
 }
 
-bool PeakCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
+bool PeakCanInterface::tryReadMessage(CanMessage &msg)
 {
     TPCANMsg buf;
     TPCANTimestamp timestamp;
 
-    if (WaitForSingleObject(_autoResetEvent, timeout_ms) != WAIT_OBJECT_0) {
-        return false;
-    }
-
     TPCANStatus result = CAN_Read(_handle, &buf, &timestamp);
-    if (result == PCAN_ERROR_OK) {
-        if ((buf.MSGTYPE & PCAN_MESSAGE_STATUS) != 0) {
-            // TODO handle status message?
-            return false;
-        } else {
-            msg.setErrorFrame(false);
-        }
-
-        msg.setInterfaceId(getId());
-        msg.setId(buf.ID);
-        msg.setExtended((buf.MSGTYPE & PCAN_MESSAGE_EXTENDED)!=0);
-        msg.setRTR((buf.MSGTYPE & PCAN_MESSAGE_RTR)!=0);
-
-        uint8_t len = (buf.LEN > 8) ? 8 : buf.LEN;
-        msg.setLength(len);
-        for (int i=0; i<len; i++) {
-            msg.setByte(i, buf.DATA[i]);
-        }
-
-        // Total Microseconds = micros + 1000 * millis + 0x100000000 * 1000 * millis_overflow
-        uint64_t ts = timestamp.millis;
-        ts += 0x100000000 * (uint64_t)timestamp.millis_overflow;
-        ts *= 1000;
-        ts += timestamp.micros;
-
-        if ( (_peakOffsetFirstFrame==0) || (_hostOffsetFirstFrame==0) ) {
-            _hostOffsetFirstFrame = getDriver()->backend().getUsecsAtMeasurementStart()
-                                  + getDriver()->backend().getUsecsSinceMeasurementStart();
-            _peakOffsetFirstFrame = ts;
-        }
-
-        ts -=_peakOffsetFirstFrame;
-        ts += _hostOffsetFirstFrame;
-
-        msg.setTimestamp(ts/1000000, ts % 1000000);
-
-        return true;
-    } else {
-        QThread::msleep(10);
+    if (result != PCAN_ERROR_OK) {
         return false;
     }
+
+    if ((buf.MSGTYPE & PCAN_MESSAGE_STATUS) != 0) {
+        // TODO handle status message?
+        return false;
+    }
+    msg.setErrorFrame(false);
+
+    msg.setInterfaceId(getId());
+    msg.setId(buf.ID);
+    msg.setExtended((buf.MSGTYPE & PCAN_MESSAGE_EXTENDED)!=0);
+    msg.setRTR((buf.MSGTYPE & PCAN_MESSAGE_RTR)!=0);
+
+    uint8_t len = (buf.LEN > 8) ? 8 : buf.LEN;
+    msg.setLength(len);
+    for (int i=0; i<len; i++) {
+        msg.setByte(i, buf.DATA[i]);
+    }
+
+    // Total Microseconds = micros + 1000 * millis + 0x100000000 * 1000 * millis_overflow
+    uint64_t ts = timestamp.millis;
+    ts += 0x100000000ul * (uint64_t)timestamp.millis_overflow;
+    ts *= 1000ul;
+    ts += timestamp.micros;
+
+    if ( (_peakOffsetFirstFrame==0) || (_hostOffsetFirstFrame==0) ) {
+        _hostOffsetFirstFrame = getDriver()->backend().getUsecsAtMeasurementStart()
+                              + getDriver()->backend().getUsecsSinceMeasurementStart();
+        _peakOffsetFirstFrame = ts;
+    }
+
+    ts += _hostOffsetFirstFrame;
+    ts -= _peakOffsetFirstFrame;
+
+    msg.setTimestamp(ts/1000000, ts % 1000000);
+
+    return true;
+}
+
+bool PeakCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms)
+{
+
+    if (tryReadMessage(msg))
+    {
+        return true;
+    }
+
+    if (WaitForSingleObject(_autoResetEvent, timeout_ms) != WAIT_OBJECT_0)
+    {
+        return false;
+    }
+
+    bool retval = tryReadMessage(msg);
+    if (!retval)
+    {
+        QThread::msleep(1);
+    }
+    return retval;
 }
 
 void PeakCanInterface::sendMessage(const CanMessage &msg)

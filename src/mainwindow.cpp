@@ -408,9 +408,9 @@ void MainWindow::showAboutDialog()
        "cangaroo\n"
        "open source can bus analyzer\n"
        "\n"
-       "version 0.2.2\n"
+       "version 0.2.3\n"
        "\n"
-       "(c)2015-2016 Hubert Denkmair"
+       "(c)2015-2017 Hubert Denkmair"
     );
 }
 

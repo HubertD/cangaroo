@@ -54,5 +54,6 @@ private:
 
     uint16_t calcBitrateMode(unsigned bitrate, unsigned samplePoint);
     QString getErrorText(uint32_t status_code);
+    bool tryReadMessage(CanMessage &msg);
 
 };
