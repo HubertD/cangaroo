@@ -47,6 +47,10 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     setMode(mode_linear);
     setAutoScroll(false);
 
+    QFont font("Monospace");
+    font.setStyleHint(QFont::TypeWriter);
+    ui->tree->setFont(font);
+
     ui->tree->setUniformRowHeights(true);
     ui->tree->setColumnWidth(0, 120);
     ui->tree->setColumnWidth(1, 70);
