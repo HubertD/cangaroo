@@ -5,7 +5,7 @@ written by Hubert Denkmair <hubert@denkmair.de>
 
 ## building on linux
 * to install all required packages in a vanilla ubuntu 16.04:
-  * sudo apt-get install git qt5-qmake qtbase5-dev libnl-3-dev libnl-route-3-dev
+  * sudo apt-get install build-essential git qt5-qmake qtbase5-dev libnl-3-dev libnl-route-3-dev
 * build with:
   * qmake -qt=qt5
   * make
