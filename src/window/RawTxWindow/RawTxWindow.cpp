@@ -1,0 +1,91 @@
+/*
+
+  Copyright (c) 2015, 2016 Hubert Denkmair <hubert@denkmair.de>
+
+  This file is part of cangaroo.
+
+  cangaroo is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 2 of the License, or
+  (at your option) any later version.
+
+  cangaroo is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with cangaroo.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
+#include "RawTxWindow.h"
+#include "ui_RawTxWindow.h"
+
+#include <QDomDocument>
+
+#include <core/Backend.h>
+#include <driver/CanInterface.h>
+
+RawTxWindow::RawTxWindow(QWidget *parent, Backend &backend) :
+    ConfigurableWidget(parent),
+    ui(new Ui::RawTxWindow),
+    _backend(backend)
+{
+    ui->setupUi(this);
+
+    connect(ui->singleSendButton, SIGNAL(released()), this, SLOT(sendRawMessage()));
+
+}
+
+RawTxWindow::~RawTxWindow()
+{
+    delete ui;
+}
+
+
+void RawTxWindow::sendRawMessage()
+{
+    CanMessage msg;
+
+    uint8_t data_int[8];
+
+    data_int[0] = ui->fieldByte0->text().toUpper().toInt(NULL, 16);
+    data_int[1] = ui->fieldByte1->text().toUpper().toInt(NULL, 16);
+    data_int[2] = ui->fieldByte2->text().toUpper().toInt(NULL, 16);
+    data_int[3] = ui->fieldByte3->text().toUpper().toInt(NULL, 16);
+    data_int[4] = ui->fieldByte4->text().toUpper().toInt(NULL, 16);
+    data_int[5] = ui->fieldByte5->text().toUpper().toInt(NULL, 16);
+    data_int[6] = ui->fieldByte6->text().toUpper().toInt(NULL, 16);
+    data_int[7] = ui->fieldByte7->text().toUpper().toInt(NULL, 16);
+
+    uint8_t address = ui->fieldAddress->text().toUpper().toInt(NULL, 16);
+    uint8_t dlc = ui->fieldDLC->text().toUpper().toInt(NULL, 16);
+
+    msg.setData(data_int[0],data_int[1],data_int[2],data_int[3],data_int[4],data_int[5],data_int[6],data_int[7]);
+    msg.setId(address);
+    msg.setLength(dlc);
+    foreach (CanInterfaceId ifid, _backend.getInterfaceList()) {
+        CanInterface *intf = _backend.getInterfaceById(ifid);
+        intf->sendMessage(msg);
+
+
+        char outmsg[256];
+        snprintf(outmsg, 256, "Send message %s to %d on port %s", msg.getDataHexString().toLocal8Bit().constData(), msg.getId(), _backend.getInterfaceById(ifid)->getName().toLocal8Bit().constData());
+        log_info(outmsg);
+    }
+
+}
+
+bool RawTxWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
+{
+    if (!ConfigurableWidget::saveXML(backend, xml, root)) { return false; }
+    root.setAttribute("type", "RawTxWindow");
+    return true;
+}
+
+bool RawTxWindow::loadXML(Backend &backend, QDomElement &el)
+{
+    if (!ConfigurableWidget::loadXML(backend, el)) { return false; }
+    return true;
+}

@@ -96,6 +96,8 @@
      <addaction name="actionLog_View"/>
      <addaction name="actionGraph_View"/>
      <addaction name="actionCan_Status_View"/>
+     <addaction name="actionGraph_View_2"/>
+     <addaction name="actionTransmit_View"/>
     </widget>
     <addaction name="menu_New"/>
    </widget>
@@ -187,6 +189,9 @@
    </property>
   </action>
   <action name="actionGraph_View">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Graph View</string>
    </property>
@@ -240,6 +245,16 @@
   <action name="actionCan_Status_View">
    <property name="text">
     <string>Can &amp;Status View</string>
+   </property>
+  </action>
+  <action name="actionGraph_View_2">
+   <property name="text">
+    <string>Graph View</string>
+   </property>
+  </action>
+  <action name="actionTransmit_View">
+   <property name="text">
+    <string>Transmit View</string>
    </property>
   </action>
  </widget>

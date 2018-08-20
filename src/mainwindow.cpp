@@ -35,11 +35,11 @@
 #include <window/LogWindow/LogWindow.h>
 #include <window/GraphWindow/GraphWindow.h>
 #include <window/CanStatusWindow/CanStatusWindow.h>
+#include <window/RawTxWindow/RawTxWindow.h>
 
 #if defined(__linux__)
 #include <driver/SocketCanDriver/SocketCanDriver.h>
 #else
-#include <driver/PeakCanDriver/PeakCanDriver.h>
 #include <driver/CandleApiDriver/CandleApiDriver.h>
 #endif
 
@@ -56,7 +56,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createTraceWindow()));
     connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(addLogWidget()));
     connect(ui->actionGraph_View, SIGNAL(triggered()), this, SLOT(createGraphWindow()));
+    connect(ui->actionGraph_View_2, SIGNAL(triggered()), this, SLOT(addGraphWidget()));
     connect(ui->actionSetup, SIGNAL(triggered()), this, SLOT(showSetupDialog()));
+    connect(ui->actionTransmit_View, SIGNAL(triggered()), this, SLOT(addRawTxWidget()));
 
     connect(ui->actionStart_Measurement, SIGNAL(triggered()), this, SLOT(startMeasurement()));
     connect(ui->actionStop_Measurement, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
@@ -72,7 +74,6 @@ MainWindow::MainWindow(QWidget *parent) :
 #if defined(__linux__)
     Backend::instance().addCanDriver(*(new SocketCanDriver(Backend::instance())));
 #else
-    Backend::instance().addCanDriver(*(new PeakCanDriver(Backend::instance())));
     Backend::instance().addCanDriver(*(new CandleApiDriver(Backend::instance())));
 #endif
 
@@ -264,6 +265,7 @@ void MainWindow::newWorkspace()
         stopAndClearMeasurement();
         clearWorkspace();
         createTraceWindow();
+        addRawTxWidget();
         backend().setDefaultSetup();
     }
 }
@@ -361,6 +363,27 @@ QMainWindow *MainWindow::createGraphWindow(QString title)
     return mm;
 }
 
+void MainWindow::addGraphWidget(QMainWindow *parent)
+{
+    if (!parent) {
+        parent = currentTab();
+    }
+    QDockWidget *dock = new QDockWidget("Graph", parent);
+    dock->setWidget(new GraphWindow(dock, backend()));
+    parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
+}
+
+void MainWindow::addRawTxWidget(QMainWindow *parent)
+{
+    if (!parent) {
+        parent = currentTab();
+    }
+    QDockWidget *dock = new QDockWidget("Transmit View", parent);
+    dock->setWidget(new RawTxWindow(dock, backend()));
+    parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
+}
+
+
 void MainWindow::addLogWidget(QMainWindow *parent)
 {
     if (!parent) {
@@ -411,6 +434,7 @@ void MainWindow::showAboutDialog()
        "version 0.2.3\n"
        "\n"
        "(c)2015-2017 Hubert Denkmair"
+       "(c)2018 Ethan Zonca"
     );
 }
 
