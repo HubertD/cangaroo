@@ -3,6 +3,7 @@ lessThan(QT_MAJOR_VERSION, 5): error("requires Qt 5")
 QT += core gui
 QT += widgets
 QT += xml
+QT += charts
 
 TARGET = cangaroo
 TEMPLATE = app

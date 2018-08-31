@@ -24,6 +24,9 @@
 #include <core/Backend.h>
 #include <core/ConfigurableWidget.h>
 #include <core/MeasurementSetup.h>
+#include <QtCharts/QChartView>
+#include <QtCharts/QtCharts>
+#include <QtCharts/QLineSeries>
 
 namespace Ui {
 class GraphWindow;
@@ -42,7 +45,14 @@ public:
     virtual bool saveXML(Backend &backend, QDomDocument &xml, QDomElement &root);
     virtual bool loadXML(Backend &backend, QDomElement &el);
 
+private slots:
+    void testAddData(qreal new_yval);
+
 private:
+    QLineSeries *data_series;
+    QChart *data_chart;
+    uint32_t testcount;
+
     Ui::GraphWindow *ui;
     Backend &_backend;
 };

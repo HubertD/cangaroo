@@ -25,6 +25,9 @@
 #include <QDomDocument>
 
 #include <core/Backend.h>
+#include <QtCharts/QChartView>
+
+#define NUM_GRAPH_POINTS 20
 
 GraphWindow::GraphWindow(QWidget *parent, Backend &backend) :
     ConfigurableWidget(parent),
@@ -32,11 +35,70 @@ GraphWindow::GraphWindow(QWidget *parent, Backend &backend) :
     _backend(backend)
 {
     ui->setupUi(this);
+
+
+    data_series = new QLineSeries();
+
+    for(uint32_t i=0; i<NUM_GRAPH_POINTS; i++)
+    {
+        data_series->append(i, i);
+    }
+
+    data_chart = new QChart();
+    data_chart->legend()->hide();
+    data_chart->addSeries(data_series);
+    data_chart->createDefaultAxes();
+    data_chart->setTitle("Simple line chart example");
+
+
+
+    ui->chartView->setChart(data_chart);
+    ui->chartView->setRenderHint(QPainter::Antialiasing);
+
+//    connect(ui->buttonTest, SIGNAL(released()), this, SLOT(testAddData()));
+
+}
+
+void GraphWindow::testAddData(qreal new_yval)
+{
+    QLineSeries* serbuf = new QLineSeries();
+
+    // Start autorange at first point
+    qreal ymin = data_series->at(1).y();
+    qreal ymax = ymin;
+
+    // Copy all points but first one
+    for(uint32_t i=1; i < data_series->count(); i++)
+    {
+        serbuf->append(data_series->at(i).x()-1, data_series->at(i).y());
+
+        // Autoranging
+        if(data_series->at(i).y() < ymin)
+            ymin = data_series->at(i).y();
+        if(data_series->at(i).y() > ymax)
+            ymax = data_series->at(i).y();
+    }
+
+    // Apply Y margin and set range
+    ymin -= 1;
+    ymax += 1;
+    data_chart->axisY()->setRange(ymin, ymax);
+
+    // Add new point in
+    serbuf->append(serbuf->points().at(serbuf->count()-1).x() + 1, new_yval);
+    testcount++;
+
+    // Replace data
+    data_series->replace(serbuf->points());
+
+    delete serbuf;
 }
 
 GraphWindow::~GraphWindow()
 {
     delete ui;
+    delete data_chart;
+    delete data_series;
 }
 
 bool GraphWindow::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
