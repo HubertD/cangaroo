@@ -541,6 +541,7 @@ bool DbcParser::parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &
 
     if (!expectAndSkipToken(tokens, dbc_tok_colon)) { return false; }
     if (!expectInt(tokens, &start_bit)) { return false; }
+
     signal->setStartBit(start_bit);
 
     if (!expectAndSkipToken(tokens, dbc_tok_pipe)) { return false; }
@@ -550,6 +551,21 @@ bool DbcParser::parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &
     if (!expectAndSkipToken(tokens, dbc_tok_at)) { return false; }
     if (!expectInt(tokens, &byte_order)) { return false; }
     signal->setIsBigEndian(byte_order==0);
+
+    // If the signal is big endian, convert the start bit to the Intel-style start bit for further parsing
+    if(signal->isBigEndian())
+    {
+        // This will be the number of 8-bit rows above the message
+        uint8_t row_position = signal->startBit() >> 3;
+
+        // Bit position in current row (0-7)
+        uint8_t column_position = signal->startBit() & 0b111;
+
+        // Calcualte the normalized start bit position (bit index starting at 0)
+        uint8_t normalized_position = (row_position * 8) + (7 - column_position);
+
+        signal->setStartBit(normalized_position);
+    }
 
     if (expectAndSkipToken(tokens, dbc_tok_plus)) {
         signal->setUnsigned(true);

@@ -171,12 +171,6 @@ uint64_t CanMessage::extractRawSignal(uint8_t start_bit, const uint8_t length, c
 
     uint64_t data = le64toh(_u64);
 
-    if (isBigEndian) {
-        // it's magic. just swap the byte order and adjust the startbit, then it works like little endian
-        data = __builtin_bswap64(data);
-        start_bit = 63 - start_bit - length;
-    }
-
     data >>= start_bit;
 
     uint64_t mask =  0xFFFFFFFFFFFFFFFF;
@@ -184,6 +178,17 @@ uint64_t CanMessage::extractRawSignal(uint8_t start_bit, const uint8_t length, c
     mask = ~mask;
 
     data &= mask;
+
+    // If the length is greater than 8, we need to byteswap to preserve endianness
+    if (isBigEndian && (length > 8))
+    {
+
+        // Swap bytes
+        data = __builtin_bswap64(data);
+
+        // Shift out unused bits
+        data >>= 64 - length;
+    }
 
     return data;
 }
