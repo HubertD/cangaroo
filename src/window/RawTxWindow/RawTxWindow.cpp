@@ -36,6 +36,7 @@ RawTxWindow::RawTxWindow(QWidget *parent, Backend &backend) :
 
     connect(ui->singleSendButton, SIGNAL(released()), this, SLOT(sendRawMessage()));
 
+    // TODO: Grey out checkboxes that are invalid depending on DLC spinbox state
 }
 
 RawTxWindow::~RawTxWindow()
@@ -48,6 +49,10 @@ void RawTxWindow::sendRawMessage()
 {
     CanMessage msg;
 
+    bool en_extended = ui->checkBox_IsExtended->isChecked();
+    bool en_rtr = ui->checkBox_IsRTR->isChecked();
+    bool en_errorframe = ui->checkBox_IsErrorFrame->isChecked();
+
     uint8_t data_int[8];
 
     data_int[0] = ui->fieldByte0->text().toUpper().toInt(NULL, 16);
@@ -59,19 +64,35 @@ void RawTxWindow::sendRawMessage()
     data_int[6] = ui->fieldByte6->text().toUpper().toInt(NULL, 16);
     data_int[7] = ui->fieldByte7->text().toUpper().toInt(NULL, 16);
 
-    uint8_t address = ui->fieldAddress->text().toUpper().toInt(NULL, 16);
+    uint32_t address = ui->fieldAddress->text().toUpper().toInt(NULL, 16);
+
+    // If address is beyond std address namespace, force extended
+    if(address > 0x7ff)
+    {
+        en_extended = true;
+        ui->checkBox_IsExtended->setChecked(true);
+    }
+
     uint8_t dlc = ui->fieldDLC->text().toUpper().toInt(NULL, 16);
 
     msg.setData(data_int[0],data_int[1],data_int[2],data_int[3],data_int[4],data_int[5],data_int[6],data_int[7]);
     msg.setId(address);
     msg.setLength(dlc);
+
+    msg.setExtended(en_extended);
+    msg.setRTR(en_rtr);
+    msg.setErrorFrame(en_errorframe);
+
+
     foreach (CanInterfaceId ifid, _backend.getInterfaceList()) {
         CanInterface *intf = _backend.getInterfaceById(ifid);
         intf->sendMessage(msg);
 
 
         char outmsg[256];
-        snprintf(outmsg, 256, "Send message %s to %d on port %s", msg.getDataHexString().toLocal8Bit().constData(), msg.getId(), _backend.getInterfaceById(ifid)->getName().toLocal8Bit().constData());
+        snprintf(outmsg, 256, "Send [%s] to %d on port %s [ext=%u rtr=%u err=%u]",
+                 msg.getDataHexString().toLocal8Bit().constData(), msg.getId(), _backend.getInterfaceById(ifid)->getName().toLocal8Bit().constData(),
+                 msg.isExtended(), msg.isRTR(), msg.isErrorFrame());
         log_info(outmsg);
     }
 
