@@ -23,7 +23,7 @@
 #include "ui_RawTxWindow.h"
 
 #include <QDomDocument>
-
+#include <QTimer>
 #include <core/Backend.h>
 #include <driver/CanInterface.h>
 
@@ -35,6 +35,14 @@ RawTxWindow::RawTxWindow(QWidget *parent, Backend &backend) :
     ui->setupUi(this);
 
     connect(ui->singleSendButton, SIGNAL(released()), this, SLOT(sendRawMessage()));
+    connect(ui->repeatSendButton, SIGNAL(toggled(bool)), this, SLOT(sendRepeatMessage(bool)));
+
+    connect(ui->spinBox_RepeatRate, SIGNAL(valueChanged(int)), this, SLOT(changeRepeatRate(int)));
+
+    // Timer for repeating messages
+    repeatmsg_timer = new QTimer(this);
+    connect(repeatmsg_timer, SIGNAL(timeout()), this, SLOT(sendRawMessage()));
+
 
     // TODO: Grey out checkboxes that are invalid depending on DLC spinbox state
 }
@@ -44,6 +52,22 @@ RawTxWindow::~RawTxWindow()
     delete ui;
 }
 
+void RawTxWindow::changeRepeatRate(int ms)
+{
+    repeatmsg_timer->setInterval(ms);
+}
+
+void RawTxWindow::sendRepeatMessage(bool enable)
+{
+    if(enable)
+    {
+        repeatmsg_timer->start(ui->spinBox_RepeatRate->value());
+    }
+    else
+    {
+        repeatmsg_timer->stop();
+    }
+}
 
 void RawTxWindow::sendRawMessage()
 {

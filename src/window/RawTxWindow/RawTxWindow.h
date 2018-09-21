@@ -44,9 +44,13 @@ public:
     virtual bool loadXML(Backend &backend, QDomElement &el);
 
 private slots:
+    void changeRepeatRate(int ms);
+    void sendRepeatMessage(bool enable);
     void sendRawMessage();
+
 
 private:
     Ui::RawTxWindow *ui;
     Backend &_backend;
+    QTimer *repeatmsg_timer;
 };
