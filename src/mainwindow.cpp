@@ -441,6 +441,7 @@ void MainWindow::showAboutDialog()
 void MainWindow::startMeasurement()
 {
     if (showSetupDialog()) {
+        backend().clearTrace();
         backend().startMeasurement();
     }
 }
