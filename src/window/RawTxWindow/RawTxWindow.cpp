@@ -45,12 +45,63 @@ RawTxWindow::RawTxWindow(QWidget *parent, Backend &backend) :
 
 
     // TODO: Grey out checkboxes that are invalid depending on DLC spinbox state
+    connect(ui->fieldDLC, SIGNAL(valueChanged(int)), this, SLOT(changeDLC(int)));
+
 }
 
 RawTxWindow::~RawTxWindow()
 {
     delete ui;
 }
+
+
+void RawTxWindow::changeDLC(int dlc)
+{
+    ui->fieldByte0->setEnabled(true);
+    ui->fieldByte1->setEnabled(true);
+    ui->fieldByte2->setEnabled(true);
+    ui->fieldByte3->setEnabled(true);
+    ui->fieldByte4->setEnabled(true);
+    ui->fieldByte5->setEnabled(true);
+    ui->fieldByte6->setEnabled(true);
+    ui->fieldByte7->setEnabled(true);
+
+    switch(dlc)
+    {
+        case 0:
+            ui->fieldByte0->setEnabled(false);
+            //fallthrough
+        case 1:
+            ui->fieldByte1->setEnabled(false);
+            //fallthrough
+
+        case 2:
+            ui->fieldByte2->setEnabled(false);
+            //fallthrough
+
+        case 3:
+            ui->fieldByte3->setEnabled(false);
+            //fallthrough
+
+        case 4:
+            ui->fieldByte4->setEnabled(false);
+            //fallthrough
+
+        case 5:
+            ui->fieldByte5->setEnabled(false);
+            //fallthrough
+
+        case 6:
+            ui->fieldByte6->setEnabled(false);
+            //fallthrough
+
+        case 7:
+            ui->fieldByte7->setEnabled(false);
+            //fallthrough
+    }
+//    repeatmsg_timer->setInterval(ms);
+}
+
 
 void RawTxWindow::changeRepeatRate(int ms)
 {
