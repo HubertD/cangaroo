@@ -54,6 +54,8 @@ QVariant BaseTraceViewModel::headerData(int section, Qt::Orientation orientation
                     return QString("Rx/Tx");
                 case column_canid:
                     return QString("CAN ID");
+                case column_sender:
+                    return QString("Sender");
                 case column_name:
                     return QString("Name");
                 case column_dlc:
@@ -160,6 +162,9 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
         case column_name:
             return (dbmsg) ? dbmsg->getName() : "";
 
+        case column_sender:
+            return (dbmsg) ? dbmsg->getSender()->name() : "";
+
         case column_dlc:
             return currentMsg.getLength();
 
@@ -178,7 +183,7 @@ QVariant BaseTraceViewModel::data_DisplayRole_Message(const QModelIndex &index, 
 QVariant BaseTraceViewModel::data_DisplayRole_Signal(const QModelIndex &index, int role, const CanMessage &msg) const
 {
     (void) role;
-    uint32_t raw_data;
+    uint64_t raw_data;
     QString value_name;
     QString unit;
 
@@ -232,6 +237,7 @@ QVariant BaseTraceViewModel::data_TextAlignmentRole(const QModelIndex &index, in
         case column_channel: return Qt::AlignCenter + Qt::AlignVCenter;
         case column_direction: return Qt::AlignCenter + Qt::AlignVCenter;
         case column_canid: return Qt::AlignRight + Qt::AlignVCenter;
+        case column_sender: return Qt::AlignLeft + Qt::AlignVCenter;
         case column_name: return Qt::AlignLeft + Qt::AlignVCenter;
         case column_dlc: return Qt::AlignCenter + Qt::AlignVCenter;
         case column_data: return Qt::AlignLeft + Qt::AlignVCenter;

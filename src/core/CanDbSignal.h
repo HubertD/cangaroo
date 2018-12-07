@@ -28,7 +28,7 @@
 
 class CanDbMessage;
 
-typedef QMap<uint32_t,QString> CanDbValueTable;
+typedef QMap<uint64_t,QString> CanDbValueTable;
 
 class CanDbSignal
 {
@@ -46,8 +46,8 @@ public:
     QString comment() const;
     void setComment(const QString &comment);
 
-    QString getValueName(const uint32_t value) const;
-    void setValueName(const uint32_t value, const QString &name);
+    QString getValueName(const uint64_t value) const;
+    void setValueName(const uint64_t value, const QString &name);
 
     double getFactor() const;
     void setFactor(double factor);
@@ -80,9 +80,9 @@ public:
     void setMuxValue(const uint32_t &muxValue);
 
     bool isPresentInMessage(const CanMessage &msg);
-    uint32_t extractRawDataFromMessage(const CanMessage &msg);
+    uint64_t extractRawDataFromMessage(const CanMessage &msg);
 
-    double convertRawValueToPhysical(const uint32_t rawValue);
+    double convertRawValueToPhysical(const uint64_t rawValue);
     double extractPhysicalFromMessage(const CanMessage &msg);
 
 

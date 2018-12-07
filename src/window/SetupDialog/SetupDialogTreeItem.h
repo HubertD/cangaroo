@@ -40,7 +40,7 @@ public:
         type_interface_root,
         type_interface,
         type_candb_root,
-        type_candb
+        type_candb,
     } item_type;
 
 public:

@@ -57,6 +57,7 @@ GraphWindow::GraphWindow(QWidget *parent, Backend &backend) :
 
 //    connect(ui->buttonTest, SIGNAL(released()), this, SLOT(testAddData()));
 
+
 }
 
 void GraphWindow::testAddData(qreal new_yval)

@@ -39,6 +39,7 @@ public:
         column_channel,
         column_direction,
         column_canid,
+        column_sender,
         column_name,
         column_dlc,
         column_data,

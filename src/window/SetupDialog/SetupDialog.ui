@@ -240,6 +240,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="btReloadDatabases">
+                <property name="text">
+                 <string>Reload Databases</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
