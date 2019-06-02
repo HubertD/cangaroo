@@ -516,7 +516,7 @@ bool __stdcall DLL candle_frame_read(candle_handle hdev, candle_frame_t *frame, 
         return false;
     }
 
-    if ( (wait_result < WAIT_OBJECT_0) || (wait_result >= WAIT_OBJECT_0 + CANDLE_URB_COUNT) ) {
+    if (wait_result >= WAIT_OBJECT_0 + CANDLE_URB_COUNT) {
         dev->last_error = CANDLE_ERR_READ_WAIT;
         return false;
     }
