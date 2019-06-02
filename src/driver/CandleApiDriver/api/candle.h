@@ -43,11 +43,9 @@ typedef enum {
     CANDLE_FRAMETYPE_TIMESTAMP_OVFL
 } candle_frametype_t;
 
-enum {
-    CANDLE_ID_EXTENDED = 0x80000000,
-    CANDLE_ID_RTR      = 0x40000000,
-    CANDLE_ID_ERR      = 0x20000000
-};
+#define CANDLE_ID_EXTENDED 0x80000000
+#define CANDLE_ID_RTR 0x40000000
+#define CANDLE_ID_ERR 0x20000000
 
 typedef enum {
     CANDLE_MODE_NORMAL        = 0x00,
