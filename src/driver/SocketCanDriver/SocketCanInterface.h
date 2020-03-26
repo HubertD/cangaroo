@@ -93,8 +93,8 @@ public:
 private:
     typedef enum {
         ts_mode_SIOCSHWTSTAMP,
-        ts_mode_SIOCGSTAMPNS,
-        ts_mode_SIOCGSTAMP
+        ts_mode_SIOCGSTAMP_OLD,
+        ts_mode_SIOCSARP
     } ts_mode_t;
 
     int _idx;
