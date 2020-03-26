@@ -428,12 +428,12 @@ bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
             if (ioctl(_fd, SIOCGSTAMP_OLD, &ts_rcv) == 0) {
                 msg.setTimestamp(ts_rcv.tv_sec, ts_rcv.tv_nsec/1000);
             } else {
-                _ts_mode = ts_mode_SIOCGSTAMP;
+                _ts_mode = ts_mode_SIOCSARP;
             }
         }
 
-        if (_ts_mode==ts_mode_SIOCGSTAMP) {
-            ioctl(_fd, SIOCGSTAMP, &tv_rcv);
+        if (_ts_mode==ts_mode_SIOCSARP) {
+            ioctl(_fd, SIOCSARP, &tv_rcv);
             msg.setTimestamp(tv_rcv.tv_sec, tv_rcv.tv_usec);
         }
 
