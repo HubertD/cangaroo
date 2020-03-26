@@ -421,11 +421,11 @@ bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
 
         if (_ts_mode == ts_mode_SIOCSHWTSTAMP) {
             // TODO implement me
-            _ts_mode = ts_mode_SIOCGSTAMPNS;
+            _ts_mode = ts_mode_SIOCGSTAMP_OLD;
         }
 
-        if (_ts_mode==ts_mode_SIOCGSTAMPNS) {
-            if (ioctl(_fd, SIOCGSTAMPNS, &ts_rcv) == 0) {
+        if (_ts_mode==ts_mode_SIOCGSTAMP_OLD) {
+            if (ioctl(_fd, SIOCGSTAMP_OLD, &ts_rcv) == 0) {
                 msg.setTimestamp(ts_rcv.tv_sec, ts_rcv.tv_nsec/1000);
             } else {
                 _ts_mode = ts_mode_SIOCGSTAMP;
