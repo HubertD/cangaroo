@@ -44,6 +44,15 @@
 #include <netlink/route/link.h>
 #include <netlink/route/link/can.h>
 
+#ifndef SIOCGSTAMP 
+// linux-headers-5.2 updated SIOCGSTAMP ioctl to work against 32-bit and 
+// 64-bit struct timeval. 
+// Commit: https://github.com/torvalds/linux/commit/0768e17073dc527ccd18ed5f96ce85f9985e9115
+// This shuffled headers a bit and caused build breakage for if only sys/socket.h
+// is included.  Fix: Include <linux/sockios.h> if SIOCGSTAMP not defined.
+#include <linux/sockios.h>
+#endif
+
 SocketCanInterface::SocketCanInterface(SocketCanDriver *driver, int index, QString name)
   : CanInterface((CanDriver *)driver),
 	_idx(index),
@@ -421,19 +430,19 @@ bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
 
         if (_ts_mode == ts_mode_SIOCSHWTSTAMP) {
             // TODO implement me
-            _ts_mode = ts_mode_SIOCGSTAMP_OLD;
+            _ts_mode = ts_mode_SIOCGSTAMPNS;
         }
 
-        if (_ts_mode==ts_mode_SIOCGSTAMP_OLD) {
-            if (ioctl(_fd, SIOCGSTAMP_OLD, &ts_rcv) == 0) {
+        if (_ts_mode==ts_mode_SIOCGSTAMPNS) {
+            if (ioctl(_fd, SIOCGSTAMPNS, &ts_rcv) == 0) {
                 msg.setTimestamp(ts_rcv.tv_sec, ts_rcv.tv_nsec/1000);
             } else {
-                _ts_mode = ts_mode_SIOCSARP;
+                _ts_mode = ts_mode_SIOCGSTAMP;
             }
         }
 
-        if (_ts_mode==ts_mode_SIOCSARP) {
-            ioctl(_fd, SIOCSARP, &tv_rcv);
+        if (_ts_mode==ts_mode_SIOCGSTAMP) {
+            ioctl(_fd, SIOCGSTAMP, &tv_rcv);
             msg.setTimestamp(tv_rcv.tv_sec, tv_rcv.tv_usec);
         }
 
