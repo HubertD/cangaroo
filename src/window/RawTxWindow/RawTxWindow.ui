@@ -28,10 +28,10 @@
   <widget class="QPushButton" name="singleSendButton">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>120</y>
-     <width>91</width>
-     <height>23</height>
+     <x>10</x>
+     <y>100</y>
+     <width>87</width>
+     <height>25</height>
     </rect>
    </property>
    <property name="text">
@@ -41,10 +41,10 @@
   <widget class="QPushButton" name="repeatSendButton">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>120</y>
-     <width>71</width>
-     <height>23</height>
+     <x>110</x>
+     <y>100</y>
+     <width>95</width>
+     <height>25</height>
     </rect>
    </property>
    <property name="text">
@@ -57,30 +57,14 @@
   <widget class="QLabel" name="label_11">
    <property name="geometry">
     <rect>
-     <x>150</x>
-     <y>120</y>
-     <width>21</width>
-     <height>20</height>
+     <x>300</x>
+     <y>100</y>
+     <width>31</width>
+     <height>26</height>
     </rect>
    </property>
    <property name="text">
     <string>ms</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_12">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>120</y>
-     <width>91</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>All values are hex</string>
-   </property>
-   <property name="textFormat">
-    <enum>Qt::PlainText</enum>
    </property>
   </widget>
   <widget class="QLineEdit" name="fieldAddress">
@@ -104,8 +88,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>39</width>
-     <height>13</height>
+     <width>55</width>
+     <height>17</height>
     </rect>
    </property>
    <property name="text">
@@ -136,8 +120,8 @@
     <rect>
      <x>90</x>
      <y>10</y>
-     <width>19</width>
-     <height>13</height>
+     <width>28</width>
+     <height>17</height>
     </rect>
    </property>
    <property name="text">
@@ -443,10 +427,10 @@
   <widget class="QSpinBox" name="spinBox_RepeatRate">
    <property name="geometry">
     <rect>
-     <x>91</x>
-     <y>120</y>
-     <width>51</width>
-     <height>22</height>
+     <x>220</x>
+     <y>100</y>
+     <width>74</width>
+     <height>26</height>
     </rect>
    </property>
    <property name="maximum">
@@ -459,10 +443,10 @@
   <widget class="QCheckBox" name="checkBox_IsRTR">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>140</x>
      <y>70</y>
-     <width>41</width>
-     <height>17</height>
+     <width>54</width>
+     <height>23</height>
     </rect>
    </property>
    <property name="text">
@@ -474,8 +458,8 @@
     <rect>
      <x>10</x>
      <y>70</y>
-     <width>91</width>
-     <height>17</height>
+     <width>109</width>
+     <height>23</height>
     </rect>
    </property>
    <property name="text">
@@ -485,10 +469,10 @@
   <widget class="QCheckBox" name="checkBox_IsErrorFrame">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>230</x>
      <y>70</y>
-     <width>81</width>
-     <height>17</height>
+     <width>106</width>
+     <height>23</height>
     </rect>
    </property>
    <property name="text">
