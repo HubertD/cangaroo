@@ -36,6 +36,9 @@
 #include <window/GraphWindow/GraphWindow.h>
 #include <window/CanStatusWindow/CanStatusWindow.h>
 #include <window/RawTxWindow/RawTxWindow.h>
+#include <linux/can.h>
+#include <linux/can/raw.h>
+#include "light_pcapng_ext.h"
 
 #if defined(__linux__)
 #include <driver/SocketCanDriver/SocketCanDriver.h>
@@ -69,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionSave_Trace_to_file, SIGNAL(triggered(bool)), this, SLOT(saveTraceToFile()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
-
+    connect(ui->action_Load_Trace_from_file, SIGNAL(triggered(bool)), this, SLOT(loadTraceFromFile()));
 
 #if defined(__linux__)
     Backend::instance().addCanDriver(*(new SocketCanDriver(Backend::instance())));
@@ -509,3 +512,60 @@ void MainWindow::on_action_WorkspaceNew_triggered()
     newWorkspace();
 }
 
+void MainWindow::loadTraceFromFile()
+{
+   QString filters("pcap NG (*.pcapng)");
+   QString defaultFilter("pcap NG ASC (*.pcapng)");
+
+   QFileDialog fileDialog(0, "Load Trace from file", QDir::currentPath(), filters);
+   fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+   fileDialog.selectNameFilter(defaultFilter);
+   fileDialog.setDefaultSuffix("pcap");
+   if (fileDialog.exec()) {
+       QString QFilename = fileDialog.selectedFiles()[0];
+       QByteArray filename = QFilename.toLocal8Bit();
+       light_pcapng_t *p = light_pcapng_open_read(filename.data(),LIGHT_FALSE);
+       if(p != NULL) {
+          int Records = 0;
+          QString Msg;
+          log_info(QString("opened %1").arg(QFilename));
+          for( ; ; ) {
+             light_packet_header pkt_header;
+             const uint8_t *pkt_data = NULL;
+             int res = 0;
+
+             res = light_get_next_packet(p,&pkt_header,&pkt_data);
+             if(res == 0) {
+                break;
+             }
+
+             if (pkt_data != NULL) {
+                Records++;
+                CanMessage msg;
+                struct can_frame *frame = (struct can_frame *) pkt_data;
+
+                msg.setTimestamp(pkt_header.timestamp);
+                msg.setRawId(__builtin_bswap32(frame->can_id));
+                msg.setInterfaceId(0);
+
+                uint8_t len = frame->can_dlc;
+                if(len > 8) {
+                   log_warning(QString("DLC reduced from %1 to 8").arg(len));
+                   len = 8;
+                }
+
+                msg.setLength(len);
+                for (int i=0; i<len; i++) {
+                    msg.setByte(i, frame->data[i]);
+                }
+                backend().getTrace()->enqueueMessage(msg, false);
+             }
+          }
+          light_pcapng_close(p);
+          log_info(QString("%1 records read").arg(Records));
+       }
+       else {
+          QMessageBox::critical(this,"Error","Couldn't open file");
+       }
+   }
+}

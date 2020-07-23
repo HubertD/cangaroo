@@ -69,7 +69,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -123,6 +123,7 @@
     <addaction name="action_TraceClear"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Trace_to_file"/>
+    <addaction name="action_Load_Trace_from_file"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMeasurement"/>
@@ -255,6 +256,16 @@
   <action name="actionTransmit_View">
    <property name="text">
     <string>Transmit View</string>
+   </property>
+  </action>
+  <action name="actionLoad_Capture_File">
+   <property name="text">
+    <string>&amp;Load Capture File...</string>
+   </property>
+  </action>
+  <action name="action_Load_Trace_from_file">
+   <property name="text">
+    <string>&amp;Load Trace from file...</string>
    </property>
   </action>
  </widget>

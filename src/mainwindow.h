@@ -67,6 +67,7 @@ public slots:
     void startMeasurement();
     void stopMeasurement();
     void saveTraceToFile();
+    void loadTraceFromFile();
 
     void updateMeasurementActions();
 

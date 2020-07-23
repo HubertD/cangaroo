@@ -1,0 +1,3 @@
+[submodule "src/LightPcapNg"]
+	path = src/LightPcapNg
+	url = https://github.com/rvelea/LightPcapNg.git
