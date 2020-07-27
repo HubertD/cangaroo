@@ -69,7 +69,7 @@
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -96,6 +96,8 @@
      <addaction name="actionLog_View"/>
      <addaction name="actionGraph_View"/>
      <addaction name="actionCan_Status_View"/>
+     <addaction name="actionGraph_View_2"/>
+     <addaction name="actionTransmit_View"/>
     </widget>
     <addaction name="menu_New"/>
    </widget>
@@ -121,6 +123,7 @@
     <addaction name="action_TraceClear"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Trace_to_file"/>
+    <addaction name="action_Load_Trace_from_file"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuMeasurement"/>
@@ -187,6 +190,9 @@
    </property>
   </action>
   <action name="actionGraph_View">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Graph View</string>
    </property>
@@ -240,6 +246,26 @@
   <action name="actionCan_Status_View">
    <property name="text">
     <string>Can &amp;Status View</string>
+   </property>
+  </action>
+  <action name="actionGraph_View_2">
+   <property name="text">
+    <string>Graph View</string>
+   </property>
+  </action>
+  <action name="actionTransmit_View">
+   <property name="text">
+    <string>Transmit View</string>
+   </property>
+  </action>
+  <action name="actionLoad_Capture_File">
+   <property name="text">
+    <string>&amp;Load Capture File...</string>
+   </property>
+  </action>
+  <action name="action_Load_Trace_from_file">
+   <property name="text">
+    <string>&amp;Load Trace from file...</string>
    </property>
   </action>
  </widget>

@@ -66,6 +66,7 @@ private slots:
     void updateButtons();
 
     void executeAddCanDb();
+    void executeReloadCanDbs();
     void executeDeleteCanDb();
 
     void executeAddInterface();
@@ -83,6 +84,7 @@ private:
     QAction *_actionDeleteCanDb;
     QAction *_actionAddInterface;
     QAction *_actionAddCanDb;
+    QAction *_actionReloadCanDbs;
 
     SetupDialogTreeModel *model;
     MeasurementNetwork *_currentNetwork;
@@ -91,6 +93,7 @@ private:
     SetupDialogTreeItem *getSelectedItem();
 
     void addCanDb(const QModelIndex &parent);
+    void reloadCanDbs(const QModelIndex &parent);
     void addInterface(const QModelIndex &parent);
 
 };

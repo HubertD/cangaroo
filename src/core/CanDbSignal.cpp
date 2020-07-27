@@ -75,7 +75,7 @@ void CanDbSignal::setComment(const QString &comment)
     _comment = comment;
 }
 
-QString CanDbSignal::getValueName(const uint32_t value) const
+QString CanDbSignal::getValueName(const uint64_t value) const
 {
     if (_valueTable.contains(value)) {
         return _valueTable[value];
@@ -84,22 +84,23 @@ QString CanDbSignal::getValueName(const uint32_t value) const
     }
 }
 
-void CanDbSignal::setValueName(const uint32_t value, const QString &name)
+void CanDbSignal::setValueName(const uint64_t value, const QString &name)
 {
     _valueTable[value] = name;
 }
 
-double CanDbSignal::convertRawValueToPhysical(const uint32_t rawValue)
+double CanDbSignal::convertRawValueToPhysical(const uint64_t rawValue)
 {
-    int v;
     if (isUnsigned()) {
-        v = rawValue;
+        uint64_t v = rawValue;
+        return v * _factor + _offset;
     } else {
         // TODO check with DBC that actually contains signed values?!
-        v = (int32_t)(rawValue<<(32-_length));
-        v>>=(32-_length);
+        int64_t v = (int64_t)(rawValue<<(64-_length));
+        v>>=(64-_length);
+        return v * _factor + _offset;
+
     }
-    return v * _factor + _offset;
 }
 
 double CanDbSignal::extractPhysicalFromMessage(const CanMessage &msg)
@@ -220,7 +221,7 @@ bool CanDbSignal::isPresentInMessage(const CanMessage &msg)
     return _muxValue == muxer->extractRawDataFromMessage(msg);
 }
 
-uint32_t CanDbSignal::extractRawDataFromMessage(const CanMessage &msg)
+uint64_t CanDbSignal::extractRawDataFromMessage(const CanMessage &msg)
 {
     return msg.extractRawSignal(startBit(), length(), isBigEndian());
 }

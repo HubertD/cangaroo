@@ -204,7 +204,7 @@ void CanTrace::saveVectorAsc(QFile &file)
     stream << "End TriggerBlock" << endl;
 }
 
-bool CanTrace::getMuxedSignalFromCache(const CanDbSignal *signal, uint32_t *raw_value)
+bool CanTrace::getMuxedSignalFromCache(const CanDbSignal *signal, uint64_t *raw_value)
 {
     if (_muxCache.contains(signal)) {
         *raw_value = _muxCache[signal];

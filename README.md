@@ -1,17 +1,22 @@
 # cangaroo
 open source can bus analyzer
 
-written by Hubert Denkmair <hubert@denkmair.de>
+written by Hubert Denkmair <hubert@denkmair.de> (https://github.com/HubertD/cangaroo)
+
+Raw CAN tx support added by Ethan Zonca (https://github.com/normaldotcom/cangaroo)
+
+Pcanng file support added by Skip Hansen (https://github.com/skiphansen/cangaroo)
 
 ## building on linux
 * to install all required packages in a vanilla ubuntu 16.04:
   * sudo apt-get install build-essential git qt5-qmake qtbase5-dev libnl-3-dev libnl-route-3-dev
 * build with:
+  * git submodule init;git submodule update
   * qmake -qt=qt5
   * make
   * make install
 
-## building on windows
+## building on windows 
 * Qt Creator (Community Version is okay) brings everything you need
 * except for the PCAN libraries. 
   * Get them from http://www.peak-system.com/fileadmin/media/files/pcan-basic.zip
@@ -23,6 +28,8 @@ written by Hubert Denkmair <hubert@denkmair.de>
   from src/src.pro
 * if you want to deploy the cangaroo app, make sure to also include the needed Qt Libraries.
   for a normal release build, these are: Qt5Core.dll Qt5Gui.dll Qt5Widgets.dll Qt5Xml.dll
+
+**NB: Building on Windows has not been tested on Skip Hansen's fork**
 
 ## changelog
 

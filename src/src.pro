@@ -3,6 +3,7 @@ lessThan(QT_MAJOR_VERSION, 5): error("requires Qt 5")
 QT += core gui
 QT += widgets
 QT += xml
+QT += charts
 
 TARGET = cangaroo
 TEMPLATE = app
@@ -17,9 +18,10 @@ unix:OBJECTS_DIR = ../build/o/unix
 win32:OBJECTS_DIR = ../build/o/win32
 macx:OBJECTS_DIR = ../build/o/mac
 
+INCLUDEPATH += $$PWD/LightPcapNg/include
 
 SOURCES += main.cpp\
-    mainwindow.cpp \
+    mainwindow.cpp
 
 HEADERS  += mainwindow.h \
 
@@ -35,10 +37,11 @@ include($$PWD/window/SetupDialog/SetupDialog.pri)
 include($$PWD/window/LogWindow/LogWindow.pri)
 include($$PWD/window/GraphWindow/GraphWindow.pri)
 include($$PWD/window/CanStatusWindow/CanStatusWindow.pri)
+include($$PWD/window/RawTxWindow/RawTxWindow.pri)
+include($$PWD/LightPcapNg.pri)
 
 unix:PKGCONFIG += libnl-3.0
 unix:PKGCONFIG += libnl-route-3.0
 unix:include($$PWD/driver/SocketCanDriver/SocketCanDriver.pri)
 
-win32:include($$PWD/driver/PeakCanDriver/PeakCanDriver.pri)
 win32:include($$PWD/driver/CandleApiDriver/CandleApiDriver.pri)

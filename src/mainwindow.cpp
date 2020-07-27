@@ -35,11 +35,14 @@
 #include <window/LogWindow/LogWindow.h>
 #include <window/GraphWindow/GraphWindow.h>
 #include <window/CanStatusWindow/CanStatusWindow.h>
+#include <window/RawTxWindow/RawTxWindow.h>
+#include <linux/can.h>
+#include <linux/can/raw.h>
+#include "light_pcapng_ext.h"
 
 #if defined(__linux__)
 #include <driver/SocketCanDriver/SocketCanDriver.h>
 #else
-#include <driver/PeakCanDriver/PeakCanDriver.h>
 #include <driver/CandleApiDriver/CandleApiDriver.h>
 #endif
 
@@ -56,7 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->action_Trace_View, SIGNAL(triggered()), this, SLOT(createTraceWindow()));
     connect(ui->actionLog_View, SIGNAL(triggered()), this, SLOT(addLogWidget()));
     connect(ui->actionGraph_View, SIGNAL(triggered()), this, SLOT(createGraphWindow()));
+    connect(ui->actionGraph_View_2, SIGNAL(triggered()), this, SLOT(addGraphWidget()));
     connect(ui->actionSetup, SIGNAL(triggered()), this, SLOT(showSetupDialog()));
+    connect(ui->actionTransmit_View, SIGNAL(triggered()), this, SLOT(addRawTxWidget()));
 
     connect(ui->actionStart_Measurement, SIGNAL(triggered()), this, SLOT(startMeasurement()));
     connect(ui->actionStop_Measurement, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
@@ -67,12 +72,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->actionSave_Trace_to_file, SIGNAL(triggered(bool)), this, SLOT(saveTraceToFile()));
     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(showAboutDialog()));
-
+    connect(ui->action_Load_Trace_from_file, SIGNAL(triggered(bool)), this, SLOT(loadTraceFromFile()));
 
 #if defined(__linux__)
     Backend::instance().addCanDriver(*(new SocketCanDriver(Backend::instance())));
 #else
-    Backend::instance().addCanDriver(*(new PeakCanDriver(Backend::instance())));
     Backend::instance().addCanDriver(*(new CandleApiDriver(Backend::instance())));
 #endif
 
@@ -264,6 +268,7 @@ void MainWindow::newWorkspace()
         stopAndClearMeasurement();
         clearWorkspace();
         createTraceWindow();
+        addRawTxWidget();
         backend().setDefaultSetup();
     }
 }
@@ -361,6 +366,27 @@ QMainWindow *MainWindow::createGraphWindow(QString title)
     return mm;
 }
 
+void MainWindow::addGraphWidget(QMainWindow *parent)
+{
+    if (!parent) {
+        parent = currentTab();
+    }
+    QDockWidget *dock = new QDockWidget("Graph", parent);
+    dock->setWidget(new GraphWindow(dock, backend()));
+    parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
+}
+
+void MainWindow::addRawTxWidget(QMainWindow *parent)
+{
+    if (!parent) {
+        parent = currentTab();
+    }
+    QDockWidget *dock = new QDockWidget("Transmit View", parent);
+    dock->setWidget(new RawTxWindow(dock, backend()));
+    parent->addDockWidget(Qt::BottomDockWidgetArea, dock);
+}
+
+
 void MainWindow::addLogWidget(QMainWindow *parent)
 {
     if (!parent) {
@@ -408,15 +434,17 @@ void MainWindow::showAboutDialog()
        "cangaroo\n"
        "open source can bus analyzer\n"
        "\n"
-       "version 0.2.3\n"
+       "version 0.2.4\n"
        "\n"
-       "(c)2015-2017 Hubert Denkmair"
+       "(c)2015-2017 Hubert Denkmair\n"
+       "(c)2018 Ethan Zonca"
     );
 }
 
 void MainWindow::startMeasurement()
 {
     if (showSetupDialog()) {
+        backend().clearTrace();
         backend().startMeasurement();
     }
 }
@@ -484,3 +512,60 @@ void MainWindow::on_action_WorkspaceNew_triggered()
     newWorkspace();
 }
 
+void MainWindow::loadTraceFromFile()
+{
+   QString filters("pcap NG (*.pcapng)");
+   QString defaultFilter("pcap NG ASC (*.pcapng)");
+
+   QFileDialog fileDialog(0, "Load Trace from file", QDir::currentPath(), filters);
+   fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
+   fileDialog.selectNameFilter(defaultFilter);
+   fileDialog.setDefaultSuffix("pcap");
+   if (fileDialog.exec()) {
+       QString QFilename = fileDialog.selectedFiles()[0];
+       QByteArray filename = QFilename.toLocal8Bit();
+       light_pcapng_t *p = light_pcapng_open_read(filename.data(),LIGHT_FALSE);
+       if(p != NULL) {
+          int Records = 0;
+          QString Msg;
+          log_info(QString("opened %1").arg(QFilename));
+          for( ; ; ) {
+             light_packet_header pkt_header;
+             const uint8_t *pkt_data = NULL;
+             int res = 0;
+
+             res = light_get_next_packet(p,&pkt_header,&pkt_data);
+             if(res == 0) {
+                break;
+             }
+
+             if (pkt_data != NULL) {
+                Records++;
+                CanMessage msg;
+                struct can_frame *frame = (struct can_frame *) pkt_data;
+
+                msg.setTimestamp(pkt_header.timestamp);
+                msg.setRawId(__builtin_bswap32(frame->can_id));
+                msg.setInterfaceId(0);
+
+                uint8_t len = frame->can_dlc;
+                if(len > 8) {
+                   log_warning(QString("DLC reduced from %1 to 8").arg(len));
+                   len = 8;
+                }
+
+                msg.setLength(len);
+                for (int i=0; i<len; i++) {
+                    msg.setByte(i, frame->data[i]);
+                }
+                backend().getTrace()->enqueueMessage(msg, false);
+             }
+          }
+          light_pcapng_close(p);
+          log_info(QString("%1 records read").arg(Records));
+       }
+       else {
+          QMessageBox::critical(this,"Error","Couldn't open file");
+       }
+   }
+}

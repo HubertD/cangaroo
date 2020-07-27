@@ -188,8 +188,8 @@
     <rect>
      <x>9</x>
      <y>220</y>
-     <width>41</width>
-     <height>16</height>
+     <width>59</width>
+     <height>17</height>
     </rect>
    </property>
    <property name="text">
@@ -202,7 +202,7 @@
      <x>140</x>
      <y>220</y>
      <width>411</width>
-     <height>126</height>
+     <height>141</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="vbOptions">

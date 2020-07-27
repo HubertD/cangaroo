@@ -44,10 +44,19 @@
 #include <netlink/route/link.h>
 #include <netlink/route/link/can.h>
 
+#ifndef SIOCGSTAMP 
+// linux-headers-5.2 updated SIOCGSTAMP ioctl to work against 32-bit and 
+// 64-bit struct timeval. 
+// Commit: https://github.com/torvalds/linux/commit/0768e17073dc527ccd18ed5f96ce85f9985e9115
+// This shuffled headers a bit and caused build breakage for if only sys/socket.h
+// is included.  Fix: Include <linux/sockios.h> if SIOCGSTAMP not defined.
+#include <linux/sockios.h>
+#endif
+
 SocketCanInterface::SocketCanInterface(SocketCanDriver *driver, int index, QString name)
   : CanInterface((CanDriver *)driver),
-	_idx(index),
-	_fd(0),
+   _idx(index),
+   _fd(0),
     _name(name),
     _ts_mode(ts_mode_SIOCSHWTSTAMP)
 {
@@ -57,7 +66,7 @@ SocketCanInterface::~SocketCanInterface() {
 }
 
 QString SocketCanInterface::getName() const {
-	return _name;
+   return _name;
 }
 
 void SocketCanInterface::setName(QString name) {
@@ -347,53 +356,53 @@ const char *SocketCanInterface::cname()
 }
 
 void SocketCanInterface::open() {
-	if((_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		perror("Error while opening socket");
-	}
+   if((_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
+      perror("Error while opening socket");
+   }
 
-	struct ifreq ifr;
+   struct ifreq ifr;
     struct sockaddr_can addr;
     strcpy(ifr.ifr_name, _name.toStdString().c_str());
-	ioctl(_fd, SIOCGIFINDEX, &ifr);
+   ioctl(_fd, SIOCGIFINDEX, &ifr);
 
-	addr.can_family  = AF_CAN;
-	addr.can_ifindex = ifr.ifr_ifindex;
+   addr.can_family  = AF_CAN;
+   addr.can_ifindex = ifr.ifr_ifindex;
 
-	if(bind(_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		perror("Error in socket bind");
-	}
+   if(bind(_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+      perror("Error in socket bind");
+   }
 }
 
 void SocketCanInterface::close() {
-	::close(_fd);
+   ::close(_fd);
 }
 
 void SocketCanInterface::sendMessage(const CanMessage &msg) {
-	struct can_frame frame;
+   struct can_frame frame;
 
-	frame.can_id = msg.getId();
+   frame.can_id = msg.getId();
 
-	if (msg.isExtended()) {
-		frame.can_id |= CAN_EFF_FLAG;
-	}
+   if (msg.isExtended()) {
+      frame.can_id |= CAN_EFF_FLAG;
+   }
 
-	if (msg.isRTR()) {
-		frame.can_id |= CAN_RTR_FLAG;
-	}
+   if (msg.isRTR()) {
+      frame.can_id |= CAN_RTR_FLAG;
+   }
 
-	if (msg.isErrorFrame()) {
-		frame.can_id |= CAN_ERR_FLAG;
-	}
+   if (msg.isErrorFrame()) {
+      frame.can_id |= CAN_ERR_FLAG;
+   }
 
-	uint8_t len = msg.getLength();
-	if (len>8) { len = 8; }
+   uint8_t len = msg.getLength();
+   if (len>8) { len = 8; }
 
-	frame.can_dlc = len;
-	for (int i=0; i<len; i++) {
-		frame.data[i] = msg.getByte(i);
-	}
+   frame.can_dlc = len;
+   for (int i=0; i<len; i++) {
+      frame.data[i] = msg.getByte(i);
+   }
 
-	::write(_fd, &frame, sizeof(struct can_frame));
+   ::write(_fd, &frame, sizeof(struct can_frame));
 }
 
 bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
@@ -441,7 +450,7 @@ bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
         msg.setExtended((frame.can_id & CAN_EFF_FLAG)!=0);
         msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
         msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);
-        msg.setInterfaceId(getId());
+        msg.setInterfaceId(0);
 
         uint8_t len = frame.can_dlc;
         if (len>8) { len = 8; }

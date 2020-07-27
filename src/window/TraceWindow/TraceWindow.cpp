@@ -44,7 +44,7 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     _aggregatedProxyModel->setSourceModel(_aggregatedTraceViewModel);
     _aggregatedProxyModel->setDynamicSortFilter(true);
 
-    setMode(mode_linear);
+    setMode(mode_aggregated);
     setAutoScroll(false);
 
     QFont font("Monospace");
@@ -57,14 +57,15 @@ TraceWindow::TraceWindow(QWidget *parent, Backend &backend) :
     ui->tree->setColumnWidth(2, 50);
     ui->tree->setColumnWidth(3, 90);
     ui->tree->setColumnWidth(4, 200);
-    ui->tree->setColumnWidth(5, 50);
-    ui->tree->setColumnWidth(6, 200);
+    ui->tree->setColumnWidth(5, 200);
+    ui->tree->setColumnWidth(6, 50);
+    ui->tree->setColumnWidth(7, 200);
     ui->tree->sortByColumn(BaseTraceViewModel::column_canid, Qt::AscendingOrder);
 
     ui->cbTimestampMode->addItem("absolute", 0);
     ui->cbTimestampMode->addItem("relative", 1);
     ui->cbTimestampMode->addItem("delta", 2);
-    setTimestampMode(timestamp_mode_relative);
+    setTimestampMode(timestamp_mode_delta);
 
     connect(_linearTraceViewModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(rowsInserted(QModelIndex,int,int)));
 
