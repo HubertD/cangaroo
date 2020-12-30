@@ -34,6 +34,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
+#include <linux/sockios.h> // Linux 5.2 Compatibility, cf. https://wiki.gentoo.org/wiki/Linux_headers_5.2_porting_notes/SIOCGSTAMP
 #include <sys/time.h>
 
 #include <linux/if.h>
