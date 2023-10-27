@@ -40,6 +40,7 @@
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include <linux/can/netlink.h>
+#include <linux/sockios.h>
 #include <netlink/version.h>
 #include <netlink/route/link.h>
 #include <netlink/route/link/can.h>
