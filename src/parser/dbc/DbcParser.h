@@ -88,5 +88,6 @@ private:
     bool parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &tokens);
     bool parseSectionCm(CanDb &candb, DbcTokenList &tokens);
     bool parseSectionVal(CanDb &candb, DbcTokenList &tokens);
+    bool parseSectionBa(CanDb &candb, DbcTokenList &tokens);
 
 };

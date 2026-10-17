@@ -115,6 +115,19 @@ uint32_t CanMessage::getId() const {
 	}
 }
 
+uint32_t CanMessage::j1939Pgn(uint32_t id) {
+	uint8_t pf  = (id >> 16) & 0xFF;
+	uint8_t ps  = (id >>  8) & 0xFF;
+	uint8_t dp  = (id >> 24) & 1;
+	uint8_t edp = (id >> 25) & 1;
+
+	uint32_t pgn = (edp << 17) | (dp << 16) | (pf << 8);
+	if (pf >= 240) { // PDU2 (broadcast): PS is part of the PGN
+		pgn |= ps;
+	}
+	return pgn;
+}
+
 void CanMessage::setId(const uint32_t id) {
     _raw_id &= ~ id_mask_extended;
     _raw_id = id;

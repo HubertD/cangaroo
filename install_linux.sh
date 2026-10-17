@@ -41,11 +41,21 @@ install_deps() {
         ubuntu|debian|linuxmint)
             echo "Installing dependencies for $OS (using apt)..."
             sudo apt update
+            # Package names differ across releases: Debian 13+/recent Ubuntu use
+            # qt6-charts-dev / qt6-serialport-dev; older releases use libqt6*6-dev.
+            apt_pick() {
+                for p in "$@"; do
+                    if apt-cache show "$p" >/dev/null 2>&1; then echo "$p"; return; fi
+                done
+                echo "$1"
+            }
+            CHARTS_PKG=$(apt_pick qt6-charts-dev libqt6charts6-dev)
+            SERIAL_PKG=$(apt_pick qt6-serialport-dev libqt6serialport6-dev)
             sudo apt install -y \
                 build-essential \
                 qt6-base-dev \
-                libqt6charts6-dev \
-                libqt6serialport6-dev \
+                "$CHARTS_PKG" \
+                "$SERIAL_PKG" \
                 libnl-3-dev \
                 libnl-route-3-dev \
                 libgl1-mesa-dev \

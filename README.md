@@ -77,7 +77,8 @@ If you downloaded a pre-compiled release tarball, use the included setup script 
 
 | Distribution | Command |
 | :--- | :--- |
-| **Ubuntu / Debian** | `sudo apt install qt6-base-dev libqt6charts6-dev libqt6serialport6-dev build-essential libnl-3-dev libnl-route-3-dev` |
+| **Ubuntu / Debian ≤12** | `sudo apt install qt6-base-dev libqt6charts6-dev libqt6serialport6-dev build-essential libnl-3-dev libnl-route-3-dev` |
+| **Debian 13+ / recent Ubuntu** | `sudo apt install qt6-base-dev qt6-charts-dev qt6-serialport-dev build-essential libnl-3-dev libnl-route-3-dev` |
 | **Fedora** | `sudo dnf install qt6-qtbase-devel qt6-qtcharts-devel qt6-qtserialport-devel libnl3-devel` |
 | **Arch Linux** | `sudo pacman -S qt6-base qt6-charts qt6-serialport libnl` |
 

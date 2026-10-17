@@ -407,6 +407,8 @@ bool DbcParser::parseSection(CanDb &candb, DbcTokenList &tokens) {
                 retval &= parseSectionCm(candb, tokens);
             } else if (sectionName == "VAL_") {
                 retval &= parseSectionVal(candb, tokens);
+            } else if (sectionName == "BA_") {
+                retval &= parseSectionBa(candb, tokens);
             } else {
                 skipUntilSectionEnding(tokens);
             }
@@ -674,6 +676,21 @@ bool DbcParser::parseSectionVal(CanDb &candb, DbcParser::DbcTokenList &tokens)
         signal->setValueName(value, name);
     }
 
+    return true;
+}
+
+bool DbcParser::parseSectionBa(CanDb &candb, DbcParser::DbcTokenList &tokens)
+{
+    // We only model one attribute: the global ProtocolType, used to flag J1939
+    // databases so messages can be matched by PGN instead of full CAN id.
+    QString attrName;
+    if (expectString(tokens, &attrName) && attrName == "ProtocolType") {
+        QString value;
+        if (expectString(tokens, &value) && value.compare("J1939", Qt::CaseInsensitive) == 0) {
+            candb.setJ1939(true);
+        }
+    }
+    skipUntilSectionEnding(tokens);
     return true;
 }
 

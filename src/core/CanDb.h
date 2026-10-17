@@ -53,6 +53,9 @@ class CanDb
         void setVersion(QString version) { _version = version; }
         QString getVersion() { return _version; }
 
+        void setJ1939(bool v) { _isJ1939 = v; }
+        bool isJ1939() const { return _isJ1939; }
+
         CanDbNode *getOrCreateNode(QString node_name);
 
         size_t getNumberOfMessages();
@@ -73,6 +76,7 @@ private:
         QString _path;
         QString _version;
         QString _comment;
+        bool _isJ1939 = false;
         CanDbNodeMap _nodes;
         CanDbMessageList _messages;
 
