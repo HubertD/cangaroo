@@ -112,6 +112,16 @@ CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage &msg) const
                 if (result != 0) {
                     return result;
                 }
+                // J1939: frames carry a varying source address (and priority) in the
+                // CAN id, so an exact raw-id match fails. Fall back to matching by PGN.
+                if (db->isJ1939() && msg.isExtended()) {
+                    uint32_t pgn = CanMessage::j1939Pgn(msg.getId());
+                    foreach (CanDbMessage *dbMsg, db->getMessageList()) {
+                        if (CanMessage::j1939Pgn(dbMsg->getRaw_id() & 0x1FFFFFFF) == pgn) {
+                            return dbMsg;
+                        }
+                    }
+                }
             }
         }
     }

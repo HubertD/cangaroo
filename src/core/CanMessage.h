@@ -45,6 +45,9 @@ public:
 	uint32_t getId() const;
 	void setId(const uint32_t id);
 
+	// J1939 Parameter Group Number from a 29-bit extended id (source address masked out).
+	static uint32_t j1939Pgn(uint32_t id);
+
 	bool isExtended() const;
 	void setExtended(const bool isExtended);
 
