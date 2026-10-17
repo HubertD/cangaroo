@@ -5,6 +5,7 @@
 #include <core/MeasurementInterface.h>
 #include "api/candle.h"
 #include "CandleApiTiming.h"
+#include "CandleApiDevice.h"
 #include <windows.h>
 #include <QList>
 
@@ -16,7 +17,7 @@ class CandleApiInterface : public CanInterface
 {
     Q_OBJECT
 public:
-    CandleApiInterface(CandleApiDriver *driver, candle_handle handle);
+    CandleApiInterface(CandleApiDriver *driver, CandleApiDevice *device, uint8_t channel);
     virtual ~CandleApiInterface();
 
     virtual QString getName() const;
@@ -47,15 +48,12 @@ public:
 
     wstring getPath() const;
 
-    void update(candle_handle dev);
-
 private:
 
-    uint64_t _hostOffsetStart;
-    uint32_t _deviceTicksStart;
     bool _isOpen;
 
-    candle_handle _handle;
+    CandleApiDevice *_device;
+    uint8_t _ch;
     MeasurementInterface _settings;
     Backend &_backend;
 

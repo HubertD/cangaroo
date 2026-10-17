@@ -24,21 +24,26 @@
 #include <core/Backend.h>
 #include <driver/CanDriver.h>
 #include "api/candle.h"
+#include <QList>
 
 class CandleApiInterface;
+class CandleApiDevice;
 class GenericCanSetupPage;
 
 class CandleApiDriver : public CanDriver
 {
 public:
     CandleApiDriver(Backend &backend);
+    virtual ~CandleApiDriver();
 
     virtual QString getName();
     virtual bool update();
 
 private:
     GenericCanSetupPage *setupPage;
-    CandleApiInterface *findInterface(candle_handle dev);
+    QList<CandleApiDevice*> _devices;
+
+    void deleteAllDevices();
 
 };
 

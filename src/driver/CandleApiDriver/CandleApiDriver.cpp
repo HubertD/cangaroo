@@ -23,6 +23,7 @@
 #include "api/candle.h"
 
 #include "CandleApiInterface.h"
+#include "CandleApiDevice.h"
 #include <driver/GenericCanSetupPage.h>
 
 CandleApiDriver::CandleApiDriver(Backend &backend)
@@ -32,49 +33,50 @@ CandleApiDriver::CandleApiDriver(Backend &backend)
     QObject::connect(&backend, SIGNAL(onSetupDialogCreated(SetupDialog&)), setupPage, SLOT(onSetupDialogCreated(SetupDialog&)));
 }
 
+CandleApiDriver::~CandleApiDriver()
+{
+    deleteAllDevices();
+}
+
 QString CandleApiDriver::getName()
 {
     return "CandleAPI";
 }
 
+void CandleApiDriver::deleteAllDevices()
+{
+    qDeleteAll(_devices);
+    _devices.clear();
+}
+
 bool CandleApiDriver::update()
 {
+    // Interfaces hold pointers into their device, so drop them before the
+    // devices they reference.
     deleteAllInterfaces();
+    deleteAllDevices();
 
     candle_list_handle clist;
-    uint8_t num_interfaces;
+    uint8_t num_devices;
     candle_handle dev;
 
     if (candle_list_scan(&clist)) {
-        if (candle_list_length(clist, &num_interfaces)) {
-            for (uint8_t i=0; i<num_interfaces; i++) {
+        if (candle_list_length(clist, &num_devices)) {
+            for (uint8_t i=0; i<num_devices; i++) {
                 if (candle_dev_get(clist, i, &dev)) {
-                    CandleApiInterface *cif = findInterface(dev);
+                    CandleApiDevice *device = new CandleApiDevice(dev);
+                    _devices.append(device);
 
-                    if (cif == NULL) {
-                        cif = new CandleApiInterface(this, dev);
-                        addInterface(cif);
-                    } else {
-                        cif->update(dev);
+                    // One interface per physical CAN channel on the device.
+                    uint8_t channels = device->channelCount();
+                    for (uint8_t ch=0; ch<channels; ch++) {
+                        addInterface(new CandleApiInterface(this, device, ch));
                     }
-
                 }
-
             }
         }
         candle_list_free(clist);
     }
 
     return true;
-}
-
-CandleApiInterface *CandleApiDriver::findInterface(candle_handle dev)
-{
-    foreach (CanInterface *intf, getInterfaces()) {
-        CandleApiInterface *cif = dynamic_cast<CandleApiInterface*>(intf);
-        if (cif->getPath() == std::wstring(candle_dev_get_path(dev))) {
-            return cif;
-        }
-    }
-    return NULL;
 }

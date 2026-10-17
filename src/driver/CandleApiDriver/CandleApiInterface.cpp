@@ -1,11 +1,12 @@
 #include "CandleApiDriver.h"
 #include "CandleApiInterface.h"
 
-CandleApiInterface::CandleApiInterface(CandleApiDriver *driver, candle_handle handle)
+CandleApiInterface::CandleApiInterface(CandleApiDriver *driver, CandleApiDevice *device, uint8_t channel)
   : CanInterface(driver),
-    _hostOffsetStart(0),
-    _deviceTicksStart(0),
-    _handle(handle),
+    _isOpen(false),
+    _device(device),
+    _ch(channel),
+    _settings(),
     _backend(driver->backend()),
     _numRx(0),
     _numTx(0),
@@ -168,12 +169,12 @@ CandleApiInterface::~CandleApiInterface()
 
 QString CandleApiInterface::getName() const
 {
-    return "candle" + QString::number(getId() & 0xFF);
+    return "candle" + QString::number(getId() & 0xFF) + ".ch" + QString::number(_ch);
 }
 
 QString CandleApiInterface::getDetailsStr() const
 {
-    return QString::fromStdWString(getPath());
+    return QString::fromStdWString(getPath()) + " (channel " + QString::number(_ch) + ")";
 }
 
 void CandleApiInterface::applyConfig(const MeasurementInterface &mi)
@@ -190,7 +191,7 @@ uint32_t CandleApiInterface::getCapabilities()
 {
     candle_capability_t caps;
 
-    if (candle_channel_get_capabilities(_handle, 0, &caps)) {
+    if (candle_channel_get_capabilities(_device->handle(), _ch, &caps)) {
 
         uint32_t retval = 0;
 
@@ -222,7 +223,7 @@ QList<CanTiming> CandleApiInterface::getAvailableBitrates()
     QList<CanTiming> retval;
 
     candle_capability_t caps;
-    if (candle_channel_get_capabilities(_handle, 0, &caps)) {
+    if (candle_channel_get_capabilities(_device->handle(), _ch, &caps)) {
         int i = 0;
         foreach (const CandleApiTiming t, _timings) {
             if (t.getBaseClk() == caps.fclk_can) {
@@ -237,7 +238,7 @@ QList<CanTiming> CandleApiInterface::getAvailableBitrates()
 bool CandleApiInterface::setBitTiming(uint32_t bitrate, uint32_t samplePoint, uint32_t fdBitrate, uint32_t fdSamplePoint, bool useFD)
 {
     candle_capability_t caps;
-    if (!candle_channel_get_capabilities(_handle, 0, &caps)) {
+    if (!candle_channel_get_capabilities(_device->handle(), _ch, &caps)) {
         return false;
     }
 
@@ -248,7 +249,7 @@ bool CandleApiInterface::setBitTiming(uint32_t bitrate, uint32_t samplePoint, ui
           && (t.getSamplePoint()==samplePoint) )
         {
             candle_bittiming_t timing = t.getTiming();
-            if (!candle_channel_set_timing(_handle, 0, &timing)) {
+            if (!candle_channel_set_timing(_device->handle(), _ch, &timing)) {
                 return false;
             }
             timing_found = true;
@@ -268,7 +269,7 @@ bool CandleApiInterface::setBitTiming(uint32_t bitrate, uint32_t samplePoint, ui
               && (t.getSamplePoint()==fdSamplePoint) )
             {
                 candle_bittiming_t timing = t.getTiming();
-                if (!candle_channel_set_data_timing(_handle, 0, &timing)) {
+                if (!candle_channel_set_data_timing(_device->handle(), _ch, &timing)) {
                     return false;
                 }
                 data_timing_found = true;
@@ -285,14 +286,17 @@ bool CandleApiInterface::setBitTiming(uint32_t bitrate, uint32_t samplePoint, ui
 
 void CandleApiInterface::open()
 {
-    if (!candle_dev_open(_handle)) {
-        // TODO what?
+    uint64_t hostNow =
+            _backend.getUsecsAtMeasurementStart() +
+            _backend.getUsecsSinceMeasurementStart();
+
+    if (!_device->acquire(hostNow)) {
         _isOpen = false;
         return;
     }
 
     if (!setBitTiming(_settings.bitrate(), _settings.samplePoint(), _settings.fdBitrate(), _settings.fdSamplePoint(), _settings.isCanFD())) {
-        // TODO what?
+        _device->release();
         _isOpen = false;
         return;
     }
@@ -315,15 +319,11 @@ void CandleApiInterface::open()
     _numTx = 0;
     _numTxErr = 0;
 
-    uint32_t t_dev;
-    if (candle_dev_get_timestamp_us(_handle, &t_dev)) {
-        _hostOffsetStart =
-                _backend.getUsecsAtMeasurementStart() +
-                _backend.getUsecsSinceMeasurementStart();
-        _deviceTicksStart = t_dev;
+    if (!_device->startChannel(_ch, flags)) {
+        _device->release();
+        _isOpen = false;
+        return;
     }
-
-    candle_channel_start(_handle, 0, flags);
     _isOpen = true;
 }
 
@@ -334,8 +334,8 @@ bool CandleApiInterface::isOpen()
 
 void CandleApiInterface::close()
 {
-    candle_channel_stop(_handle, 0);
-    candle_dev_close(_handle);
+    _device->stopChannel(_ch);
+    _device->release();
     _isOpen = false;
 }
 
@@ -363,7 +363,7 @@ void CandleApiInterface::sendMessage(const CanMessage &msg)
         frame.data[i] = msg.getByte(i);
     }
 
-    if (candle_frame_send(_handle, 0, &frame)) {
+    if (_device->send(_ch, &frame)) {
         _numTx++;
     } else {
         _numTxErr++;
@@ -375,7 +375,7 @@ bool CandleApiInterface::readMessage(QList<CanMessage> &msglist, unsigned int ti
     candle_frame_t frame;
     CanMessage msg;
 
-    if (candle_frame_read(_handle, &frame, timeout_ms)) {
+    if (_device->read(_ch, &frame, timeout_ms)) {
 
         if (candle_frame_type(&frame)==CANDLE_FRAMETYPE_RECEIVE) {
             _numRx++;
@@ -400,8 +400,8 @@ bool CandleApiInterface::readMessage(QList<CanMessage> &msglist, unsigned int ti
                 msg.setByte(i, data[i]);
             }
 
-            uint32_t dev_ts = candle_frame_timestamp_us(&frame) - _deviceTicksStart;
-            uint64_t ts_us = _hostOffsetStart + dev_ts;
+            uint32_t dev_ts = candle_frame_timestamp_us(&frame) - _device->deviceTicksStart();
+            uint64_t ts_us = _device->hostOffsetStart() + dev_ts;
 
             uint64_t us_since_start = _backend.getUsecsSinceMeasurementStart();
             if (us_since_start > 0x180000000) { // device timestamp overflow must have happend at least once
@@ -460,12 +460,6 @@ int CandleApiInterface::getNumTxDropped()
 
 wstring CandleApiInterface::getPath() const
 {
-    return wstring(candle_dev_get_path(_handle));
-}
-
-void CandleApiInterface::update(candle_handle dev)
-{
-    candle_dev_free(_handle);
-    _handle = dev;
+    return _device->path();
 }
 
