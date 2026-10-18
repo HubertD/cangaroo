@@ -49,8 +49,10 @@ SocketCanDriver::~SocketCanDriver() {
 
 bool SocketCanDriver::update() {
 
+    deleteAllInterfaces();
+
     struct nl_sock *sock = nl_socket_alloc();
-    struct nl_cache *cache;
+    struct nl_cache *cache = NULL;
 
     nl_connect(sock, NETLINK_ROUTE);
     int result = rtnl_link_alloc_cache(sock, AF_UNSPEC, &cache);
@@ -69,7 +71,9 @@ bool SocketCanDriver::update() {
         }
     }
 
-    nl_cache_free(cache);
+    if (cache) {
+        nl_cache_free(cache);
+    }
     nl_close(sock);
     nl_socket_free(sock);
 

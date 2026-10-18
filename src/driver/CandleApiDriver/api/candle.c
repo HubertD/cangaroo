@@ -398,6 +398,13 @@ bool __stdcall DLL candle_channel_set_timing(candle_handle hdev, uint8_t ch, can
     return candle_ctrl_set_bittiming(dev, ch, data);
 }
 
+bool __stdcall DLL candle_channel_set_data_timing(candle_handle hdev, uint8_t ch, candle_bittiming_t *data)
+{
+    // TODO ensure device is open, check channel count..
+    candle_device_t *dev = (candle_device_t*)hdev;
+    return candle_ctrl_set_data_bittiming(dev, ch, data);
+}
+
 bool __stdcall DLL candle_channel_set_bitrate(candle_handle hdev, uint8_t ch, uint32_t bitrate)
 {
     // TODO ensure device is open, check channel count..
@@ -491,11 +498,22 @@ bool __stdcall DLL candle_frame_send(candle_handle hdev, uint8_t ch, candle_fram
     frame->echo_id = 0;
     frame->channel = ch;
 
+    uint32_t frame_size = 24; // Classic CAN size with timestamp
+    if (frame->flags & CANDLE_FLAG_FD) {
+        frame_size = 80;
+    }
+
+    // Move the timestamp to the correct position for Classic CAN
+    if (!(frame->flags & CANDLE_FLAG_FD)) {
+        uint32_t *ts_ptr = (uint32_t*)(&frame->data[8]);
+        *ts_ptr = frame->timestamp_us;
+    }
+
     bool rc = WinUsb_WritePipe(
         dev->winUSBHandle,
         dev->bulkOutPipe,
         (uint8_t*)frame,
-        sizeof(*frame),
+        frame_size,
         &bytes_sent,
         0
     );
@@ -530,17 +548,37 @@ bool __stdcall DLL candle_frame_read(candle_handle hdev, candle_frame_t *frame, 
         return false;
     }
 
-    if (bytes_transfered < sizeof(*frame)-4) {
+    if (bytes_transfered < 20) {
         candle_prepare_read(dev, urb_num);
         dev->last_error = CANDLE_ERR_READ_SIZE;
         return false;
     }
 
-    if (bytes_transfered < sizeof(*frame)) {
-        frame->timestamp_us = 0;
-    }
+    uint8_t *buf = dev->rxurbs[urb_num].buf;
+    bool is_fd = (buf[10] & CANDLE_FLAG_FD) != 0;
 
-    memcpy(frame, dev->rxurbs[urb_num].buf, sizeof(*frame));
+    uint32_t expected_size = is_fd ? 80 : 24;
+
+    memset(frame, 0, sizeof(*frame));
+    
+    // Copy header
+    memcpy(frame, buf, 12);
+
+    if (is_fd) {
+        memcpy(frame->data, buf + 12, 64);
+        if (bytes_transfered >= 80) {
+            memcpy(&frame->timestamp_us, buf + 76, 4);
+        } else {
+            frame->timestamp_us = 0;
+        }
+    } else {
+        memcpy(frame->data, buf + 12, 8);
+        if (bytes_transfered >= 24) {
+            memcpy(&frame->timestamp_us, buf + 20, 4);
+        } else {
+            frame->timestamp_us = 0;
+        }
+    }
 
     return candle_prepare_read(dev, urb_num);
 }

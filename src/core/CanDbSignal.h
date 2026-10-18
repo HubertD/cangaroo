@@ -28,7 +28,7 @@
 
 class CanDbMessage;
 
-typedef QMap<uint32_t,QString> CanDbValueTable;
+typedef QMap<uint64_t,QString> CanDbValueTable;
 
 class CanDbSignal
 {
@@ -36,6 +36,8 @@ public:
     CanDbSignal(CanDbMessage *parent);
     QString name() const;
     void setName(const QString &name);
+    
+    CanDbMessage* getParentMessage() const { return _parent; }
 
     uint8_t startBit() const;
     void setStartBit(uint8_t startBit);
@@ -46,8 +48,8 @@ public:
     QString comment() const;
     void setComment(const QString &comment);
 
-    QString getValueName(const uint32_t value) const;
-    void setValueName(const uint32_t value, const QString &name);
+    QString getValueName(const uint64_t value) const;
+    void setValueName(const uint64_t value, const QString &name);
 
     double getFactor() const;
     void setFactor(double factor);
@@ -79,11 +81,13 @@ public:
     uint32_t getMuxValue() const;
     void setMuxValue(const uint32_t &muxValue);
 
-    bool isPresentInMessage(const CanMessage &msg);
-    uint32_t extractRawDataFromMessage(const CanMessage &msg);
+    bool isPresentInMessage(const CanMessage &msg) const;
+    uint64_t extractRawDataFromMessage(const CanMessage &msg) const;
 
-    double convertRawValueToPhysical(const uint32_t rawValue);
-    double extractPhysicalFromMessage(const CanMessage &msg);
+    double convertRawValueToPhysical(const uint64_t rawValue) const;
+    double extractPhysicalFromMessage(const CanMessage &msg) const;
+    void applyPhysicalToMessage(double physicalValue, CanMessage &msg);
+    void injectRawDataToMessage(uint64_t rawValue, CanMessage &msg);
 
 
 private:

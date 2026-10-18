@@ -23,7 +23,7 @@
 
 #include <QFile>
 #include <QChar>
-#include <QRegExp>
+#include <QRegularExpression>
 
 typedef enum {
     dbc_tok_whitespace = 1,
@@ -83,14 +83,17 @@ class DbcStringToken : public DbcToken {
 public:
     DbcStringToken(int line, int column);
     virtual bool acceptsChar(QChar ch);
+private:
+    bool _done;
+    bool _escape;
 };
 
 class DbcRegExpToken : public DbcToken {
 public:
-    DbcRegExpToken(int line, int column, dbc_token_type_t type, QRegExp re);
+    DbcRegExpToken(int line, int column, dbc_token_type_t type, QRegularExpression re);
     virtual bool acceptsChar(QChar ch);
 private:
-    QRegExp _re;
+    QRegularExpression _re;
 };
 
 class DbcSingleCharToken : public DbcToken {

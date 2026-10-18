@@ -49,6 +49,8 @@ public:
     QList<CanInterface*> getInterfaces() const;
     CanInterface *getInterfaceById(CanInterfaceId id);
     CanInterfaceId addInterface(CanInterface *intf);
+    void deleteInterface(CanInterface *intf);
+    void deleteAllInterfaces();
 
     CanInterface *getInterfaceByName(QString ifName);
 

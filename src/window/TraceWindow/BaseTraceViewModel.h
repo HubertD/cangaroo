@@ -35,10 +35,13 @@ class BaseTraceViewModel : public QAbstractItemModel
 
 public:
     enum {
+        column_index,
         column_timestamp,
         column_channel,
         column_direction,
+        column_type,
         column_canid,
+        column_sender,
         column_name,
         column_dlc,
         column_data,
@@ -51,6 +54,8 @@ public:
     virtual int columnCount(const QModelIndex &parent) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual QVariant data(const QModelIndex &index, int role) const;
+
+    virtual CanMessage getMessage(const QModelIndex &index) const = 0;
 
     Backend *backend() const;
     CanTrace *trace() const;

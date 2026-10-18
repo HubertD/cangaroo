@@ -31,6 +31,7 @@
 #include <core/CanDb.h>
 #include <core/MeasurementSetup.h>
 #include <core/Log.h>
+#include <core/ConditionalLoggingManager.h>
 
 class MeasurementNetwork;
 class CanTrace;
@@ -71,6 +72,8 @@ public:
     CanTrace *getTrace();
     void clearTrace();
 
+    ConditionalLoggingManager *getConditionalLoggingManager() const { return _conditionalLoggingManager; }
+
     CanDbMessage *findDbMessage(const CanMessage &msg) const;
 
     CanInterfaceIdList getInterfaceList();
@@ -82,7 +85,7 @@ public:
     CanDriver *getDriverByName(QString driverName);
     CanInterface *getInterfaceByDriverAndName(QString driverName, QString deviceName);
 
-    pCanDb loadDbc(QString filename);
+    pCanDb loadDbc(QString filename, QString *errorMsg = 0);
 
     void clearLog();
     LogModel &getLogModel() const;
@@ -93,11 +96,14 @@ signals:
 
     void onSetupChanged();
 
+    void onClearTraceRequested();
+
     void onLogMessage(const QDateTime dt, const log_level_t level, const QString msg);
 
     void onSetupDialogCreated(SetupDialog &dlg);
 
 public slots:
+    void onMessageEnqueued(int idx);
 
 private:
     static Backend *_instance;
@@ -111,4 +117,5 @@ private:
     QList<CanListener*> _listeners;
 
     LogModel *_logModel;
+    ConditionalLoggingManager *_conditionalLoggingManager;
 };

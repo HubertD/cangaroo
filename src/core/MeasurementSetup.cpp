@@ -94,23 +94,38 @@ MeasurementNetwork *MeasurementSetup::createNetwork()
 
 void MeasurementSetup::removeNetwork(MeasurementNetwork *network)
 {
-    _networks.removeAll(network);
+    if (_networks.removeAll(network) > 0) {
+        delete network;
+    }
 }
 
 
 CanDbMessage *MeasurementSetup::findDbMessage(const CanMessage &msg) const
 {
-    CanDbMessage *result = 0;
+    CanInterfaceId msgIfId = msg.getInterfaceId();
 
     foreach (MeasurementNetwork *network, _networks) {
-        foreach (pCanDb db, network->_canDbs) {
-            result = db->getMessageById(msg.getRawId());
-            if (result != 0) {
-                return result;
+        // Enforce network context: Only search DBs in the network that contains this interface
+        if (network->getReferencedCanInterfaces().contains(msgIfId)) {
+            foreach (pCanDb db, network->_canDbs) {
+                CanDbMessage *result = db->getMessageById(msg.getRawId());
+                if (result != 0) {
+                    return result;
+                }
+                // J1939: frames carry a varying source address (and priority) in the
+                // CAN id, so an exact raw-id match fails. Fall back to matching by PGN.
+                if (db->isJ1939() && msg.isExtended()) {
+                    uint32_t pgn = CanMessage::j1939Pgn(msg.getId());
+                    foreach (CanDbMessage *dbMsg, db->getMessageList()) {
+                        if (CanMessage::j1939Pgn(dbMsg->getRaw_id() & 0x1FFFFFFF) == pgn) {
+                            return dbMsg;
+                        }
+                    }
+                }
             }
         }
     }
-    return result;
+    return 0;
 }
 
 QString MeasurementSetup::getInterfaceName(const CanInterface &interface) const

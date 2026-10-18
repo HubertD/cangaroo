@@ -56,7 +56,17 @@ typedef enum {
     CANDLE_MODE_TRIPLE_SAMPLE = 0x04,
     CANDLE_MODE_ONE_SHOT      = 0x08,
     CANDLE_MODE_HW_TIMESTAMP  = 0x10,
+    CANDLE_MODE_FD            = 0x100,
 } candle_mode_t;
+
+enum {
+    CANDLE_FLAG_FD = 0x01,
+    CANDLE_FLAG_BRS = 0x02
+};
+
+enum {
+    CANDLE_FEATURE_FD = 0x100
+};
 
 typedef enum {
     CANDLE_ERR_OK                  =  0,
@@ -100,7 +110,7 @@ typedef struct {
     uint8_t channel;
     uint8_t flags;
     uint8_t reserved;
-    uint8_t data[8];
+    uint8_t data[64];
     uint32_t timestamp_us;
 } candle_frame_t;
 
@@ -144,6 +154,7 @@ bool __stdcall DLL candle_dev_free(candle_handle hdev);
 bool __stdcall DLL candle_channel_count(candle_handle hdev, uint8_t *num_channels);
 bool __stdcall DLL candle_channel_get_capabilities(candle_handle hdev, uint8_t ch, candle_capability_t *cap);
 bool __stdcall DLL candle_channel_set_timing(candle_handle hdev, uint8_t ch, candle_bittiming_t *data);
+bool __stdcall DLL candle_channel_set_data_timing(candle_handle hdev, uint8_t ch, candle_bittiming_t *data);
 bool __stdcall DLL candle_channel_set_bitrate(candle_handle hdev, uint8_t ch, uint32_t bitrate);
 bool __stdcall DLL candle_channel_start(candle_handle hdev, uint8_t ch, uint32_t flags);
 bool __stdcall DLL candle_channel_stop(candle_handle hdev, uint8_t ch);

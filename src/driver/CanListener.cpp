@@ -28,11 +28,14 @@
 #include <core/CanMessage.h>
 #include "CanInterface.h"
 
+#include <QMessageBox>
+
 CanListener::CanListener(QObject *parent, Backend &backend, CanInterface &intf)
   : QObject(parent),
     _backend(backend),
     _intf(intf),
-    _shouldBeRunning(true)
+    _shouldBeRunning(true),
+    _openComplete(false)
 {
     _thread = new QThread();
 }
@@ -54,13 +57,38 @@ CanInterface &CanListener::getInterface()
 
 void CanListener::run()
 {
-    CanMessage msg;
+    // Note: open and close done from run() so all operations take place in the same thread
+    //CanMessage msg;
+    QList<CanMessage> rxMessages;
     CanTrace *trace = _backend.getTrace();
+
+    _intf.open();
+
+    qRegisterMetaType<log_level_t >("log_level_t");
+    log_info(QString(tr("interface: %1, Version: %2")).arg(_intf.getName(),_intf.getVersion()));
+
+    _openComplete = true;
     while (_shouldBeRunning) {
-        if (_intf.readMessage(msg, 1000)) {
-            trace->enqueueMessage(msg, false);
+        if (_intf.readMessage(rxMessages, 500)) {
+            for(const CanMessage &msg: std::as_const(rxMessages))
+            {
+                trace->enqueueMessage(msg, false);
+            }
+            rxMessages.clear();
+        }
+        else if(_intf.isOpen() == false)
+        {
+            log_error(QString(tr("Error on interface: %1, Closed!!!")).arg(_intf.getName()));
+            rxMessages.clear();
+            break;
+
+        }
+        else
+        {
+            rxMessages.clear();
         }
     }
+    _intf.close();
     _thread->quit();
 }
 
@@ -69,6 +97,10 @@ void CanListener::startThread()
     moveToThread(_thread);
     connect(_thread, SIGNAL(started()), this, SLOT(run()));
     _thread->start();
+
+    // Wait for interface to be open before returning so that beginMeasurement is emitted after interface open
+    while(!_openComplete)
+      QThread().usleep(250);
 }
 
 void CanListener::requestStop()

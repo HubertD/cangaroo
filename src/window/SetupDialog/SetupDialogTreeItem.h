@@ -24,6 +24,8 @@
 #include <QList>
 #include <QVariant>
 
+#include <QObject>
+
 #include <core/Backend.h>
 #include <core/MeasurementSetup.h>
 #include <core/MeasurementNetwork.h>
@@ -40,7 +42,7 @@ public:
         type_interface_root,
         type_interface,
         type_candb_root,
-        type_candb
+        type_candb,
     } item_type;
 
 public:

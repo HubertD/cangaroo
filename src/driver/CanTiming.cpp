@@ -8,6 +8,16 @@ CanTiming::CanTiming(unsigned id, unsigned bitrate, unsigned bitrate_fd, unsigne
 {
 }
 
+CanTiming::CanTiming(unsigned id, unsigned bitrate, unsigned bitrate_fd, unsigned samplePoint, unsigned samplePoint_fd)
+    : _id(id),
+    _bitrate(bitrate),
+    _bitrate_fd(bitrate_fd),
+    _samplePoint(samplePoint),
+    _samplePoint_fd(samplePoint_fd)
+{
+}
+
+
 unsigned CanTiming::getId()
 {
     return _id;
@@ -34,6 +44,16 @@ unsigned CanTiming::getSamplePoint()
 }
 
 QString CanTiming::getSamplePointStr(unsigned samplePoint)
+{
+    return QString::number(samplePoint/10.0, 'f', 1).append("%");
+}
+
+unsigned CanTiming::getSamplePointFD()
+{
+    return _samplePoint_fd;
+}
+
+QString CanTiming::getSamplePointFDStr(unsigned samplePoint)
 {
     return QString::number(samplePoint/10.0, 'f', 1).append("%");
 }

@@ -79,6 +79,23 @@ CanInterfaceId CanDriver::addInterface(CanInterface *intf)
     return intf->getId();
 }
 
+void CanDriver::deleteInterface(CanInterface *intf)
+{
+    delete intf;
+    _interfaces.removeOne(intf);
+}
+
+void CanDriver::deleteAllInterfaces()
+{
+    for(CanInterface* interface: _interfaces)
+    {
+        delete interface;
+        _interfaces.removeOne(interface);
+    }
+}
+
+
+
 CanInterface *CanDriver::getInterfaceByName(QString ifName)
 {
     foreach (CanInterface *intf, _interfaces) {

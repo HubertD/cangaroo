@@ -32,17 +32,20 @@ public:
     virtual ~AggregatedTraceViewItem();
 
     void appendChild(AggregatedTraceViewItem *child);
+    void removeChildren();
     AggregatedTraceViewItem *child(int row) const;
     int childCount() const;
     int row() const;
     AggregatedTraceViewItem *parent() const;
     AggregatedTraceViewItem *firstChild() const;
     AggregatedTraceViewItem *lastChild() const;
+    void setRow(int row) { _row = row; }
 
     CanMessage _lastmsg, _prevmsg;
 
 private:
     AggregatedTraceViewItem *_parent;
     QList<AggregatedTraceViewItem *> _children;
+    int _row = -1;
 
 };

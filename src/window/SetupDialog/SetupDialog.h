@@ -47,6 +47,7 @@ public:
     bool showSetupDialog(MeasurementSetup &setup);
     void addPage(QWidget *widget);
     void displayPage(QWidget *widget);
+    bool isReflashNetworks();
 
 signals:
     void onShowInterfacePage(SetupDialog &dlg, MeasurementInterface *mi);
@@ -54,6 +55,7 @@ signals:
 public slots:
     void treeViewSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
     void treeViewContextMenu(const QPoint& pos);
+    void candbsTreeViewContextMenu(const QPoint& pos);
 
 private slots:
     void edNetworkNameChanged();
@@ -61,28 +63,33 @@ private slots:
     void on_btAddInterface_clicked();
     void on_btRemoveInterface_clicked();
 
-    void on_btAddDatabase_clicked();
-    void on_btRemoveDatabase_clicked();
+    void on_btAddDbc_clicked();
+    void on_btRemoveDbc_clicked();
     void updateButtons();
 
     void executeAddCanDb();
+    void executeReloadCanDbs();
     void executeDeleteCanDb();
+
+
 
     void executeAddInterface();
     void executeDeleteInterface();
 
     void on_btAddNetwork_clicked();
     void on_btRemoveNetwork_clicked();
-
+    void on_btRefreshNetworks_clicked();
 
 private:
     Ui::SetupDialog *ui;
     Backend *_backend;
+    bool _isReflashNetworks;
 
     QAction *_actionDeleteInterface;
     QAction *_actionDeleteCanDb;
     QAction *_actionAddInterface;
     QAction *_actionAddCanDb;
+    QAction *_actionReloadCanDbs;
 
     SetupDialogTreeModel *model;
     MeasurementNetwork *_currentNetwork;
@@ -90,7 +97,8 @@ private:
     QModelIndex getSelectedIndex();
     SetupDialogTreeItem *getSelectedItem();
 
-    void addCanDb(const QModelIndex &parent);
+    void addCanDb(const QModelIndex &parent, const QString &filename);
+    void reloadCanDbs(const QModelIndex &parent);
     void addInterface(const QModelIndex &parent);
 
 };

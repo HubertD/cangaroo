@@ -56,11 +56,11 @@ QVariant SetupDialogTreeModel::headerData(int section, Qt::Orientation orientati
 
     if (role==Qt::DisplayRole) {
         switch (section) {
-            case column_device: return "Device";
-            case column_driver: return "Driver";
-            case column_bitrate: return "Bitrate";
-            case column_filename: return "Filename";
-            case column_path: return "Path";
+        case column_device: return tr("Device");
+        case column_driver: return tr("Driver");
+        case column_bitrate: return tr("Bitrate");
+        case column_filename: return tr("Filename");
+        case column_path: return tr("Path");
             default: return "";
         }
     } else {
@@ -117,7 +117,7 @@ SetupDialogTreeItem *SetupDialogTreeModel::addNetwork()
     QString s;
     int i=0;
     while (true) {
-        s = QString("Network %1").arg(++i);
+        s = tr("Network ") + QString("%1").arg(++i);
         if (_rootItem->setup->getNetworkByName(s)==0) {
             break;
         }
@@ -135,9 +135,12 @@ SetupDialogTreeItem *SetupDialogTreeModel::addNetwork()
 void SetupDialogTreeModel::deleteNetwork(const QModelIndex &index)
 {
     SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem*>(index.internalPointer());
+    if (!item) return;
+
     beginRemoveRows(index.parent(), index.row(), index.row());
     _rootItem->removeChild(item);
     _rootItem->setup->removeNetwork(item->network);
+    delete item;
     endRemoveRows();
 }
 
@@ -163,9 +166,10 @@ void SetupDialogTreeModel::deleteCanDb(const QModelIndex &index)
 
     SetupDialogTreeItem *parentItem = item->getParentItem();
     if (parentItem && parentItem->network && parentItem->network->_canDbs.contains(item->candb)) {
-        parentItem->network->_canDbs.removeAll(item->candb);
         beginRemoveRows(index.parent(), item->row(), item->row());
+        parentItem->network->_canDbs.removeAll(item->candb);
         item->getParentItem()->removeChild(item);
+        delete item;
         endRemoveRows();
     }
 }
@@ -192,9 +196,10 @@ void SetupDialogTreeModel::deleteInterface(const QModelIndex &index)
 
     SetupDialogTreeItem *parentItem = item->getParentItem();
     if (parentItem && parentItem->network && parentItem->network->interfaces().contains(item->intf)) {
-        parentItem->network->removeInterface(item->intf);
         beginRemoveRows(index.parent(), item->row(), item->row());
+        parentItem->network->removeInterface(item->intf);
         item->getParentItem()->removeChild(item);
+        delete item;
         endRemoveRows();
     }
 }
@@ -258,6 +263,16 @@ void SetupDialogTreeModel::load(MeasurementSetup &setup)
     SetupDialogTreeItem *_oldRoot = _rootItem;
     _rootItem = _newRoot;
     delete _oldRoot;
+    endResetModel();
+}
+
+void SetupDialogTreeModel::unload()
+{
+    beginResetModel();
+    if (_rootItem) {
+        delete _rootItem;
+        _rootItem = 0;
+    }
     endResetModel();
 }
 

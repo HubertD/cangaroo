@@ -1,0 +1,48 @@
+VERSION ""
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIG_UNIT_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: EngineECU TransmissionECU DisplayECU
+
+BO_ 256 EngineData: 8 EngineECU
+ SG_ EngineSpeed : 0|16@0+ (1,0) [0|8000] "rpm" DisplayECU
+ SG_ EngineTemp : 16|8@0+ (1,-40) [-40|215] "degC" DisplayECU
+ SG_ OilPressure : 24|8@0+ (0.1,0) [0|25] "bar" DisplayECU
+
+BO_ 512 TransmissionData: 4 TransmissionECU
+ SG_ GearPos : 0|4@0+ (1,0) [0|15] "" DisplayECU
+ SG_ VehicleSpeed : 4|12@0+ (0.1,0) [0|400] "km/h" DisplayECU
+
+BO_ 768 AmbientData: 2 SensorECU
+ SG_ OutsideTemp : 0|8@0+ (1,-40) [-40|100] "degC" DisplayECU
+ SG_ Humidity : 8|8@0+ (0.5,0) [0|100] "%" DisplayECU
+
+CM_ BO_ 256 "Engine status information";
+CM_ SG_ 256 EngineSpeed "Current engine rotations per minute";
+CM_ BO_ 512 "Transmission status and vehicle speed";
+CM_ BO_ 768 "Environment sensor data";
+
+VAL_ 512 GearPos 0 "Neutral" 1 "First" 2 "Second" 3 "Third" 4 "Fourth" 5 "Fifth" 6 "Sixth" 7 "Reverse" 15 "Error" ;

@@ -30,6 +30,10 @@ enum {
     CANDLE_BREQ_BT_CONST,
     CANDLE_BREQ_DEVICE_CONFIG,
     CANDLE_TIMESTAMP_GET,
+    CANDLE_BREQ_IDENTIFY,
+    CANDLE_BREQ_GET_USER_ID,
+    CANDLE_BREQ_SET_USER_ID,
+    CANDLE_BREQ_DATA_BITTIMING
 };
 
 static bool usb_control_msg(WINUSB_INTERFACE_HANDLE hnd, uint8_t request, uint8_t requesttype, uint16_t value, uint16_t index, void *data, uint16_t size)
@@ -140,6 +144,22 @@ bool candle_ctrl_set_bittiming(candle_device_t *dev, uint8_t channel, candle_bit
     bool rc = usb_control_msg(
         dev->winUSBHandle,
         CANDLE_BREQ_BITTIMING,
+        USB_DIR_OUT|USB_TYPE_VENDOR|USB_RECIP_INTERFACE,
+        channel,
+        0,
+        data,
+        sizeof(*data)
+    );
+
+    dev->last_error = rc ? CANDLE_ERR_OK : CANDLE_ERR_SET_BITTIMING;
+    return rc;
+}
+
+bool candle_ctrl_set_data_bittiming(candle_device_t *dev, uint8_t channel, candle_bittiming_t *data)
+{
+    bool rc = usb_control_msg(
+        dev->winUSBHandle,
+        CANDLE_BREQ_DATA_BITTIMING,
         USB_DIR_OUT|USB_TYPE_VENDOR|USB_RECIP_INTERFACE,
         channel,
         0,

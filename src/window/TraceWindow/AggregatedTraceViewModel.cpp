@@ -21,6 +21,8 @@
 
 #include "AggregatedTraceViewModel.h"
 #include <QColor>
+#include <QSet>
+#include <core/ThemeManager.h>
 
 #include <core/Backend.h>
 #include <core/CanTrace.h>
@@ -75,14 +77,29 @@ void AggregatedTraceViewModel::onUpdateModel()
     }
 
     if (!_pendingMessageUpdates.isEmpty()) {
+        QSet<int> updatedRows;
         foreach (CanMessage msg, _pendingMessageUpdates) {
-            updateItem(msg);
+            AggregatedTraceViewItem *item = _map.value(makeUniqueKey(msg));
+            if (item) {
+                updateItem(msg);
+                updatedRows.insert(item->row());
+            }
+        }
+        
+        foreach (int r, updatedRows) {
+            AggregatedTraceViewItem *item = _rootItem->child(r);
+            if (item) {
+                QModelIndex msgIdx = createIndex(r, 0, item);
+                emit dataChanged(msgIdx, msgIdx.sibling(r, column_count - 1));
+
+                if (item->childCount() > 0) {
+                    QModelIndex firstChild = index(0, 0, msgIdx);
+                    QModelIndex lastChild = index(item->childCount() - 1, column_count - 1, msgIdx);
+                    emit dataChanged(firstChild, lastChild);
+                }
+            }
         }
         _pendingMessageUpdates.clear();
-    }
-
-    if (_rootItem->childCount()>0) {
-        dataChanged(createIndex(0, 0, _rootItem->firstChild()), createIndex(_rootItem->childCount()-1, column_count-1, _rootItem->lastChild()));
     }
 
 }
@@ -90,6 +107,15 @@ void AggregatedTraceViewModel::onUpdateModel()
 void AggregatedTraceViewModel::onSetupChanged()
 {
     beginResetModel();
+    for (AggregatedTraceViewItem *item : _map.values()) {
+        item->removeChildren();
+        CanDbMessage *dbmsg = backend()->findDbMessage(item->_lastmsg);
+        if (dbmsg) {
+            for (int i=0; i<dbmsg->getSignals().length(); i++) {
+                item->appendChild(new AggregatedTraceViewItem(item));
+            }
+        }
+    }
     endResetModel();
 }
 
@@ -99,12 +125,12 @@ void AggregatedTraceViewModel::beforeAppend(int num_messages)
     int start_id = trace->size();
 
     for (int i=start_id; i<start_id + num_messages; i++) {
-        const CanMessage *msg = trace->getMessage(i);
-        unique_key_t key = makeUniqueKey(*msg);
+        CanMessage msg = trace->getMessage(i);
+        unique_key_t key = makeUniqueKey(msg);
         if (_map.contains(key) || _pendingMessageInserts.contains(key)) {
-            _pendingMessageUpdates.append(*msg);
+            _pendingMessageUpdates.append(msg);
         } else {
-            _pendingMessageInserts[key] = *msg;
+            _pendingMessageInserts[key] = msg;
         }
     }
 
@@ -184,10 +210,22 @@ int AggregatedTraceViewModel::rowCount(const QModelIndex &parent) const
     return parentItem->childCount();
 }
 
+CanMessage AggregatedTraceViewModel::getMessage(const QModelIndex &index) const
+{
+    if (!index.isValid()) return CanMessage();
+    AggregatedTraceViewItem *item = static_cast<AggregatedTraceViewItem*>(index.internalPointer());
+    if (item == _rootItem) return CanMessage();
+    return (item->parent() == _rootItem) ? item->_lastmsg : item->parent()->_lastmsg;
+}
+
 QVariant AggregatedTraceViewModel::data_DisplayRole(const QModelIndex &index, int role) const
 {
     AggregatedTraceViewItem *item = (AggregatedTraceViewItem *)index.internalPointer();
     if (!item) { return QVariant(); }
+
+    if (index.column() == column_index) {
+        return (item->parent() == _rootItem) ? QVariant((uint32_t)(index.row() + 1)) : QVariant();
+    }
 
     if (item->parent() == _rootItem) { // CanMessage row
         return data_DisplayRole_Message(index, role, item->_lastmsg, item->_prevmsg);
@@ -203,15 +241,7 @@ QVariant AggregatedTraceViewModel::data_TextColorRole(const QModelIndex &index, 
     if (!item) { return QVariant(); }
 
     if (item->parent() == _rootItem) { // CanMessage row
-
-        struct timeval now;
-        gettimeofday(&now, 0);
-
-        int color = getTimeDiff(item->_lastmsg.getTimestamp(), now)*100;
-        if (color>200) { color = 200; }
-        if (color<0) { color = 0; }
-
-        return QVariant::fromValue(QColor(color, color, color));
+        return QVariant();
     } else { // CanSignal Row
         return data_TextColorRole_Signal(index, role, item->parent()->_lastmsg);
     }

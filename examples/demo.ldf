@@ -1,0 +1,194 @@
+LIN_description_file;
+LIN_protocol_version = "2.0";
+LIN_language_version = "2.0";
+LIN_speed = 19.2 kbps;
+
+// Two-slave motor/lighting demo bus
+// Master timebase 5 ms, jitter 0.2 ms
+
+Nodes {
+    Master: Master, 5 ms, 0.2 ms;
+    Slaves: Slave1, Slave2;
+}
+
+// ---------------------------------------------------------------------------
+// Signals
+// ---------------------------------------------------------------------------
+
+Signals {
+    // Master → Slave1  (motor controller)
+    TargetSpeed_S1:  16, 0, Master, Slave1;  // 0-8000 rpm, 0.5 rpm/bit
+    MotorEnable_S1:   8, 0, Master, Slave1;  // 0=Off 1=Fwd 2=Rev 3=Brake
+    RampRate_S1:      8, 0, Master, Slave1;  // 0-255, 50 rpm/s per bit
+
+    // Slave1 → Master  (motor controller status)
+    ActualSpeed_S1:  16, 0, Slave1, Master;  // current speed, same encoding
+    ErrorFlags_S1:    8, 0, Slave1, Master;  // error bitmask
+    Temperature_S1:   8, 0, Slave1, Master;  // -40 … +87.5 °C, 0.5 °C/bit
+
+    // Master → Slave2  (lighting controller)
+    LightIntensity_S2: 8, 0, Master, Slave2; // 0-100 %
+    LightMode_S2:      8, 0, Master, Slave2; // operating mode
+
+    // Slave2 → Master  (lighting controller status)
+    AmbientLight_S2:  16, 0, Slave2, Master; // 0-6553.5 lux, 0.1 lux/bit
+    ButtonState_S2:    8, 0, Slave2, Master; // 0=Released 1=Pressed
+    SupplyVoltage_S2:  8, 0, Slave2, Master; // 0-25.5 V, 0.1 V/bit
+}
+
+// ---------------------------------------------------------------------------
+// Frames
+// ---------------------------------------------------------------------------
+
+Frames {
+    // Slave1 — motor controller (4 bytes each)
+    MasterToSlave1: 0x01, Master, 4 {
+        TargetSpeed_S1,  0;   // bits  0-15
+        MotorEnable_S1, 16;   // bits 16-23
+        RampRate_S1,    24;   // bits 24-31
+    }
+    Slave1ToMaster: 0x02, Slave1, 4 {
+        ActualSpeed_S1,  0;   // bits  0-15
+        ErrorFlags_S1,  16;   // bits 16-23
+        Temperature_S1, 24;   // bits 24-31
+    }
+
+    // Slave2 — lighting controller (2 bytes TX, 4 bytes RX)
+    MasterToSlave2: 0x03, Master, 2 {
+        LightIntensity_S2, 0;  // bits 0-7
+        LightMode_S2,      8;  // bits 8-15
+    }
+    Slave2ToMaster: 0x04, Slave2, 4 {
+        AmbientLight_S2,  0;   // bits  0-15
+        ButtonState_S2,  16;   // bits 16-23
+        SupplyVoltage_S2,24;   // bits 24-31
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Signal encoding types
+// ---------------------------------------------------------------------------
+
+Signal_encoding_types {
+    MotorSpeedEncoding {
+        physical_value, 0, 8000, 0.5, 0, "rpm";
+    }
+    MotorEnableEncoding {
+        logical_value, 0, "Off";
+        logical_value, 1, "Forward";
+        logical_value, 2, "Reverse";
+        logical_value, 3, "Brake";
+    }
+    RampRateEncoding {
+        physical_value, 0, 12750, 50, 0, "rpm/s";
+    }
+    ErrorFlagsEncoding {
+        logical_value, 0, "OK";
+        logical_value, 1, "OverCurrent";
+        logical_value, 2, "OverTemp";
+        logical_value, 4, "HallFault";
+    }
+    TemperatureEncoding {
+        physical_value, 0, 255, 0.5, -40, "degC";
+    }
+    PercentEncoding {
+        physical_value, 0, 100, 1, 0, "%";
+    }
+    LightModeEncoding {
+        logical_value, 0, "Off";
+        logical_value, 1, "Dim";
+        logical_value, 2, "Normal";
+        logical_value, 3, "Bright";
+        logical_value, 4, "Auto";
+    }
+    AmbientLightEncoding {
+        physical_value, 0, 6553.5, 0.1, 0, "lux";
+    }
+    ButtonEncoding {
+        logical_value, 0, "Released";
+        logical_value, 1, "Pressed";
+    }
+    VoltageEncoding {
+        physical_value, 0, 25.5, 0.1, 0, "V";
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Signal representation
+// ---------------------------------------------------------------------------
+
+Signal_representation {
+    MotorSpeedEncoding:  TargetSpeed_S1, ActualSpeed_S1;
+    MotorEnableEncoding: MotorEnable_S1;
+    RampRateEncoding:    RampRate_S1;
+    ErrorFlagsEncoding:  ErrorFlags_S1;
+    TemperatureEncoding: Temperature_S1;
+    PercentEncoding:     LightIntensity_S2;
+    LightModeEncoding:   LightMode_S2;
+    AmbientLightEncoding:AmbientLight_S2;
+    ButtonEncoding:      ButtonState_S2;
+    VoltageEncoding:     SupplyVoltage_S2;
+}
+
+// ---------------------------------------------------------------------------
+// Node attributes
+// ---------------------------------------------------------------------------
+
+Node_attributes {
+    Slave1 {
+        LIN_protocol       = "2.0";
+        configured_NAD     = 0x01;
+        initial_NAD        = 0x01;
+        product_id         = 0x0001, 0x0001, 0;
+        response_error     = ErrorFlags_S1;
+        P2_min             = 50 ms;
+        ST_min             = 0 ms;
+        N_As_timeout       = 1000 ms;
+        N_Cr_timeout       = 1000 ms;
+        configurable_frames {
+            MasterToSlave1;
+            Slave1ToMaster;
+        }
+    }
+    Slave2 {
+        LIN_protocol       = "2.0";
+        configured_NAD     = 0x02;
+        initial_NAD        = 0x02;
+        product_id         = 0x0001, 0x0002, 0;
+        P2_min             = 50 ms;
+        ST_min             = 0 ms;
+        N_As_timeout       = 1000 ms;
+        N_Cr_timeout       = 1000 ms;
+        configurable_frames {
+            MasterToSlave2;
+            Slave2ToMaster;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Schedule tables
+// ---------------------------------------------------------------------------
+
+Schedule_tables {
+    // Normal operation: all four frames polled at equal 10 ms intervals.
+    // Total cycle: 40 ms  →  Slave1 at 25 Hz, Slave2 at 25 Hz.
+    NormalOperation {
+        MasterToSlave1  delay 10 ms;
+        Slave1ToMaster  delay 10 ms;
+        MasterToSlave2  delay 10 ms;
+        Slave2ToMaster  delay 10 ms;
+    }
+
+    // Fast motor control: Slave1 polled twice per cycle for tighter speed loop,
+    // Slave2 updated once at the end with a longer slot.
+    // Total cycle: 40 ms  →  Slave1 at 50 Hz, Slave2 at 25 Hz.
+    FastMotorControl {
+        MasterToSlave1  delay 5 ms;
+        Slave1ToMaster  delay 5 ms;
+        MasterToSlave2  delay 10 ms;
+        Slave2ToMaster  delay 10 ms;
+        MasterToSlave1  delay 5 ms;
+        Slave1ToMaster  delay 5 ms;
+    }
+}

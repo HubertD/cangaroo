@@ -21,6 +21,7 @@
 
 #include "DbcParser.h"
 #include <QTextStream>
+#include <QStringEncoder>
 #include <stdint.h>
 #include <iostream>
 #include <core/Backend.h>
@@ -51,8 +52,8 @@ bool DbcParser::parseFile(QFile *file, CanDb &candb)
 
 DbcToken *DbcParser::createNewToken(QChar ch, int line, int column)
 {
-    static const QString acceptableIdStartChars("ABCDEFGHIKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
-    static const QRegExp numberRegExp("^(\\d+(\\.\\d*)?(E[-+]?\\d*)?)$");
+    static const QString acceptableIdStartChars("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_");
+    static const QRegularExpression numberRegExp("^(\\d+(\\.\\d*)?(E[-+]?\\d*)?)$");
 
     if (ch.isSpace()) {
         return new DbcWhitespaceToken(line, column);
@@ -104,7 +105,8 @@ DbcParser::error_t DbcParser::tokenize(QFile *file, DbcParser::DbcTokenList &tok
     error_t retval = err_ok;
 
     QTextStream in(file);
-    in.setCodec("ISO 8859-1");
+    //in.setCodec("ISO 8859-1");
+    in.setEncoding(QStringEncoder::Latin1);
 
     while (true) {
         QString s = in.read(1);
@@ -265,13 +267,17 @@ bool DbcParser::expectIdentifier(DbcParser::DbcTokenList &tokens, QString *id, b
 bool DbcParser::expectString(DbcParser::DbcTokenList &tokens, QString *str, bool skipWhitespace)
 {
     QString quotedStr;
-    bool ok = expectData(tokens, dbc_tok_string, &quotedStr, skipWhitespace);
-    if (ok && quotedStr.length()>=2) {
-        *str = quotedStr.mid(1, quotedStr.length()-2);
-        return true;
-    } else {
-        return false;
+    if (expectData(tokens, dbc_tok_string, &quotedStr, skipWhitespace)) {
+        // Remove any escape characters
+        quotedStr.replace(QRegularExpression("\\\\(.)"), "\\1");
+
+        // Remove leading and trailing quotes
+        if (quotedStr.length() >=2 ) {
+            *str = quotedStr.mid(1, quotedStr.length()-2);
+            return true;
+        }
     }
+    return false;
 }
 
 bool DbcParser::expectNumber(DbcParser::DbcTokenList &tokens, QString *str, bool skipWhitespace)
@@ -401,6 +407,8 @@ bool DbcParser::parseSection(CanDb &candb, DbcTokenList &tokens) {
                 retval &= parseSectionCm(candb, tokens);
             } else if (sectionName == "VAL_") {
                 retval &= parseSectionVal(candb, tokens);
+            } else if (sectionName == "BA_") {
+                retval &= parseSectionBa(candb, tokens);
             } else {
                 skipUntilSectionEnding(tokens);
             }
@@ -451,7 +459,7 @@ bool DbcParser::parseSectionBu(CanDb &candb, DbcParser::DbcTokenList &tokens)
         return false;
     }
 
-    foreach(s, strings) {
+    for (const QString &s : strings) {
         candb.getOrCreateNode(s);
     }
 
@@ -541,6 +549,7 @@ bool DbcParser::parseSectionBoSg(CanDb &candb, CanDbMessage *msg, DbcTokenList &
 
     if (!expectAndSkipToken(tokens, dbc_tok_colon)) { return false; }
     if (!expectInt(tokens, &start_bit)) { return false; }
+
     signal->setStartBit(start_bit);
 
     if (!expectAndSkipToken(tokens, dbc_tok_pipe)) { return false; }
@@ -667,6 +676,21 @@ bool DbcParser::parseSectionVal(CanDb &candb, DbcParser::DbcTokenList &tokens)
         signal->setValueName(value, name);
     }
 
+    return true;
+}
+
+bool DbcParser::parseSectionBa(CanDb &candb, DbcParser::DbcTokenList &tokens)
+{
+    // We only model one attribute: the global ProtocolType, used to flag J1939
+    // databases so messages can be matched by PGN instead of full CAN id.
+    QString attrName;
+    if (expectString(tokens, &attrName) && attrName == "ProtocolType") {
+        QString value;
+        if (expectString(tokens, &value) && value.compare("J1939", Qt::CaseInsensitive) == 0) {
+            candb.setJ1939(true);
+        }
+    }
+    skipUntilSectionEnding(tokens);
     return true;
 }
 

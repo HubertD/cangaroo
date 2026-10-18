@@ -22,7 +22,7 @@
 #include "AggregatedTraceViewItem.h"
 
 AggregatedTraceViewItem::AggregatedTraceViewItem(AggregatedTraceViewItem *parent)
-  : _parent(parent)
+  : _parent(parent), _row(-1)
 {
 }
 
@@ -33,7 +33,14 @@ AggregatedTraceViewItem::~AggregatedTraceViewItem()
 
 void AggregatedTraceViewItem::appendChild(AggregatedTraceViewItem *child)
 {
+    child->setRow(_children.size());
     _children.append(child);
+}
+
+void AggregatedTraceViewItem::removeChildren()
+{
+    qDeleteAll(_children);
+    _children.clear();
 }
 
 AggregatedTraceViewItem *AggregatedTraceViewItem::child(int row) const
@@ -48,11 +55,7 @@ int AggregatedTraceViewItem::childCount() const
 
 int AggregatedTraceViewItem::row() const
 {
-    if (_parent) {
-        return _parent->_children.indexOf(const_cast<AggregatedTraceViewItem*>(this));
-    } else {
-        return 0;
-    }
+    return _row;
 }
 
 AggregatedTraceViewItem *AggregatedTraceViewItem::parent() const

@@ -14,12 +14,15 @@ public:
      * \param samplePoint sample point, e.g. 0.875
      */
     CanTiming(unsigned id, unsigned bitrate, unsigned bitrate_fd, unsigned samplePoint);
+    CanTiming(unsigned id, unsigned bitrate, unsigned bitrate_fd, unsigned samplePoint, unsigned samplePoint_fd);
     unsigned getId();
     unsigned getBitrate();
     unsigned getBitrateFD();
     bool isCanFD();
     unsigned getSamplePoint();
     static QString getSamplePointStr(unsigned samplePoint);
+    unsigned getSamplePointFD();
+    static QString getSamplePointFDStr(unsigned samplePoint);
 
     /*!
      * \brief getTitle get a brief one-line description of this timing
@@ -32,6 +35,7 @@ private:
     unsigned _bitrate;
     unsigned _bitrate_fd;
     unsigned _samplePoint;
+    unsigned _samplePoint_fd;
 };
 
 #endif // CANTIMING_H

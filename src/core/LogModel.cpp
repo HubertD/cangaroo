@@ -79,15 +79,28 @@ QVariant LogModel::headerData(int section, Qt::Orientation orientation, int role
         if (orientation == Qt::Horizontal) {
             switch (section) {
                 case column_time:
-                    return QString("Time");
+                    return QString(tr("Time"));
                 case column_level:
-                    return QString("Level");
+                    return QString(tr("Level"));
                 case column_text:
-                    return QString("Message");
+                    return QString(tr("Message"));
             }
         }
 
     }
+    else if (role == Qt::TextAlignmentRole) {
+        switch (section) {
+        case column_time:
+            return static_cast<int>(Qt::AlignRight) + static_cast<int>(Qt::AlignVCenter);
+        case column_level:
+            return static_cast<int>(Qt::AlignCenter) + static_cast<int>(Qt::AlignVCenter);
+        case column_text:
+            return static_cast<int>(Qt::AlignLeft) + static_cast<int>(Qt::AlignVCenter);
+        default:
+            return QVariant();
+        }
+    }
+
     return QVariant();
 }
 
@@ -96,39 +109,49 @@ QVariant LogModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::TextAlignmentRole) {
         switch (index.column()) {
-            case column_time:
-                return Qt::AlignRight + Qt::AlignVCenter;
-            case column_level:
-                return Qt::AlignCenter + Qt::AlignVCenter;
-            case column_text:
-                return Qt::AlignLeft + Qt::AlignVCenter;
-            default:
-                return QVariant();
+        case column_time:
+            return static_cast<int>(Qt::AlignRight) + static_cast<int>(Qt::AlignVCenter);
+        case column_level:
+            return static_cast<int>(Qt::AlignCenter) + static_cast<int>(Qt::AlignVCenter);
+        case column_text:
+            return static_cast<int>(Qt::AlignLeft) + static_cast<int>(Qt::AlignVCenter);
+        default:
+            return QVariant();
         }
     }
 
-    if (role != Qt::DisplayRole) {
-        return QVariant();
-    }
-
-    if (!index.isValid()) {
-        return QVariant();
-    }
-
-    LogItem *item = _items.value(index.row(), 0);
-    if (item) {
-
-        switch (index.column()) {
-            case column_time:
-                return item->dt.toString("hh:mm:ss");
-            case column_level:
-                return logLevelText(item->level);
-            case column_text:
-                return item->text;
-            default:
-                return QVariant();
+    if (role == Qt::DisplayRole) {
+        if (!index.isValid()) {
+            return QVariant();
         }
 
+        LogItem *item = _items.value(index.row(), 0);
+        if (item) {
+            switch (index.column()) {
+                case column_time:
+                    return item->dt.toString("hh:mm:ss");
+                case column_level:
+                    return logLevelText(item->level);
+                case column_text:
+                    return item->text;
+                default:
+                    return QVariant();
+            }
+        }
+    }
+
+    if(role == Qt::ToolTipRole) {
+        QString data = index.data(Qt::DisplayRole).toString();
+        uint  length = data.length();
+        if(length>30)
+        {
+            uint div = length / 30;
+            for(uint i = 0;i< div-1;i++)
+            {
+                data.insert(30*(i+1)+i,"\n");
+            }
+        }
+        return data;
     }
     return QVariant();
 }
@@ -148,12 +171,12 @@ void LogModel::onLogMessage(const QDateTime dt, const log_level_t level, const Q
 QString LogModel::logLevelText(log_level_t level)
 {
     switch (level) {
-        case log_level_debug: return "debug";
-        case log_level_info: return "info";
-        case log_level_warning: return "warning";
-        case log_level_error: return "error";
-        case log_level_critical: return "critical";
-        case log_level_fatal: return "fatal";
+        case log_level_debug: return tr("debug");
+        case log_level_info: return tr("info");
+        case log_level_warning: return tr("warning");
+        case log_level_error: return tr("error");
+        case log_level_critical: return tr("critical");
+        case log_level_fatal: return tr("fatal");
         default: return "";
     }
 }

@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "qtimer.h"
 #include <core/ConfigurableWidget.h>
 #include <core/Backend.h>
 
@@ -45,7 +46,12 @@ public:
 
 private slots:
     void rowsInserted(const QModelIndex & parent, int first, int last);
+    void _scroll_timer_timeout();
+    void on_btnExport_clicked();
+    void on_btnClear_clicked();
 
 private:
     Ui::LogWindow *ui;
+    Backend *_backend;
+    QTimer _scroll_timer;
 };

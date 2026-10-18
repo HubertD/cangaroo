@@ -22,6 +22,8 @@
 #include "SocketCanInterface.h"
 
 #include <core/Backend.h>
+#include <core/MeasurementSetup.h>
+#include <core/MeasurementNetwork.h>
 #include <core/MeasurementInterface.h>
 #include <core/CanMessage.h>
 
@@ -34,23 +36,38 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>
 
 #include <linux/if.h>
 #include <linux/can.h>
 #include <linux/can/raw.h>
 #include <linux/can/netlink.h>
+#include <linux/sockios.h>
 #include <netlink/version.h>
 #include <netlink/route/link.h>
 #include <netlink/route/link/can.h>
 
+
 SocketCanInterface::SocketCanInterface(SocketCanDriver *driver, int index, QString name)
   : CanInterface((CanDriver *)driver),
 	_idx(index),
+    _isOpen(false),
 	_fd(0),
     _name(name),
     _ts_mode(ts_mode_SIOCSHWTSTAMP)
 {
+    _status.rx_count = 0;
+    _status.rx_errors = 0;
+    _status.rx_overruns = 0;
+    _status.tx_count = 0;
+    _status.tx_errors = 0;
+    _status.tx_dropped = 0;
+
+    _status.tx_dropped = 0;
+
+    memset(&_config, 0, sizeof(_config));
+    memset(&_offset_stats, 0, sizeof(_offset_stats));
+
+    _ts_mode = ts_mode_SIOCGSTAMP;
 }
 
 SocketCanInterface::~SocketCanInterface() {
@@ -74,6 +91,17 @@ QList<CanTiming> SocketCanInterface::getAvailableBitrates()
     foreach (unsigned br, bitrates) {
         foreach (unsigned sp, samplePoints) {
             retval << CanTiming(i++, br, 0, sp);
+        }
+    }
+
+    // Add CAN FD Data Bitrates if supported
+    if (supportsCanFD()) {
+        QList<unsigned> fdBitrates({500000, 1000000, 2000000, 4000000, 5000000, 8000000});
+        foreach (unsigned br, bitrates) {
+            foreach (unsigned fdbr, fdBitrates) {
+                // For simplicity, we add FD variants of common arbitration bitrates
+                retval << CanTiming(i++, br, fdbr, 800, 800);
+            }
         }
     }
 
@@ -134,28 +162,52 @@ void SocketCanInterface::applyConfig(const MeasurementInterface &mi)
         return;
     }
 
-    log_info(QString("calling canifconfig to reconfigure interface %1").arg(getName()));
-    QStringList sl = buildCanIfConfigArgs(mi);
-    sl.prepend("canifconfig");
-    log_info(sl.join(" "));
+    QString cmd;
+    QStringList args;
 
-    QProcess canIfConfig;
-    canIfConfig.start("canifconfig", buildCanIfConfigArgs(mi));
-    if (!canIfConfig.waitForFinished()) {
-        log_error(QString("timeout waiting for canifconfig"));
+    // Use ip link if CAN FD is requested, as it's the standard way now
+    if (mi.isCanFD()) {
+        log_info(QString("calling ip link to reconfigure interface %1 (CAN FD)").arg(getName()));
+        
+        // First bring interface down
+        QProcess::execute("ip", {"link", "set", getName(), "down"});
+        
+        cmd = "ip";
+        args << "link" << "set" << getName() << "up" << "type" << "can";
+        args << "bitrate" << QString::number(mi.bitrate());
+        args << "sample-point" << QString::number((float)mi.samplePoint()/1000.0, 'f', 3);
+        args << "dbitrate" << QString::number(mi.fdBitrate());
+        args << "dsample-point" << QString::number((float)mi.fdSamplePoint()/1000.0, 'f', 3);
+        args << "fd" << "on";
+        
+        if (mi.doAutoRestart()) {
+            args << "restart-ms" << QString::number(mi.autoRestartMs());
+        }
+
+    } else {
+        log_info(QString("calling canifconfig to reconfigure interface %1").arg(getName()));
+        cmd = "canifconfig";
+        args = buildCanIfConfigArgs(mi);
+    }
+
+    log_info(cmd + " " + args.join(" "));
+
+    QProcess proc;
+    proc.start(cmd, args);
+    if (!proc.waitForFinished()) {
+        log_error(QString("timeout waiting for %1").arg(cmd));
         return;
     }
 
-    if (canIfConfig.exitStatus()!=QProcess::NormalExit) {
-        log_error(QString("canifconfig crashed"));
+    if (proc.exitStatus()!=QProcess::NormalExit) {
+        log_error(QString("%1 crashed").arg(cmd));
         return;
     }
 
-    if (canIfConfig.exitCode() != 0) {
-        log_error(QString("canifconfig failed: ") + QString(canIfConfig.readAllStandardError()).trimmed());
+    if (proc.exitCode() != 0) {
+        log_error(QString("%1 failed: ").arg(cmd) + QString(proc.readAllStandardError()).trimmed());
         return;
     }
-
 }
 
 #if (LIBNL_CURRENT<=216)
@@ -172,7 +224,7 @@ bool SocketCanInterface::updateStatus()
     bool retval = false;
 
     struct nl_sock *sock = nl_socket_alloc();
-    struct nl_cache *cache;
+    struct nl_cache *cache = NULL;
     struct rtnl_link *link;
     uint32_t state;
 
@@ -201,7 +253,9 @@ bool SocketCanInterface::updateStatus()
         }
     }
 
-    nl_cache_free(cache);
+    if (cache) {
+        nl_cache_free(cache);
+    }
     nl_close(sock);
     nl_socket_free(sock);
 
@@ -213,7 +267,7 @@ bool SocketCanInterface::readConfig()
     bool retval = false;
 
     struct nl_sock *sock = nl_socket_alloc();
-    struct nl_cache *cache;
+    struct nl_cache *cache = NULL;
     struct rtnl_link *link;
 
     nl_connect(sock, NETLINK_ROUTE);
@@ -225,7 +279,9 @@ bool SocketCanInterface::readConfig()
         }
     }
 
-    nl_cache_free(cache);
+    if (cache) {
+        nl_cache_free(cache);
+    }
     nl_close(sock);
     nl_socket_free(sock);
 
@@ -265,11 +321,27 @@ bool SocketCanInterface::supportsTripleSampling()
 }
 
 unsigned SocketCanInterface::getBitrate() {
+    unsigned br = 0;
     if (readConfig()) {
-        return _config.bit_timing.bitrate;
-    } else {
-        return 0;
+        br = _config.bit_timing.bitrate;
     }
+
+    if (br == 0) {
+        // Fallback to setup bitrate
+        foreach (MeasurementNetwork *network, Backend::instance().getSetup().getNetworks()) {
+            foreach (MeasurementInterface *mi, network->interfaces()) {
+                if (mi->canInterface() == getId()) {
+                    unsigned fallbackBr = mi->bitrate();
+                    // log_info(QString("SocketCanInterface %1: getBitrate() fallback to %2 (ID match %3)").arg(_name).arg(fallbackBr).arg(getId()));
+                    return fallbackBr;
+                }
+            }
+        }
+    }
+
+    if (br == 0) br = 500000; // Final safety fallback
+
+    return br;
 }
 
 uint32_t SocketCanInterface::getCapabilities()
@@ -295,6 +367,12 @@ bool SocketCanInterface::updateStatistics()
     return updateStatus();
 }
 
+void SocketCanInterface::resetStatistics()
+{
+    _offset_stats = _status;
+    CanInterface::resetStatistics();
+}
+
 uint32_t SocketCanInterface::getState()
 {
     switch (_status.can_state) {
@@ -309,32 +387,32 @@ uint32_t SocketCanInterface::getState()
 
 int SocketCanInterface::getNumRxFrames()
 {
-    return _status.rx_count;
+    return _status.rx_count - _offset_stats.rx_count;
 }
 
 int SocketCanInterface::getNumRxErrors()
 {
-    return _status.rx_errors;
+    return _status.rx_errors - _offset_stats.rx_errors;
 }
 
 int SocketCanInterface::getNumTxFrames()
 {
-    return _status.tx_count;
+    return _status.tx_count - _offset_stats.tx_count;
 }
 
 int SocketCanInterface::getNumTxErrors()
 {
-    return _status.tx_errors;
+    return _status.tx_errors - _offset_stats.tx_errors;
 }
 
 int SocketCanInterface::getNumRxOverruns()
 {
-    return _status.rx_overruns;
+    return _status.rx_overruns - _offset_stats.rx_overruns;
 }
 
 int SocketCanInterface::getNumTxDropped()
 {
-    return _status.tx_dropped;
+    return _status.tx_dropped - _offset_stats.tx_dropped;
 }
 
 int SocketCanInterface::getIfIndex() {
@@ -347,62 +425,124 @@ const char *SocketCanInterface::cname()
 }
 
 void SocketCanInterface::open() {
-	if((_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
-		perror("Error while opening socket");
-	}
+    _isOpen = false;
+    if((_fd = socket(PF_CAN, SOCK_RAW, CAN_RAW)) < 0) {
+        log_error(QString("SocketCanInterface: Error while opening socket: %1").arg(strerror(errno)));
+        return;
+    }
 
-	struct ifreq ifr;
+    struct ifreq ifr;
     struct sockaddr_can addr;
-    strcpy(ifr.ifr_name, _name.toStdString().c_str());
-	ioctl(_fd, SIOCGIFINDEX, &ifr);
 
-	addr.can_family  = AF_CAN;
-	addr.can_ifindex = ifr.ifr_ifindex;
+    strncpy(ifr.ifr_name, _name.toStdString().c_str(), IFNAMSIZ - 1);
+    ifr.ifr_name[IFNAMSIZ - 1] = '\0';
+    if (ioctl(_fd, SIOCGIFINDEX, &ifr) < 0) {
+        log_error(QString("SocketCanInterface: Error getting interface index for %1: %2").arg(_name, strerror(errno)));
+        ::close(_fd);
+        return;
+    }
 
-	if(bind(_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-		perror("Error in socket bind");
-	}
+    addr.can_family  = AF_CAN;
+    addr.can_ifindex = ifr.ifr_ifindex;
+
+    if(bind(_fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        log_error(QString("SocketCanInterface: Error in socket bind for %1: %2").arg(_name, strerror(errno)));
+        ::close(_fd);
+        return;
+    }
+
+    int enable = 1;
+    if (setsockopt(_fd, SOL_CAN_RAW, CAN_RAW_FD_FRAMES, &enable, sizeof(enable)) != 0) {
+        // Just info, not error, since older kernels might not support it
+        // and we can still communicate using classic CAN frames.
+    }
+
+    _isOpen = true;
+}
+
+bool SocketCanInterface::isOpen()
+{
+    return _isOpen;
 }
 
 void SocketCanInterface::close() {
-	::close(_fd);
+    ::close(_fd);
+    _isOpen = false;
 }
 
 void SocketCanInterface::sendMessage(const CanMessage &msg) {
-	struct can_frame frame;
+    if (!_isOpen) {
+        log_error(QString("SocketCanInterface: Cannot send message, interface %1 is not open").arg(_name));
+        return;
+    }
 
-	frame.can_id = msg.getId();
+    if (msg.isFD() || (supportsCanFD() && msg.getLength() > 8)) {
+        struct canfd_frame frame;
+        memset(&frame, 0, sizeof(frame));
+        frame.can_id = msg.getId();
 
-	if (msg.isExtended()) {
-		frame.can_id |= CAN_EFF_FLAG;
-	}
+        if (msg.isExtended()) {
+            frame.can_id |= CAN_EFF_FLAG;
+        }
 
-	if (msg.isRTR()) {
-		frame.can_id |= CAN_RTR_FLAG;
-	}
+        if (msg.isErrorFrame()) {
+            frame.can_id |= CAN_ERR_FLAG;
+        }
 
-	if (msg.isErrorFrame()) {
-		frame.can_id |= CAN_ERR_FLAG;
-	}
+        if (msg.isBRS()) {
+            frame.flags |= CANFD_BRS;
+        }
 
-	uint8_t len = msg.getLength();
-	if (len>8) { len = 8; }
+        uint8_t len = msg.getLength();
+        if (len > 64) len = 64;
+        frame.len = len;
 
-	frame.can_dlc = len;
-	for (int i=0; i<len; i++) {
-		frame.data[i] = msg.getByte(i);
-	}
+        for (int i=0; i<len; i++) {
+            frame.data[i] = msg.getByte(i);
+        }
 
-	::write(_fd, &frame, sizeof(struct can_frame));
+        if (::write(_fd, &frame, sizeof(struct canfd_frame)) < 0) {
+            log_error(QString("SocketCanInterface: Error writing FD frame to %1: %2").arg(_name, strerror(errno)));
+        }
+    } else {
+        struct can_frame frame;
+        memset(&frame, 0, sizeof(frame));
+        frame.can_id = msg.getId();
+
+        if (msg.isExtended()) {
+            frame.can_id |= CAN_EFF_FLAG;
+        }
+
+        if (msg.isRTR()) {
+            frame.can_id |= CAN_RTR_FLAG;
+        }
+
+        if (msg.isErrorFrame()) {
+            frame.can_id |= CAN_ERR_FLAG;
+        }
+
+        uint8_t len = msg.getLength();
+        if (len > 8) len = 8;
+        frame.can_dlc = len;
+
+        for (int i=0; i<len; i++) {
+            frame.data[i] = msg.getByte(i);
+        }
+
+        if (::write(_fd, &frame, sizeof(struct can_frame)) < 0) {
+            log_error(QString("SocketCanInterface: Error writing frame to %1: %2").arg(_name, strerror(errno)));
+        }
+    }
+    // Track sent bits
+    addFrameBits(msg);
 }
 
-bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
+bool SocketCanInterface::readMessage(QList<CanMessage> &msglist, unsigned int timeout_ms) {
 
-    struct can_frame frame;
+    struct canfd_frame frame;
     struct timespec ts_rcv;
     struct timeval tv_rcv;
     struct timeval timeout;
-    //struct ifreq hwtstamp;
     fd_set fdset;
 
     timeout.tv_sec = timeout_ms / 1000;
@@ -411,11 +551,12 @@ bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
     FD_ZERO(&fdset);
     FD_SET(_fd, &fdset);
 
+    CanMessage msg;
 
     int rv = select(_fd+1, &fdset, NULL, NULL, &timeout);
-    if (rv>0) {
-
-        if (read(_fd, &frame, sizeof(struct can_frame)) < 0) {
+    if (rv > 0) {
+        int nbytes = ::read(_fd, &frame, sizeof(struct canfd_frame));
+        if (nbytes < 0) {
             return false;
         }
 
@@ -424,7 +565,7 @@ bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
             _ts_mode = ts_mode_SIOCGSTAMPNS;
         }
 
-        if (_ts_mode==ts_mode_SIOCGSTAMPNS) {
+        if (_ts_mode == ts_mode_SIOCGSTAMPNS) {
             if (ioctl(_fd, SIOCGSTAMPNS, &ts_rcv) == 0) {
                 msg.setTimestamp(ts_rcv.tv_sec, ts_rcv.tv_nsec/1000);
             } else {
@@ -432,27 +573,33 @@ bool SocketCanInterface::readMessage(CanMessage &msg, unsigned int timeout_ms) {
             }
         }
 
-        if (_ts_mode==ts_mode_SIOCGSTAMP) {
+        if (_ts_mode == ts_mode_SIOCGSTAMP) {
             ioctl(_fd, SIOCGSTAMP, &tv_rcv);
             msg.setTimestamp(tv_rcv.tv_sec, tv_rcv.tv_usec);
         }
 
-        msg.setId(frame.can_id);
+        msg.setId(frame.can_id & CAN_EFF_MASK);
         msg.setExtended((frame.can_id & CAN_EFF_FLAG)!=0);
         msg.setRTR((frame.can_id & CAN_RTR_FLAG)!=0);
         msg.setErrorFrame((frame.can_id & CAN_ERR_FLAG)!=0);
         msg.setInterfaceId(getId());
 
-        uint8_t len = frame.can_dlc;
-        if (len>8) { len = 8; }
+        bool isFD = (nbytes == CANFD_MTU);
+        msg.setFD(isFD);
+        if (isFD) {
+            msg.setBRS((frame.flags & CANFD_BRS) != 0);
+        }
 
+        uint8_t len = frame.len;
         msg.setLength(len);
         for (int i=0; i<len; i++) {
             msg.setByte(i, frame.data[i]);
         }
 
+        msglist.append(msg);
+        addFrameBits(msg); // Track received bits
         return true;
-    } else {
-        return false;
-    }
+    } 
+    
+    return false;
 }

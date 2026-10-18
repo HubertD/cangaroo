@@ -47,7 +47,9 @@ void MeasurementNetwork::addInterface(MeasurementInterface *intf)
 
 void MeasurementNetwork::removeInterface(MeasurementInterface *intf)
 {
-    _interfaces.removeAll(intf);
+    if (_interfaces.removeAll(intf) > 0) {
+        delete intf;
+    }
 }
 
 QList<MeasurementInterface *> MeasurementNetwork::interfaces()
@@ -76,6 +78,25 @@ void MeasurementNetwork::addCanDb(QSharedPointer<CanDb> candb)
 {
     _canDbs.append(candb);
 }
+
+bool MeasurementNetwork::reloadCanDbs(Backend *backend, QStringList *errors)
+{
+    bool allSuccess = true;
+    for (pCanDb &db : _canDbs) {
+        QString errorMsg;
+        pCanDb newDb = backend->loadDbc(db->getPath(), &errorMsg);
+        if (newDb) {
+            db->updateFrom(newDb.data());
+        } else {
+            allSuccess = false;
+            if (errors) {
+                errors->append(QString("%1: %2").arg(db->getPath(), errorMsg));
+            }
+        }
+    }
+    return allSuccess;
+}
+
 
 QString MeasurementNetwork::name() const
 {

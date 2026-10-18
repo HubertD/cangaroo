@@ -35,3 +35,12 @@ Makefile*
 
 
 test.dbc
+
+.vscode/
+
+build/
+
+bin/
+
+# Release artifacts
+releases/

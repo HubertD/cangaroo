@@ -100,11 +100,11 @@ QVariant SetupDialogTreeItem::dataCanDb(const QModelIndex &index) const
 QVariant SetupDialogTreeItem::dataDisplayRole(const QModelIndex &index) const
 {
     switch (_type) {
-        case type_root: return "Setup";
+    case type_root: return QObject::tr("Setup");
         case type_network: return (network!=0) ? network->name() : QVariant();
-        case type_interface_root: return "Interfaces";
+        case type_interface_root: return QObject::tr("Interfaces");
         case type_interface: return dataInterface(index);
-        case type_candb_root: return "Can Databases";
+        case type_candb_root: return QObject::tr("DBC");
         case type_candb: return dataCanDb(index);
     }
     return QVariant();

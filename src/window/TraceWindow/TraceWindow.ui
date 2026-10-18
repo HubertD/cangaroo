@@ -30,6 +30,16 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>View:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="cbViewMode"/>
+      </item>
+      <item>
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Timestamps:</string>
@@ -40,44 +50,107 @@
        <widget class="QComboBox" name="cbTimestampMode"/>
       </item>
       <item>
-       <widget class="QCheckBox" name="cbAggregated">
-        <property name="text">
-         <string>aggregate by ID</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="cbAutoScroll">
-        <property name="text">
-         <string>auto scroll</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>40</width>
+          <width>36</width>
           <height>20</height>
          </size>
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="TraceClearpushButton">
+        <property name="text">
+         <string>Clear</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Filter: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="filterLineEdit">
+        <property name="maximumSize">
+         <size>
+          <width>150</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string/>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QTreeView" name="tree">
-     <property name="verticalScrollMode">
-      <enum>QAbstractItemView::ScrollPerPixel</enum>
+    <widget class="QTabWidget" name="tabs">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
+     <widget class="QWidget" name="tabAgg">
+      <attribute name="title">
+       <string>Monitor</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QTreeView" name="treeAgg">
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabUds">
+      <attribute name="title">
+       <string>UDS Protocol</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QTreeView" name="treeUds">
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabJ1939">
+      <attribute name="title">
+       <string>J1939</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QTreeView" name="treeJ1939">
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../cangaroo.qrc"/>
+ </resources>
  <connections/>
 </ui>

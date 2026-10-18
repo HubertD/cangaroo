@@ -54,6 +54,11 @@ CanDbNode *CanDb::getOrCreateNode(QString node_name)
     }
 }
 
+size_t CanDb::getNumberOfMessages()
+{
+    return _messages.size();
+}
+
 CanDbMessage *CanDb::getMessageById(uint32_t raw_id)
 {
     if (_messages.contains(raw_id)) {
@@ -61,6 +66,11 @@ CanDbMessage *CanDb::getMessageById(uint32_t raw_id)
     } else {
         return 0;
     }
+}
+
+CanDbMessageList CanDb::getMessageList()
+{
+    return _messages;
 }
 
 void CanDb::addMessage(CanDbMessage *msg)
@@ -85,5 +95,49 @@ bool CanDb::saveXML(Backend &backend, QDomDocument &xml, QDomElement &root)
     root.setAttribute("type", "dbc");
     root.setAttribute("filename", _path);
     return true;
+}
+
+void CanDb::updateFrom(CanDb *other)
+{
+    this->setVersion(other->getVersion());
+    this->setComment(other->getComment());
+
+    for (CanDbMessage *otherMsg : other->getMessageList()) {
+        CanDbMessage *myMsg = this->getMessageById(otherMsg->getRaw_id());
+        if (!myMsg) {
+            myMsg = new CanDbMessage(this);
+            myMsg->setName(otherMsg->getName());
+            myMsg->setRaw_id(otherMsg->getRaw_id());
+            myMsg->setDlc(otherMsg->getDlc());
+            myMsg->setComment(otherMsg->getComment());
+            this->addMessage(myMsg);
+        } else {
+            myMsg->setName(otherMsg->getName());
+            myMsg->setDlc(otherMsg->getDlc());
+            myMsg->setComment(otherMsg->getComment());
+        }
+
+        for (CanDbSignal *otherSig : otherMsg->getSignals()) {
+            CanDbSignal *mySig = myMsg->getSignalByName(otherSig->name());
+            if (!mySig) {
+                mySig = new CanDbSignal(myMsg);
+                mySig->setName(otherSig->name());
+                myMsg->addSignal(mySig);
+            }
+            mySig->setStartBit(otherSig->startBit());
+            mySig->setLength(otherSig->length());
+            mySig->setFactor(otherSig->getFactor());
+            mySig->setOffset(otherSig->getOffset());
+            mySig->setMinimumValue(otherSig->getMinimumValue());
+            mySig->setMaximumValue(otherSig->getMaximumValue());
+            mySig->setUnit(otherSig->getUnit());
+            mySig->setUnsigned(otherSig->isUnsigned());
+            mySig->setIsBigEndian(otherSig->isBigEndian());
+            mySig->setIsMuxer(otherSig->isMuxer());
+            mySig->setIsMuxed(otherSig->isMuxed());
+            mySig->setMuxValue(otherSig->getMuxValue());
+            mySig->setComment(otherSig->comment());
+        }
+    }
 }
 

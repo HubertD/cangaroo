@@ -50,6 +50,8 @@ public:
     virtual QModelIndex parent(const QModelIndex &child) const;
     virtual int rowCount(const QModelIndex &parent) const;
 
+    virtual CanMessage getMessage(const QModelIndex &index) const override;
+
 private:
     CanIdMap _map;
     AggregatedTraceViewItem *_rootItem;

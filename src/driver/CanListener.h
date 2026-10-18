@@ -21,11 +21,12 @@
 
 #pragma once
 
+#include <QThread>
 #include <QObject>
 #include <driver/CanDriver.h>
 #include <driver/CanInterface.h>
 
-class QThread;
+//class QThread;
 class CanMessage;
 class Backend;
 
@@ -54,6 +55,6 @@ private:
     Backend &_backend;
     CanInterface &_intf;
     bool _shouldBeRunning;
+    bool _openComplete;
     QThread *_thread;
-
 };

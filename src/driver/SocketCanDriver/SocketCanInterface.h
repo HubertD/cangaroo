@@ -72,12 +72,14 @@ public:
 
 
 	virtual void open();
+    virtual bool isOpen();
 	virtual void close();
 
     virtual void sendMessage(const CanMessage &msg);
-    virtual bool readMessage(CanMessage &msg, unsigned int timeout_ms);
+    virtual bool readMessage(QList<CanMessage> &msglist, unsigned int timeout_ms);
 
     virtual bool updateStatistics();
+    virtual void resetStatistics();
     virtual uint32_t getState();
     virtual int getNumRxFrames();
     virtual int getNumRxErrors();
@@ -98,11 +100,13 @@ private:
     } ts_mode_t;
 
     int _idx;
+    bool _isOpen;
 	int _fd;
     QString _name;
 
     can_config_t _config;
     can_status_t _status;
+    can_status_t _offset_stats;
     ts_mode_t _ts_mode;
 
     const char *cname();

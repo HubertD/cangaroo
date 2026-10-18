@@ -3,6 +3,7 @@ QMAKE_CFLAGS += -std=gnu11
 SOURCES += \
     $$PWD/CandleApiDriver.cpp \
     $$PWD/CandleApiInterface.cpp \
+    $$PWD/CandleApiDevice.cpp \
     $$PWD/api/candle.c \
     $$PWD/api/candle_ctrl_req.c \
     $$PWD/CandleApiTiming.cpp
@@ -16,6 +17,7 @@ HEADERS += \
     $$PWD/api/candle.h \
     $$PWD/CandleApiDriver.h \
     $$PWD/CandleApiInterface.h \
+    $$PWD/CandleApiDevice.h \
     $$PWD/api/candle_ctrl_req.h \
     $$PWD/api/candle_defs.h \
     $$PWD/api/ch_9.h \

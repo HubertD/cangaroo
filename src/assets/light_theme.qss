@@ -1,0 +1,46 @@
+/* Light Theme QSS */
+
+QMainWindow::separator {
+  background: transparent;
+  width: 6px;
+  height: 6px;
+}
+QMainWindow::separator:hover {
+  background: #0078d7;
+}
+QSplitter::handle {
+  background: transparent;
+  width: 6px;
+  height: 6px;
+}
+QSplitter::handle:hover {
+  background: #0078d7;
+}
+
+QPushButton#btnStartMeasurement {
+  background-color: #28a745;
+  color: white;
+  border-radius: 12px;
+  padding: 5px 15px;
+  font-weight: bold;
+}
+QPushButton#btnStartMeasurement:disabled {
+  background-color: #94d3a2;
+}
+
+QPushButton#btnStopMeasurement {
+  background-color: #dc3545;
+  color: white;
+  border-radius: 12px;
+  padding: 5px 15px;
+  font-weight: bold;
+}
+QPushButton#btnStopMeasurement:disabled {
+  background-color: #f1aeb5;
+}
+
+QToolTip {
+  color: black;
+  background-color: white;
+  border: 1px solid gray;
+}

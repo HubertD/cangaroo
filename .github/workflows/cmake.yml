@@ -1,0 +1,336 @@
+name: Build CANgaroo
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-ubuntu:
+    name: Build CANgaroo (Ubuntu / Qt6)
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential git cmake \
+          qt6-base-dev qt6-base-private-dev qt6-tools-dev \
+          libqt6serialport6-dev libqt6charts6-dev \
+          libnl-3-dev libnl-route-3-dev libgl1-mesa-dev fuse libfuse2 wget \
+          python3-dev pybind11-dev python3-pybind11
+
+        echo "=== Qt6 Version ==="
+        qmake6 --version
+        
+        echo "=== Qt6 Plugin Path ==="
+        QT6_PLUGIN_PATH=$(qmake6 -query QT_INSTALL_PLUGINS)
+        echo "Qt6 Plugins: $QT6_PLUGIN_PATH"
+
+    - name: Run qmake6 and make
+      run: |
+        qmake6
+        make -j$(nproc)
+
+    - name: Prepare AppDir
+      run: |
+          mkdir -p AppDir/usr/bin
+          mkdir -p AppDir/usr/share/applications
+          mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps
+          mkdir -p AppDir/usr/plugins/styles
+          mkdir -p AppDir/usr/plugins/platformthemes
+
+          sed -i 's|Exec=/usr/bin/cangaroo %f|Exec=cangaroo %f|' cangaroo.desktop
+
+          cp bin/cangaroo AppDir/usr/bin/
+          cp cangaroo.desktop AppDir/usr/share/applications/
+          cp src/assets/cangaroo.png AppDir/usr/share/icons/hicolor/256x256/apps/
+
+    - name: Create qt.conf
+      run: |
+          cat > AppDir/usr/bin/qt.conf << 'EOF'
+          [Paths]
+          Plugins = ../plugins
+          Libraries = ../lib
+          Prefix = ../
+          EOF
+          
+          echo "=== qt.conf created ==="
+          cat AppDir/usr/bin/qt.conf
+
+    - name: Download linuxdeploy
+      run: |
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x linuxdeploy*.AppImage
+
+    - name: Build AppImage
+      env:
+        QMAKE: qmake6
+        QML_SOURCES_PATHS: ./src
+      run: |
+          ./linuxdeploy-x86_64.AppImage \
+            --appdir AppDir \
+            --plugin qt \
+            --output appimage
+
+    - name: Upload AppImage
+      uses: actions/upload-artifact@v6
+      with:
+          name: CANgaroo-Linux-AppImage
+          path: "CAN*.AppImage"
+
+    - name: Upload Binary
+      uses: actions/upload-artifact@v6
+      with:
+          name: CANgaroo-Linux-Binary
+          path: bin/cangaroo
+
+  build-windows:
+    name: Build CANgaroo (Windows / MinGW / Qt6)
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup MSYS2 (without install)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+
+      - name: Cache MinGW and MSYS2 packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:/msys64/mingw64
+            C:/msys64/var/cache/pacman/pkg
+          key: >
+            msys2-mingw64-qt6-${{ runner.os }}-${{ hashFiles('.github/workflows/cmake.yml') }}
+          restore-keys: |
+            msys2-mingw64-qt6-${{ runner.os }}-
+
+      - name: Install MinGW + Qt6 (cached)
+        run: |
+          pacman -S --needed --noconfirm \
+            mingw-w64-x86_64-toolchain \
+            mingw-w64-x86_64-qt6 \
+            mingw-w64-x86_64-qt6-tools \
+            mingw-w64-x86_64-make \
+            mingw-w64-x86_64-ntldd \
+            mingw-w64-x86_64-python \
+            mingw-w64-x86_64-pybind11 \
+            git
+
+      - name: Verify Qt6 installation
+        run: |
+          qmake6 --version
+          which qmake6
+
+      - name: Configure build (Qt6 qmake)
+        run: |
+          qmake6 CONFIG+=release
+
+      - name: Build
+        run: |
+          mingw32-make -j$(nproc)
+
+      - name: List build output
+        run: |
+          echo "==== Project root ===="
+          ls -lah
+
+          echo "==== Executables ===="
+          find . -maxdepth 2 -name "*.exe" -type f -print
+
+      - name: Prepare distribution directory
+        run: |
+          mkdir -p dist
+          cp ./bin/*.exe dist/
+
+      - name: Deploy Qt6 runtime (windeployqt)
+        run: |
+          EXE=$(ls dist/*.exe | head -n 1)
+          windeployqt6 \
+            --release \
+            --no-system-d3d-compiler \
+            "$EXE"
+
+      - name: Add MinGW runtime DLLs
+        run: |
+          cp /mingw64/bin/libgcc_s_seh-1.dll dist/
+          cp /mingw64/bin/libstdc++-6.dll dist/
+          cp /mingw64/bin/libwinpthread-1.dll dist/
+          cp /mingw64/bin/libmd4c.dll dist/
+          cp /mingw64/bin/libharfbuzz-0.dll dist/
+          cp /mingw64/bin/libfreetype-6.dll dist/
+          cp /mingw64/bin/libpng16-16.dll dist/
+          cp /mingw64/bin/zlib1.dll dist/
+          cp /mingw64/bin/libdouble-conversion.dll dist/
+          cp /mingw64/bin/libb2-1.dll dist/
+          cp /mingw64/bin/libicuin78.dll dist/
+          cp /mingw64/bin/libbrotlidec.dll dist/
+          cp /mingw64/bin/libzstd.dll dist/
+          cp /mingw64/bin/libicuuc78.dll dist/
+          cp /mingw64/bin/libpcre2-16-0.dll dist/
+          cp /mingw64/bin/libpython3.12.dll dist/ || cp /mingw64/bin/libpython3.11.dll dist/ || true
+
+      - name: Deploy MinGW runtime dependencies
+        run: |
+          EXE=$(ls dist/*.exe | head -n 1)
+
+          echo "Resolving MinGW runtime dependencies for $EXE"
+
+          ntldd -R "$EXE" \
+            | grep mingw64 \
+            | awk '{print $3}' \
+            | sort -u \
+            | while IFS= read -r file; do
+              # Convert Windows path to Linux path
+              linux_path=$(echo "$file" | sed -E 's|([A-Za-z]):\\|/\L\1/|; s|\\|/|g')
+    
+              echo "Copying $linux_path"
+              cp "$linux_path" dist/ || echo "Skipped $linux_path"
+              done
+
+      - name: Verify missing DLLs
+        run: |
+          EXE=$(ls dist/*.exe | head -n 1)
+          ntldd "$EXE" || true
+      - name: Upload Windows Qt6 binaries
+        uses: actions/upload-artifact@v6
+        with:
+          name: CANgaroo-Windows-MinGW-Qt6
+          path: dist/*
+
+  release:
+    name: Create GitHub Release
+    needs: [build-ubuntu, build-windows]
+    if: github.event_name == 'workflow_dispatch' || github.ref_name == 'main' || github.ref_name == 'master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine New Version
+        id: versioning
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.4.0")
+          echo "Latest tag: $latest_tag"
+          
+          # Remove 'v' prefix if exists
+          clean_tag=${latest_tag#v}
+          
+          major=$(echo $clean_tag | cut -d. -f1)
+          minor=$(echo $clean_tag | cut -d. -f2)
+          patch=$(echo $clean_tag | cut -d. -f3)
+          
+          new_minor=$((minor+1))
+          new_tag="v$major.$new_minor.0"
+          
+          echo "Next tag: $new_tag"
+          echo "version=$new_tag" >> $GITHUB_OUTPUT
+
+      - name: Create Git Tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.versioning.outputs.version }}
+          git push origin ${{ steps.versioning.outputs.version }}
+
+      - name: Download Linux Binary
+        uses: actions/download-artifact@v4
+        with:
+          name: CANgaroo-Linux-Binary
+          path: bin
+
+      - name: Download Linux AppImage
+        uses: actions/download-artifact@v4
+        with:
+          name: CANgaroo-Linux-AppImage
+          path: appimage
+
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: CANgaroo-Windows-MinGW-Qt6
+          path: windows-bins
+
+      - name: Package Release
+        run: |
+          VERSION=${{ steps.versioning.outputs.version }}
+          mkdir -p release-pkg
+          
+          # Linux packaging
+          LINUX_DIR="cangaroo-${VERSION}-linux-x86_64"
+          mkdir -p "$LINUX_DIR"
+          
+          cp bin/cangaroo "$LINUX_DIR/"
+          cp appimage/CAN*.AppImage "$LINUX_DIR/CANgaroo-x86_64.AppImage"
+          cp README.md "$LINUX_DIR/"
+          cp LICENSE "$LINUX_DIR/"
+          cp CONTRIBUTING.md "$LINUX_DIR/"
+          cp setup_release.sh "$LINUX_DIR/"
+          
+          tar -czf "release-pkg/${LINUX_DIR}.tar.gz" "$LINUX_DIR"
+          
+          # Windows packaging (Zip the dist folder)
+          WINDOWS_ZIP="cangaroo-${VERSION}-windows-x64.zip"
+          cd windows-bins
+          zip -r "../release-pkg/${WINDOWS_ZIP}" .
+          cd ..
+          
+          # Generate Checksums
+          cd release-pkg
+          for file in *; do
+            sha256sum "$file" > "${file}.sha256"
+          done
+          cd ..
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$latest_tag" ]; then
+            log=$(git log --oneline -n 20)
+          else
+            log=$(git log ${latest_tag}..HEAD --oneline)
+          fi
+          
+          # Set output using multi-line delimiter
+          {
+            echo "body<<EOF"
+            echo "Automated release for version ${{ steps.versioning.outputs.version }}"
+            echo ""
+            echo "### Changes since last release:"
+            echo "$log"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.versioning.outputs.version }}
+          name: Release ${{ steps.versioning.outputs.version }}
+          body: ${{ steps.changelog.outputs.body }}
+          files: |
+            release-pkg/*.tar.gz
+            release-pkg/*.zip
+            release-pkg/*.sha256
+          draft: true
+          prerelease: false

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>756</width>
-    <height>459</height>
+    <width>400</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,7 @@
       <bool>false</bool>
      </property>
      <property name="columnCount">
-      <number>13</number>
+      <number>9</number>
      </property>
      <attribute name="headerDefaultSectionSize">
       <number>80</number>
@@ -83,26 +83,6 @@
      <column>
       <property name="text">
        <string notr="true">9</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">10</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">11</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">12</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">13</string>
       </property>
      </column>
     </widget>

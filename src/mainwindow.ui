@@ -2,16 +2,19 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
+    <width>1365</width>
     <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>cangaroo</string>
+   <string>CANgaroo</string>
   </property>
   <property name="documentMode">
    <bool>false</bool>
@@ -36,6 +39,53 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayoutControls">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="btnStartMeasurement">
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnStopMeasurement">
+        <property name="text">
+         <string>Stop</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnSetupMeasurement">
+        <property name="text">
+         <string>Setup Interface...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_Controls">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
     <item>
      <widget class="QTabWidget" name="mainTabs">
       <property name="autoFillBackground">
@@ -68,8 +118,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1200</width>
-     <height>21</height>
+     <width>1365</width>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -96,6 +146,10 @@
      <addaction name="actionLog_View"/>
      <addaction name="actionGraph_View"/>
      <addaction name="actionCan_Status_View"/>
+     <addaction name="actionGraph_View_2"/>
+     <addaction name="actionTransmit_View"/>
+     <addaction name="actionGenerator_View"/>
+     <addaction name="actionScript_View"/>
     </widget>
     <addaction name="menu_New"/>
    </widget>
@@ -112,6 +166,8 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionReport_Issue"/>
+    <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menu_Trace">
@@ -181,12 +237,20 @@
     <string>&amp;About</string>
    </property>
   </action>
+  <action name="actionReport_Issue">
+   <property name="text">
+    <string>&amp;Report Issue...</string>
+   </property>
+  </action>
   <action name="actionSave_Trace_to_file">
    <property name="text">
     <string>&amp;Save Trace to file...</string>
    </property>
   </action>
   <action name="actionGraph_View">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>&amp;Graph View</string>
    </property>
@@ -240,6 +304,26 @@
   <action name="actionCan_Status_View">
    <property name="text">
     <string>Can &amp;Status View</string>
+   </property>
+  </action>
+  <action name="actionGraph_View_2">
+   <property name="text">
+    <string>Graph View</string>
+   </property>
+  </action>
+  <action name="actionTransmit_View">
+   <property name="text">
+    <string>Message View</string>
+   </property>
+  </action>
+  <action name="actionGenerator_View">
+   <property name="text">
+    <string>Generator View</string>
+   </property>
+  </action>
+  <action name="actionScript_View">
+   <property name="text">
+    <string>Script View</string>
    </property>
   </action>
  </widget>

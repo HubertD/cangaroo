@@ -6,13 +6,302 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>752</width>
-    <height>541</height>
+    <width>1000</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Graph</string>
+   <string>Visualization View</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="toolbarLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>View Type:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="viewSelector"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Duration:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="durationSelector">
+       <item>
+        <property name="text">
+         <string>All</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1 min</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>5 min</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>10 min</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>15 min</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>30 min</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="zoomInButton">
+       <property name="text">
+        <string>🔍+</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="zoomOutButton">
+       <property name="text">
+        <string>🔍-</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetZoomButton">
+       <property name="text">
+        <string>↺</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </spacer>
+     </item>
+
+     <item>
+      <widget class="QPushButton" name="btnFullReset">
+       <property name="text">
+        <string>Reset All Signals</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="clearButton">
+       <property name="text">
+        <string>Clear UI</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QSplitter" name="verticalMainSplitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
+     </property>
+     <widget class="QSplitter" name="mainSplitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QSplitter" name="graphSplitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <widget class="QStackedWidget" name="stackedWidget">
+        <property name="currentIndex">
+         <number>-1</number>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="configPanel" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>180</width>
+         <height>0</height>
+        </size>
+       </property>
+       <layout class="QVBoxLayout" name="configLayout">
+        <item>
+         <widget class="QLineEdit" name="signalSearchEdit">
+          <property name="placeholderText">
+           <string>Search Signals/Messages...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTreeWidget" name="signalTree">
+          <column>
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Unit</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Comment</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>System Node</string>
+           </property>
+           <property name="hidden">
+            <bool>true</bool>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_actionButtons">
+          <item>
+           <widget class="QPushButton" name="btnAddGraph">
+            <property name="text">
+             <string>Add to Graph</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnAddCondition">
+            <property name="text">
+             <string>Add to Condition</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QFrame" name="bottomPanel">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <layout class="QVBoxLayout" name="bottomPanelLayout">
+       <item>
+        <widget class="QLabel" name="configLabel">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Conditional Logging</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="conditionTable">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Signal</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Operator</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Threshold</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Live Feedback</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Action</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="bottomActionLayout">
+
+          <item>
+           <widget class="QCheckBox" name="chkGraphFilter">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Show on Graph on Trigger</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Status:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="triggerStatusLabel">
+           <property name="font">
+            <font>
+             <italic>true</italic>
+            </font>
+           </property>
+           <property name="text">
+            <string>Condition not met</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacerBottom">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

@@ -25,6 +25,7 @@
 #include <QMenu>
 #include <QFileDialog>
 #include <QTreeWidget>
+#include <QMessageBox>
 
 #include <core/Backend.h>
 #include <core/MeasurementSetup.h>
@@ -40,6 +41,7 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SetupDialog),
     _backend(&backend),
+    _isReflashNetworks(false),
     _currentNetwork(0)
 {
     ui->setupUi(this);
@@ -51,6 +53,7 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     _actionDeleteInterface = new QAction("Delete", this);
     _actionAddCanDb = new QAction("Add...", this);
     _actionDeleteCanDb = new QAction("Delete", this);
+    _actionReloadCanDbs = new QAction("Reload", this);
 
     model = new SetupDialogTreeModel(_backend, this);
 
@@ -74,17 +77,22 @@ SetupDialog::SetupDialog(Backend &backend, QWidget *parent) :
     ui->candbsTreeView->setColumnHidden(SetupDialogTreeModel::column_path, false);
 
     connect(ui->treeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(treeViewContextMenu(QPoint)));
+    connect(ui->candbsTreeView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(candbsTreeViewContextMenu(QPoint)));
     connect(ui->edNetworkName, SIGNAL(textChanged(QString)), this, SLOT(edNetworkNameChanged()));
 
     connect(ui->treeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(treeViewSelectionChanged(QItemSelection,QItemSelection)));
     connect(ui->candbsTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
     connect(ui->interfacesTreeView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(updateButtons()));
 
+    connect(ui->btReloadDbc, SIGNAL (released()), this, SLOT(executeReloadCanDbs()));
+    connect(ui->btRefreshNetworks, SIGNAL(released()), this, SLOT(on_btRefreshNetworks_clicked()));
+
     connect(_actionAddCanDb, SIGNAL(triggered()), this, SLOT(executeAddCanDb()));
     connect(_actionDeleteCanDb, SIGNAL(triggered()), this, SLOT(executeDeleteCanDb()));
 
     connect(_actionAddInterface, SIGNAL(triggered()), this, SLOT(executeAddInterface()));
     connect(_actionDeleteInterface, SIGNAL(triggered()), this, SLOT(executeDeleteInterface()));
+
 
     emit backend.onSetupDialogCreated(*this);
 }
@@ -107,6 +115,8 @@ void SetupDialog::displayPage(QWidget *widget)
 
 bool SetupDialog::showSetupDialog(MeasurementSetup &setup)
 {
+    _isReflashNetworks = false;
+
     model->load(setup);
     ui->treeView->expandAll();
 
@@ -114,7 +124,9 @@ bool SetupDialog::showSetupDialog(MeasurementSetup &setup)
     ui->treeView->setCurrentIndex(first);
 
     updateButtons();
-    return exec()==QDialog::Accepted;
+    bool result = exec()==QDialog::Accepted;
+    model->unload();
+    return result;
 }
 
 void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
@@ -133,6 +145,11 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
     QModelIndex idx = selected.first().topLeft();
     SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem *>(idx.internalPointer());
 
+    if (!item) {
+        ui->stackedWidget->setCurrentWidget(ui->emptyPage);
+        updateButtons();
+        return;
+    }
 
     _currentNetwork = item->network;
 
@@ -164,8 +181,6 @@ void SetupDialog::treeViewSelectionChanged(const QItemSelection &selected, const
             default:
                 ui->stackedWidget->setCurrentWidget(ui->emptyPage);
                 break;
-
-
         }
     }
 
@@ -209,6 +224,7 @@ void SetupDialog::treeViewContextMenu(const QPoint &pos)
                 break;
             case SetupDialogTreeItem::type_candb:
                 contextMenu.addAction(_actionDeleteCanDb);
+                contextMenu.addAction(_actionReloadCanDbs);
                 break;
             default:
                 break;
@@ -217,6 +233,21 @@ void SetupDialog::treeViewContextMenu(const QPoint &pos)
 
 
     QPoint globalPos = ui->treeView->mapToGlobal(pos);
+    contextMenu.exec(globalPos);
+}
+
+void SetupDialog::candbsTreeViewContextMenu(const QPoint &pos)
+{
+    QMenu contextMenu;
+    QModelIndex index = ui->candbsTreeView->indexAt(pos);
+    if (index.isValid()) {
+        ui->candbsTreeView->setCurrentIndex(index);
+        contextMenu.addAction(_actionReloadCanDbs);
+        contextMenu.addAction(_actionDeleteCanDb);
+    } else {
+        contextMenu.addAction(_actionAddCanDb);
+    }
+    QPoint globalPos = ui->candbsTreeView->mapToGlobal(pos);
     contextMenu.exec(globalPos);
 }
 
@@ -260,23 +291,108 @@ void SetupDialog::on_btRemoveInterface_clicked()
     model->deleteInterface(ui->interfacesTreeView->selectionModel()->currentIndex());
 }
 
-void SetupDialog::addCanDb(const QModelIndex &parent)
+void SetupDialog::reloadCanDbs(const QModelIndex &index)
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Load CAN Database", "", "Vector DBC Files (*.dbc)");
-    if (!filename.isNull()) {
-        pCanDb candb = _backend->loadDbc(filename);
+    SetupDialogTreeItem *item = static_cast<SetupDialogTreeItem*>(index.internalPointer());
+    if (!item || !item->network) return;
+
+    QStringList errors;
+    if (!item->network->reloadCanDbs(_backend, &errors)) {
+        QMessageBox::warning(this, tr("DBC Error"),
+            tr("Failed to reload one or more DBC files:\n\n%1").arg(errors.join("\n")));
+    }
+
+    // Synchronize stale pointers in tree items
+    SetupDialogTreeItem *root = (item->getType() == SetupDialogTreeItem::type_candb_root) ? item : item->getParentItem();
+    if (root && root->getType() == SetupDialogTreeItem::type_candb_root) {
+        for (int i=0; i < root->getChildCount(); ++i) {
+            SetupDialogTreeItem *child = root->child(i);
+            if (child->getType() == SetupDialogTreeItem::type_candb) {
+                 // Find the updated pCanDb in the network by path
+                 foreach (pCanDb updatedDb, root->network->_canDbs) {
+                     if (updatedDb->getPath() == child->candb->getPath()) {
+                         child->candb = updatedDb;
+                         break;
+                     }
+                 }
+            }
+        }
+    }
+
+    model->dataChanged(index, index);
+}
+
+void SetupDialog::executeReloadCanDbs()
+{
+    reloadCanDbs(ui->treeView->selectionModel()->currentIndex());
+}
+
+void SetupDialog::addCanDb(const QModelIndex &parent, const QString &filename)
+{
+    // Check for duplicates
+    if (_currentNetwork) {
+        foreach (pCanDb existingDb, _currentNetwork->_canDbs) {
+            if (existingDb->getPath() == filename) {
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, tr("Duplicate DBC"),
+                    tr("The file is already loaded:\n%1\n\nDo you want to reload it?").arg(filename),
+                    QMessageBox::Yes | QMessageBox::No);
+
+                if (reply == QMessageBox::Yes) {
+                    // Find the index of the existing DBC in the model to remove it first
+                    SetupDialogTreeItem *root = static_cast<SetupDialogTreeItem*>(parent.internalPointer());
+                    if (root && root->getType() == SetupDialogTreeItem::type_candb_root) {
+                        for (int i=0; i < root->getChildCount(); ++i) {
+                            SetupDialogTreeItem *child = root->child(i);
+                            if (child->getType() == SetupDialogTreeItem::type_candb && child->candb->getPath() == filename) {
+                                model->deleteCanDb(model->indexOfItem(child));
+                                break;
+                            }
+                        }
+                    }
+
+                    // Now load fresh
+                    QString errorMsg;
+                    pCanDb candb = _backend->loadDbc(filename, &errorMsg);
+                    if (candb) {
+                        model->addCanDb(parent, candb);
+                    } else {
+                        QMessageBox::critical(this, tr("Reload Failed"),
+                            tr("Failed to reload DBC:\n%1\n\nReason: %2").arg(filename, errorMsg));
+                    }
+                }
+                return;
+            }
+        }
+    }
+
+    QString errorMsg;
+    pCanDb candb = _backend->loadDbc(filename, &errorMsg);
+    if (candb) {
         model->addCanDb(parent, candb);
+        if (!errorMsg.isEmpty()) {
+            QMessageBox::warning(this, tr("DBC Warning"), errorMsg);
+        }
+    } else {
+        QMessageBox::critical(this, tr("DBC Error"),
+            tr("Failed to load DBC file:\n%1\n\nReason: %2").arg(filename, errorMsg));
+    }
+}
+
+void SetupDialog::on_btAddDbc_clicked()
+{
+    QStringList files = QFileDialog::getOpenFileNames(this, "Load CAN Databases", "", "Vector DBC Files (*.dbc)");
+    if (files.isEmpty()) return;
+
+    QModelIndex parent = ui->treeView->selectionModel()->currentIndex();
+    for (const QString &filename : files) {
+        addCanDb(parent, filename);
     }
 }
 
 void SetupDialog::executeAddCanDb()
 {
-    addCanDb(ui->treeView->selectionModel()->currentIndex());
-}
-
-void SetupDialog::on_btAddDatabase_clicked()
-{
-    addCanDb(ui->treeView->selectionModel()->currentIndex());
+    on_btAddDbc_clicked();
 }
 
 void SetupDialog::executeDeleteCanDb()
@@ -284,14 +400,16 @@ void SetupDialog::executeDeleteCanDb()
     model->deleteCanDb(getSelectedIndex());
 }
 
-void SetupDialog::on_btRemoveDatabase_clicked()
+void SetupDialog::on_btRemoveDbc_clicked()
 {
     model->deleteCanDb(ui->candbsTreeView->selectionModel()->currentIndex());
 }
 
 void SetupDialog::updateButtons()
 {
-    ui->btRemoveDatabase->setEnabled(ui->candbsTreeView->selectionModel()->hasSelection());
+    ui->btRemoveDbc->setEnabled(ui->candbsTreeView->selectionModel()->hasSelection());
+    ui->btReloadDbc->setEnabled(ui->candbsTreeView->selectionModel()->hasSelection());
+
     ui->btRemoveInterface->setEnabled(ui->interfacesTreeView->selectionModel()->hasSelection());
 
     SetupDialogTreeItem *item = getSelectedItem();
@@ -308,5 +426,27 @@ void SetupDialog::on_btAddNetwork_clicked()
 void SetupDialog::on_btRemoveNetwork_clicked()
 {
     model->deleteNetwork(getSelectedIndex());
+}
+
+void SetupDialog::on_btRefreshNetworks_clicked()
+{
+    _backend->setDefaultSetup();
+    model->load(_backend->getSetup());
+    ui->treeView->expandAll();
+
+    QModelIndex first = model->index(0, 0, QModelIndex());
+    if (first.isValid()) {
+        ui->treeView->setCurrentIndex(first);
+    } else {
+        ui->stackedWidget->setCurrentWidget(ui->emptyPage);
+    }
+
+    updateButtons();
+    _isReflashNetworks = true;
+}
+
+bool SetupDialog::isReflashNetworks()
+{
+    return _isReflashNetworks;
 }
 

@@ -59,13 +59,9 @@ int LinearTraceViewModel::rowCount(const QModelIndex &parent) const
         if (id & 0x80000000) { // node of a message
             return 0;
         } else { // a message
-            const CanMessage *msg = trace()->getMessage(id-1);
-            if (msg) {
-                CanDbMessage *dbmsg = backend()->findDbMessage(*msg);
-                return (dbmsg!=0) ? dbmsg->getSignals().length() : 0;
-            } else {
-                return 0;
-            }
+            CanMessage msg = trace()->getMessage(id-1);
+            CanDbMessage *dbmsg = backend()->findDbMessage(msg);
+            return (dbmsg!=0) ? dbmsg->getSignals().length() : 0;
         }
     } else {
         return trace()->size();
@@ -108,17 +104,16 @@ QVariant LinearTraceViewModel::data_DisplayRole(const QModelIndex &index, int ro
     quintptr id = index.internalId();
     int msg_id = (id & ~0x80000000)-1;
 
-    const CanMessage *msg = trace()->getMessage(msg_id);
-    if (!msg) { return QVariant(); }
+    CanMessage msg = trace()->getMessage(msg_id);
 
     if (id & 0x80000000) {
-        return data_DisplayRole_Signal(index, role, *msg);
+        return data_DisplayRole_Signal(index, role, msg);
     } else if (id) {
-        if (msg_id>1) {
-            const CanMessage *prev_msg = trace()->getMessage(msg_id-1);
-            return data_DisplayRole_Message(index, role, *msg, *prev_msg);
+        if (msg_id>=1) {
+            CanMessage prev_msg = trace()->getMessage(msg_id-1);
+            return data_DisplayRole_Message(index, role, msg, prev_msg);
         } else {
-            return data_DisplayRole_Message(index, role, *msg, CanMessage());
+            return data_DisplayRole_Message(index, role, msg, CanMessage());
         }
     }
 
@@ -133,10 +128,8 @@ QVariant LinearTraceViewModel::data_TextColorRole(const QModelIndex &index, int 
 
     if (id & 0x80000000) { // CanSignal row
         int msg_id = (id & ~0x80000000)-1;
-        const CanMessage *msg = trace()->getMessage(msg_id);
-        if (msg) {
-            return data_TextColorRole_Signal(index, role, *msg);
-        }
+        CanMessage msg = trace()->getMessage(msg_id);
+        return data_TextColorRole_Signal(index, role, msg);
     }
 
     return QVariant();

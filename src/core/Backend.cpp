@@ -23,6 +23,7 @@
 #include "LogModel.h"
 
 #include <QDateTime>
+#include <QFileInfo>
 
 #include <core/CanTrace.h>
 #include <core/MeasurementSetup.h>
@@ -44,8 +45,10 @@ Backend::Backend()
     _logModel = new LogModel(*this);
 
     setDefaultSetup();
-    _trace = new CanTrace(*this, this, 100);
+    _trace = new CanTrace(*this, this, 50);
+    _conditionalLoggingManager = new ConditionalLoggingManager(*this, this);
 
+    connect(_trace, SIGNAL(messageEnqueued(int)), this, SLOT(onMessageEnqueued(int)));
     connect(&_setup, SIGNAL(onSetupChanged()), this, SIGNAL(onSetupChanged()));
 }
 
@@ -70,7 +73,7 @@ void Backend::addCanDriver(CanDriver &driver)
 
 bool Backend::startMeasurement()
 {
-    log_info("Starting measurement");
+    log_info(tr("Starting measurement"));
 
     _measurementStartTime = QDateTime::currentMSecsSinceEpoch();
     _timerSinceStart.start();
@@ -84,9 +87,7 @@ bool Backend::startMeasurement()
             if (intf) {
                 intf->applyConfig(*mi);
 
-                log_info(QString("Listening on interface: %1").arg(intf->getName()));
-                intf->open();
-
+                log_info(QString(tr("Listening on interface: %1")).arg(intf->getName()));
                 CanListener *listener = new CanListener(0, *this, *intf);
                 listener->startThread();
                 _listeners.append(listener);
@@ -107,15 +108,14 @@ bool Backend::stopMeasurement()
         }
 
         foreach (CanListener *listener, _listeners) {
+            log_info(QString(tr("Closing interface: %1")).arg(getInterfaceName(listener->getInterfaceId())));
             listener->waitFinish();
-            log_info(QString("Closing interface: %1").arg(getInterfaceName(listener->getInterfaceId())));
-            listener->getInterface().close();
         }
 
         qDeleteAll(_listeners);
         _listeners.clear();
 
-        log_info("Measurement stopped");
+        log_info(tr("Measurement stopped"));
 
         _measurementRunning = false;
 
@@ -138,11 +138,12 @@ void Backend::loadDefaultSetup(MeasurementSetup &setup)
         driver->update();
         foreach (CanInterfaceId intf, driver->getInterfaceIds()) {
             MeasurementNetwork *network = setup.createNetwork();
-            network->setName(QString().sprintf("Network %d", i++));
+            network->setName(tr("Network ") + QString("%1").arg(i++));
 
             MeasurementInterface *mi = new MeasurementInterface();
             mi->setCanInterface(intf);
             mi->setBitrate(500000);
+            mi->setFdBitrate(2000000);
             network->addInterface(mi);
         }
     }
@@ -151,6 +152,7 @@ void Backend::loadDefaultSetup(MeasurementSetup &setup)
 void Backend::setDefaultSetup()
 {
     loadDefaultSetup(_setup);
+    emit onSetupChanged();
 }
 
 MeasurementSetup &Backend::getSetup()
@@ -161,6 +163,7 @@ MeasurementSetup &Backend::getSetup()
 void Backend::setSetup(MeasurementSetup &new_setup)
 {
     _setup.cloneFrom(new_setup);
+    emit onSetupChanged();
 }
 
 double Backend::currentTimeStamp() const
@@ -176,6 +179,7 @@ CanTrace *Backend::getTrace()
 void Backend::clearTrace()
 {
     _trace->clear();
+    emit onClearTraceRequested();
 }
 
 CanDbMessage *Backend::findDbMessage(const CanMessage &msg) const
@@ -247,13 +251,26 @@ CanInterface *Backend::getInterfaceByDriverAndName(QString driverName, QString d
 
 }
 
-pCanDb Backend::loadDbc(QString filename)
+pCanDb Backend::loadDbc(QString filename, QString *errorMsg)
 {
     DbcParser parser;
 
+    QFileInfo info(filename);
+    if (!info.exists() || !info.isReadable()) {
+        if (errorMsg) {
+            *errorMsg = tr("File not found or not readable.");
+        }
+        return pCanDb();
+    }
+
     QFile *dbc = new QFile(filename);
+
     pCanDb candb(new CanDb());
-    parser.parseFile(dbc, *candb);
+    if (!parser.parseFile(dbc, *candb)) {
+        if (errorMsg) {
+            *errorMsg = tr("Failed to parse DBC file. Please check the log for details.");
+        }
+    }
     delete dbc;
 
     return candb;
@@ -292,4 +309,11 @@ uint64_t Backend::getUsecsSinceMeasurementStart() const
 void Backend::logMessage(const QDateTime dt, const log_level_t level, const QString msg)
 {
     emit onLogMessage(dt, level, msg);
+}
+
+void Backend::onMessageEnqueued(int idx)
+{
+    if (_conditionalLoggingManager->isEnabled()) {
+        _conditionalLoggingManager->processMessage(_trace->getMessage(idx));
+    }
 }
